@@ -1,3 +1,7 @@
+
+
+
+
 # GIVEN AN OBJECT `obj` THAT WAS CREATED BY `obj = setRefClass(...)`
 # THE FOLLWING WOULD BE RETURNED BY `class(obj)`
 REFERENCE_CLASS.NAME_STRING = 'refObjectGenerator'
@@ -27,6 +31,7 @@ ERROR.STACK = list()
 handle.Error <- function(errorString)
 {
     error = extract.ErrorFeatures(errorString$message)
+
     
     if (is.ErrorObject(error$Name) && is.ValidError(error$ID))
         handle.ErrorObject(error$ID)
@@ -36,10 +41,6 @@ handle.Error <- function(errorString)
 
 extract.ErrorFeatures <- function(errorString)
 {
-    print(errorString)
-   
-    print(is.ValidErrorString(errorString))
-     
     if (is.ValidErrorString(errorString))
         error = split.ErrorString(errorString)
     else
@@ -75,6 +76,7 @@ is.ErrorObject <- function(error)
 
 is.ValidError <- function(error)
 {
+    
     error %in% names(ERROR.STACK)
 }
 
@@ -134,10 +136,7 @@ ERROR.methodDefinition_throw <- function()
 
 ERROR.methodDefinition_addTo.ErrorStack <- function()
 {
-    assign.VariablesInGlobalScope(
-        ERROR.STACK[obtain.IDString(.self$ID)],
-        .self
-        )
+    ERROR.STACK[obtain.IDString(.self$ID)] <<- .self
 }
 
 ERROR.methodDefinition_obtain.formattedThrowString <- function()
@@ -155,10 +154,7 @@ ERROR.methodDefinition_initialize <- function(message = '', description = 'ERROR
     callSuper(message, description, ...)
      
     # INCREASE STACK POINTER
-    assign.VariablesInGlobalScope(
-        ERROR.STACK_POINTER,
-        as.integer(ERROR.STACK_POINTER + 1)
-        )
+    ERROR.STACK_POINTER <<- as.integer(ERROR.STACK_POINTER + 1)
 
     initFields(ID = ERROR.STACK_POINTER)
 }
@@ -172,7 +168,7 @@ FATAL_ERROR.methodDefinition_handle <- function()
 NOTIFICATION.methodDefinition_issue <- function()
 {
     cat(
-        sprintf('%s\n%s', toupper(description), message)
+        sprintf('%s\n%s\n', toupper(description), message)
         )
 }
 
@@ -250,22 +246,22 @@ WARNING = setRefClass(
 #   WRAPPER FUNCTIONS
 # ************************************************************************************************** 
 
-attemptExecution <- function(expr, nof.Attempts = Inf)
+attemptExecution <- function(expr, nof.Attempts = 1)
 {
     index.Attempt = 0
     success = F
-    
+   
+    suppressWarnings( 
     while(!success && index.Attempt < nof.Attempts) 
     {
         index.Attempt = index.Attempt + 1 
         
         tryCatch(
             {
-                expr
-                copyVariablesToScope(environment(), parent.frame())
+                eval(expr = parse(text = expr))
                 success = T
             },
             error = handle.Error
         )
-    }
+    })
 }
