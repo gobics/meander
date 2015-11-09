@@ -4,6 +4,8 @@ REFERENCE_CLASS.NAME_STRING = 'refObjectGenerator'
 
 ERROR_CLASS.NAME_STRING = 'ERROR'
 
+WARNING_CLASS.NAME_STRING = 'WARNING'
+
 ERROR.NAME_ID_DELIMITER = ':'
 
 ERROR.ID_PREFIX = 'ID_'
@@ -14,7 +16,7 @@ ERROR.REGEX_VALID_ERROR_STRING = bindStrings(
     '[[:digit:]]+$'
 )
 
-ERROR.STACK_POINTER = 0
+ERROR.STACK_POINTER = as.integer(0)
 
 ERROR.STACK = list()
 
@@ -132,7 +134,10 @@ ERROR.methodDefinition_throw <- function()
 
 ERROR.methodDefinition_addTo.ErrorStack <- function()
 {
-    ERROR.STACK[obtain.IDString(.self$ID)] <<- .self
+    assign.VariablesInGlobalScope(
+        ERROR.STACK[obtain.IDString(.self$ID)],
+        .self
+        )
 }
 
 ERROR.methodDefinition_obtain.formattedThrowString <- function()
@@ -140,55 +145,107 @@ ERROR.methodDefinition_obtain.formattedThrowString <- function()
     bindStrings(.self$get.ClassName(), ERROR.NAME_ID_DELIMITER, obtain.IDString(.self$ID))
 }
 
-ERROR.methodDefinition_initialize <- function()
+StatusMessage.methodDefinition_initialize <- function(message = '', description = '', ...)
 {
-    ERROR.STACK_POINTER <<- as.integer(ERROR.STACK_POINTER + 1)
-
-    ID <<- ERROR.STACK_POINTER
+   initFields(message = message, description = description, ...)
 }
 
+ERROR.methodDefinition_initialize <- function(message = '', description = 'ERROR', ...)
+{
+    callSuper(message, description, ...)
+     
+    # INCREASE STACK POINTER
+    assign.VariablesInGlobalScope(
+        ERROR.STACK_POINTER,
+        as.integer(ERROR.STACK_POINTER + 1)
+        )
+
+    initFields(ID = ERROR.STACK_POINTER)
+}
+
+# DUMMY-STUB
 FATAL_ERROR.methodDefinition_handle <- function()
 {
-    stop('asdb')
+    stop(get.ClassName())
 }
 
+NOTIFICATION.methodDefinition_issue <- function()
+{
+    cat(
+        sprintf('%s\n%s', toupper(description), message)
+        )
+}
+
+WARNING.methodDefinition_initialize <- function(message = '', description = 'WARNING', ...)
+{
+    callSuper(message = message, description = description, ...)
+}
 # ************************************************************************************************** 
 #   CLASS DEFINITIONS
 # ************************************************************************************************** 
 
 StatusMessage = setRefClass(
     'StatusMessage',
+    
     fields = list(
         description = 'character',
         message     = 'character'
-    ),
+        ),
+    
     methods = list(
-        get.ClassName = function() {.self$getRefClass()@className[1]}
-    )
+        get.ClassName = function() {.self$getRefClass()@className[1]},
+        initialize = StatusMessage.methodDefinition_initialize
+        )
 )
 
 ERROR = setRefClass(
     ERROR_CLASS.NAME_STRING,
+    
     contains = 'StatusMessage',
+    
     fields = list(
         ID = 'integer'
-    ),
+        ),
+    
     methods = list(
        handle = ERROR.methodDefinition_handle,
        throw  = ERROR.methodDefinition_throw,
        obtain.formattedThrowString = ERROR.methodDefinition_obtain.formattedThrowString,
        initialize = ERROR.methodDefinition_initialize,
        addTo.ErrorStack = ERROR.methodDefinition_addTo.ErrorStack
-    )
+        )
 )
 
 FATAL_ERROR = setRefClass(
     'FATAL_ERROR',
+    
     contains = ERROR_CLASS.NAME_STRING,
+    
     methods = list(
        handle = FATAL_ERROR.methodDefinition_handle
-    )
+        )
 )
+
+NOTIFICATION = setRefClass(
+    'NOTIFICATION',
+    
+    contains = 'StatusMessage',
+    
+    methods = list(
+        issue = NOTIFICATION.methodDefinition_issue
+        )
+)
+
+WARNING = setRefClass(
+    'WARNING',
+    
+    contains = 'NOTIFICATION',
+    
+    methods = list(
+        initialize = WARNING.methodDefinition_initialize
+        )
+)
+
 # ************************************************************************************************** 
 #   WRAPPER FUNCTIONS
 # ************************************************************************************************** 
@@ -203,7 +260,11 @@ attemptExecution <- function(expr, nof.Attempts = Inf)
         index.Attempt = index.Attempt + 1 
         
         tryCatch(
-            {expr; success = T},
+            {
+                expr
+                copyVariablesToScope(environment(), parent.frame())
+                success = T
+            },
             error = handle.Error
         )
     }
