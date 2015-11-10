@@ -116,9 +116,11 @@ filter.uprocresult <- function( ko.key, KO.Filter)
   
 }
 
-process.storeRDS <- function(rds.fileout,uproc.filein,tmp.data.frame,Sample)
+process.storeRDS <- function(Object.data.big,Object.job.path,tmp.data.frame,Sample)
 {
-  .Return <- fread(uproc.filein, nrows=-1, select = c(1,3,8,9,10,11))
+  .uproc.filein <- slot(Object.job.path,FILETYPE.UproC)[Sample]
+  cat('shit:',.uproc.filein,'\n')
+  .Return <- fread(.uproc.filein, nrows=-1, select = c(1,3,8,9,10,11))
   setnames(.Return,c('V1','V3','V8','V9','V10','V11'),c('seq.no','length','ko','score','x','y'))
   .Return[,ko := as.integer(substr(.Return[,ko],2,100))]
   
@@ -171,6 +173,15 @@ process.storeRDS <- function(rds.fileout,uproc.filein,tmp.data.frame,Sample)
   
   .Q <- filter.multihit.dt(.Return, .nLines, 'ko', 'seq.no')
   cat('filtered out multihits:', sum(.Q),'\n',sep = '')
+  
+  
+  #filter RNA out
+  if (length(slot(Object.data.big,'SeqRNA')) != 0)
+  {
+  .Q <- filter.key.dt(.Return, 'seq.no', slot(Object.data.big,'SeqRNA')[[Sample]])
+  cat('filtered out by RNA:', sum(.Q),'\n',sep = '')  
+  }
+
   return(tmp.data.frame)
 }
 

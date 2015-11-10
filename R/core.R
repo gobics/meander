@@ -124,11 +124,14 @@ meander.start <- function(
   Object.job.path <- .ret[[1]]
   Object.data.big <- .ret[[2]]
   print(.ret[[3]])
+  
+  .ret <- start.DNAnoRNA(Object.job.path,Object.data.big,TRUE)
+  
   }
 
   if (File.type == FILETYPE.DNAwoRNA)
   {
-    .ret <- start.DNAnoRNA(NULL,NULL,FALSE)
+    .ret <- start.DNAnoRNA(Object.job.path,Object.data.big,TRUE)
   }
   
   if (File.type == FILETYPE.UproC)

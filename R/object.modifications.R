@@ -9,3 +9,9 @@ setInputdata <- function(ObjectPart,Type,value)
   slot(ObjectPart,Type) <- value
   return(ObjectPart)
 }
+
+
+store.Objectpart <- function(Object.Part,filename)
+{
+  
+}
