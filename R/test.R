@@ -25,27 +25,57 @@ UProcScorePlot <- function(plot.frame,rds.input,breaks,sample)
   return(plot.frame)
 }
 
-
-#plot.lines(plot.frame,cl,'xTEST','yTEST','titleTEST')
-plot.lines <- function(plot.frame,colorVec,xLabel,yLabel,mainTitle)
+.ok.fun <- function()
 {
-#cl <- rainbow(5)
-#plot(0,0,xlim = c(0,max(plot.frame[,'x'])+(max(plot.frame[,'x'])*0.1)),ylim = c(0,max(plot.frame[,'y'])+(max(plot.frame[,'y'])*0.1)),type = "n",xlab = 'UProC-score', ylab = 'Fraction Hits')
-#for (i in 1:5)
-#{
-#  lines(plot.frame[plot.frame[,'z'] == i,'x'],plot.frame[plot.frame[,'z'] == i,'y'],col = colorVec[i])
-#}
-#legend(x = 'topleft', legend = unique(plot.frame[,'z']), fill = colorVec)
-samples.unique <- unique(plot.frame[,'z'])
+  cat("all is ok.\n")  
+}
 
-  plot(0,0,xlim = c(0,max(plot.frame[,'x'])+(max(plot.frame[,'x'])*0.1)),ylim = c(0,max(plot.frame[,'y'])+(max(plot.frame[,'y'])*0.1)),type = "n",xlab = xLabel, ylab = yLabel, main = mainTitle)
-    for (i in 1:length(samples.unique))
-    {
-      lines(plot.frame[plot.frame[,'z'] == i,'x'],plot.frame[plot.frame[,'z'] == i,'y'],col = colorVec[i])
-    }
-  legend(x = 'topleft', legend = samples.unique, fill = colorVec)
-
+.bad.fun <- function()
+{
+  cat("all is bad.\n") 
+  stop('rip')
 }
 
 
+OK <- setClass	(
+  #Name
+  "OK",
+  #Sots
+  slots =	c(
+  handle = "function",
+  message = 'character',
+  description = 'character'
+  ),
+  prototype = list(
+    handle = .ok.fun,
+    message = 'OK',
+    description = 'all good.'
+  )
+)
 
+BAD <- setClass (
+  #NAME
+  "BAD",
+  slots = c(
+    handle = "function",
+    message = 'character',
+    description = 'character'
+  ),
+  prototype = list(
+    handle = .bad.fun,
+    message = 'OK',
+    description = 'all good.'
+  )
+)
+
+
+.dummy.RNA <- function(filepath)
+{
+  con <- file(filepath, "r", blocking = FALSE)
+  linn=readLines(con)
+  close(con)
+  .nSeq <- sum(substr(linn,1,1) == '>')
+  .fRNA = 0.05
+  .RNA <- sample(.nSeq,as.integer((.nSeq*.fRNA)))
+  return(.RNA)
+}

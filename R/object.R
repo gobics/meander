@@ -1,21 +1,28 @@
+.errorZ <- setClass("errorZ",
+         representation(Error="character", Warning="character")
+         )
+
+
 .ObjectPaths <- setClass	(
   #Name
   "ObjectPaths",
   #Sots
   slots =	c(
     DirOut = "character",
-    DNAin = "character",
-    DNAwithoutRNAin = "vector",
-    UPRoCin = "vector",
-    RDSin = "vector"
+    DNA = "vector",
+    RNAfilteredDNA = "vector",
+    UproC = "vector",
+    RDS = "vector",
+    Type = "character"
   ),
   # default = empty
   prototype=list(
     DirOut = '',
-    DNAin = '',
-    DNAwithoutRNAin = '',
-    UPRoCin = '',
-    RDSin = ''
+    DNA = vector(),
+    RNAfilteredDNA = vector(),
+    UproC = vector(),
+    RDS = vector(),
+    Type = ''
   )
 )
 
@@ -97,36 +104,155 @@
     ReadComposition = data.frame(Sample = NULL, DNA = NULL, Hits = NULL, noTax = NULL, RNA = NULL),
     UProCScores = data.frame(Sample = NULL, XScores = NULL, YCounts = NULL),
     Taxonomy = data.frame(Sample = NULL, TaxID = NULL, Counts = NULL),
-    PCA = data.frame(Sample = NULL),
+    PCA = data.frame(Sample = NULL, PC1 = NULL, PC2 = NULL, Class = NULL),
     LogFoldChange = data.frame(Couns = NULL, Change = NULL),
     Consensus = data.frame(Method = NULL, Stuff = NULL)
   )
 )
 
-
-Object <- setClass (
+.ObjectResume <- setClass(
   #Name
-  "Config",
+  "ObjectResume",
   #slots
   slots = c(
-  Paths = "ObjectPaths",
-  UProc = "ObjectUProCModus",
-  AvailibleMethods = "ObjectDependency",
-  AvailiblePackages = "ObjectRpackages"
+    where = 'character',
+    which = 'numeric'
+  ),
+  # default
+  prototype=list(
+    where = '',
+    which = 0
   )
 )
 
-Object2 <- setClass (
+
+.ObjectJobConfig <- setClass (
+  #name
+  "ObjectJobConfig",
+  #slots
+  slots = c(
+    ClassVec = 'vector',
+    ClassNames = 'vector',
+    SelectedClasses = 'vector',
+    SelectedTax = 'numeric',
+    requiredLength = 'numeric'
+    ),
+  # default
+  prototype=list(
+    ClassVec = vector(),
+    ClassNames = vector(),
+    SelectedClasses = vector(),
+    SelectedTax = -1,
+    requiredLength = 0
+  )
+)
+
+
+
+
+
+
+##TODO
+#nReq <- number of list it must have...number of #Samples etc.
+
+
+
+
+.Object.DATA.BIG <- setClass (
+  #Name
+  "Object.DATA.BIG",
+  #slots
+  slots = c(
+    SeqRNA = "list"
+  ),
+  prototype = list(
+    SeqRNA = list()
+  )
+)
+
+
+.Object.DATA <- setClass (
+  #Name
+  "Object.DATA",
+  #slots
+  slots = c(
+  BIG = "Object.DATA.BIG"
+  )
+)
+
+.Object.Job.Paths <- setClass (
+  #Name
+  "Object.Job.Paths",
+  #Sots
+  slots =	c(
+    DirOut = "character",
+    DNA = "vector",
+    RNAfilteredDNA = "vector",
+    UproC = "vector",
+    RDS = "vector",
+    Type = "character"
+  ),
+  # default = empty
+  prototype=list(
+    DirOut = '',
+    DNA = vector(),
+    RNAfilteredDNA = vector(),
+    UproC = vector(),
+    RDS = vector(),
+    Type = ''
+  )
+)
+
+.Object.Job.Config <- setClass (
+  #name
+  "Object.Job.Config",
+  #slots
+  slots = c(
+    ClassVec = 'vector',
+    ClassNames = 'vector',
+    SelectedClasses = 'vector',
+    SelectedTax = 'numeric',
+    requiredLength = 'numeric'
+  ),
+  # default
+  prototype=list(
+    ClassVec = vector(),
+    ClassNames = vector(),
+    SelectedClasses = vector(),
+    SelectedTax = -1,
+    requiredLength = 0
+  )
+)
+
+.Object.Job <- setClass (
+  #Name
+  "Object.Job",
+  #Slots
+  slots = c(
+    Paths = "Object.Job.Paths",
+    Config = "Object.Job.Config"
+  )
+)
+
+
+
+
+
+Object <- setClass (
   #Name
   "MeandeRObject",
   #slots
   slots = c(
-  DATA = 'ObjectDataFrames'
+    DATA = "Object.DATA",
+    Job = "Object.Job"
   )
-
+  
 )
 
 ##############checks###################
+
+
+#TODO fix this shit!
 setValidity ("ObjectPaths",
              function ( object ){
                retval <- NULL
@@ -149,7 +275,7 @@ setValidity ("ObjectRpackages",
                retval <- NULL
                if ( sum(slot(object,'useRmethods') %in% c('DESeq2','DESeq','edger','samr')) < 3 )
                {
-                 retval <- c ( retval , "method selection different from default.")
+                 retval <- c ( retval , "method selection different from default.\n")
                }
 
                if (is.null(retval))
@@ -158,5 +284,40 @@ setValidity ("ObjectRpackages",
                  return (retval)
              })
 
+setValidity ("ObjectJobConfig",
+             function ( object ){
+               retval <- NULL
+               if  (length(slot(object,'ClassVec')) == 0)
+               {
+                 retval <- c ( retval , OBJECT.ERROR.NORESUME)
+               }
+               
+               if (slot(object,'requiredLength') == 0)
+               {
+                 retval <- c ( retval , OBJECT.ERROR.NORESUME)
+               }
+               
+               if (slot(object,'requiredLength') != length(slot(object,'ClassVec')))
+               {
+                 retval <- c ( retval , OBJECT.ERROR.NORESUME)
+               }
+               
+               if (length(slot(object,'ClassNames')) != length(unique(slot(object,'ClassVec'))))
+               {
+                 retval <- c ( retval , OBJECT.ERROR.NORESUME)
+               }
+               
+               if (length(slot(object,'SelectedClasses')) != 2)
+               {
+                 retval <- c ( retval , OBJECT.ERROR.NORESUME)
+               }
+               
+               if (is.null(retval))
+                 return(TRUE)
+               else
+                 return (retval)
+             })
+
+              
 
 #validObject(Z, test = TRUE)

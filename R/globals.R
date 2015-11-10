@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 set.globals <- function () {
   #Methods
   assign("method.ONE.A", "DEseq2", envir = .GlobalEnv)
@@ -117,10 +116,6 @@ BAD <- setClass (
   )
 )
 
-
-
-
-=======
 # THIS FILE IS INTENDED TO STORE GLOBAL CONSTANTS NEEDED THROUGHOUT THE HOLE PROGRAMM
 # SUCH AS BUT NOT LIMITED TO PATH NAMES DEFAULT FILE EXTENSIONS AND COLOR DESCRIPTORS
 # DATE: 2015-11-01
@@ -149,4 +144,3 @@ RDS_FILE_EXTENSION = 'Rds'
 # ******************************************************************************
 # END     :   FILE CONSTANTS
 # ******************************************************************************
->>>>>>> 7695e4ac52e3510f100744580c589f3e1e995e17

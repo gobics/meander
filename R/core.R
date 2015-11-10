@@ -1,23 +1,37 @@
+
+#Q <- meander.start(Dir.in = '/gobics/home/hklingen/Vortrag/EST/',Dir.out = '/c1')
 meander.start <- function(
   #preselected files & types
   File.list = NULL, File.type = NULL,
   #preselected
-  TaxID = NULL,
+  Selected.TaxID = NULL,
   #preselected
   UPRoCScore = NULL,
   FLAG.plot = TRUE,
   FLAG.tcltk = FALSE,
   #preselected dir
   Dir.in = NULL,
-  Dir.out = NULL
+  Dir.out = NULL,
+  #preselected
+  AllFiles = FALSE,
+  ObjectSave = 'Always',
+  #
+  Set.Conditions = NULL,
+  Set.ConditionVec = NULL,
+  Set.ConditionNames = NULL
   )
 {
 ## load general config & load objects
-  job.Object <- .ObjectPaths()
+  Object.job.path <- .Object.Job.Paths()
+  Object.job.config <- .Object.Job.Config()
+  Object.data.big <- .Object.DATA.BIG()
   ##
-
+  Object.Final <- Object();
+  
+  DEBUG.PRINT <- TRUE
+  
 # TODO put into Object
-.inFiles = c("DNA","RNAfilteredDNA","UproC","RDS")
+  set.globals()
 
 ## Where to start?
   # preselected parameters?
@@ -25,15 +39,22 @@ meander.start <- function(
   #set input dir if missing
   if( is.null(Dir.in) & is.null(File.list))
   {
-  Dir.in = .select.dir(FLAG.tcltk = FALSE,FLAG.create = FALSE ,Message = 'please select input folder :\n')
+  Dir.in = select.dir(FLAG.tcltk = FALSE,FLAG.create = FALSE ,Message = 'please select input folder :\n')
   }
 
   #set output dir if missing
   if( is.null(Dir.out) )
   {
-  Dir.out = .select.dir(FLAG.tcltk = FALSE,FLAG.create = TRUE ,Message = 'please select output folder :\n')
+  Dir.out = select.dir(FLAG.tcltk = FALSE,FLAG.create = TRUE ,Message = 'please select output folder :\n')
   }
 
+  
+  
+  #create all subfolders for dir
+  create.directory(Dir.out,c('UPROC','RDS','HTML','OBJECT'))
+  
+  
+  
   # get filelist from Dir.in
 
   # put data in
@@ -42,22 +63,104 @@ meander.start <- function(
       if( is.null(File.list) )
       {
       .inFiles = dir(path = Dir.in)
-        File.list <- .select.List(FLAG = FALSE, Choices = .inFiles)
+      
+        if (AllFiles)
+        {
+         File.list <- .inFiles
+        }
+        
+        else
+        {
+          File.list <- select.multiple.List(FLAG = FALSE, Choices = .inFiles) 
+        }
+        
       }
 
       if( is.null(File.type) )
       {
-        .inList = c(
-          'DNAin',
-        'DNAwithoutRNAin',
-        'UPRoCin',
-        'RDSin')
-        File.type <- .select.List(FLAG = FALSE, Choices = .inList)
+        .inList = c(FILETYPE.DNA,FILETYPE.DNAwoRNA,FILETYPE.UproC,FILETYPE.RDS)
+        File.type <- select.List(FLAG = FALSE, Choices = .inList)
       }
+  
+  
+    #combine path and filenames
+    .full.filepaths = file.path(Dir.in,File.list)
+    #check if files are what is claimed
+    .res <- check.input(File.type,NULL,.full.filepaths)
+    .res@handle()
+    
+    
+    
+    
     #add to objectpart
-    job.Object2 <- .setInputdata(job.Object,File.type,File.list)
-  print(job.Object2)
+    Object.job.path <- setInputdata(Object.job.path,File.type,.full.filepaths)
+    Object.job.path <- setInputdata(Object.job.path,'DirOut',Dir.out)
+
+  
+    
+    #create paths
+    
   ##
+  
+  ##check if error.
+    if (DEBUG.PRINT) {  cat('checking for error : \t') }
+  .res@handle()
+    if (DEBUG.PRINT) {  cat('OK\n') }
+  
+  ##set next function
+  
+  
+  
+  ## set conditions
+  
+  
+  
+  ## save Object for the first time.
+  
+  #ToDo: create shitty method for each...
+  if (File.type == FILETYPE.DNA)
+  {
+  .ret <- start.DNA(Object.job.path = Object.job.path, Object.data.big = Object.data.big, object.save.FLAG = FALSE)
+  Object.job.path <- .ret[[1]]
+  Object.data.big <- .ret[[2]]
+  print(.ret[[3]])
+  }
+
+  if (File.type == FILETYPE.DNAwoRNA)
+  {
+    .ret <- start.DNAnoRNA(NULL,NULL,FALSE)
+  }
+  
+  if (File.type == FILETYPE.UproC)
+  {
+    .ret <- start.UProC(NULL)
+  }
+  
+  if (File.type == FILETYPE.RDS)
+  {
+    .ret <- start.RDS(Object.job.path)
+  }
+  
+  #set selected conditions
+  
+  #.ret <- set.selected.Conditions(FALSE,slot())
+  
+  #.ret <- start.Object()
+  
+  
+  
+  
+  
+  
+###build complete object
+  slot(slot(Object.Final,'Job'),'Paths') = Object.job.path
+  slot(slot(Object.Final,'Job'),'Config') = Object.job.config
+  slot(slot(Object.Final,'DATA'),'BIG') = Object.data.big
+  ###
+  
+  
+  
+return(Object.Final)  
 }
 
 
