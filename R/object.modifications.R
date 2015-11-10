@@ -11,7 +11,16 @@ setInputdata <- function(ObjectPart,Type,value)
 }
 
 
-store.Objectpart <- function(Object.Part,filename)
+storeObjectpart <- function(Object.Part,filename)
 {
-  
+Sys.chmod(path = filename, mode = '0700')
+saveRDS(object = Object.Part, file = filename ) 
+Sys.chmod(path = filename, mode = '0400')
+}
+
+setObjectposition <- function(Object,type,position)
+{
+slot(Object,'Step') = type
+slot(Object,'Position') = position
+return(Object)
 }

@@ -52,7 +52,8 @@ start.DNAnoRNA <- function(Object.job.path,Object.data.big,object.save.FLAG)
     
     #get basename, put a .uproc behind and put the dirout path to it...
     .file.out = file.path(slot(Object.job.path,'DirOut'),'UPROC',paste0(basename(.Allfiles[i]),'.upoc'))
-    .systemcommand = paste0(.UPROCbin, .UPROCmode, .file.out, .UProCDB, .UProCmodel, .Allfiles[i] )
+    .file.out.RDS = file.path(slot(Object.job.path,'DirOut'),'RDS',paste0(basename(.Allfiles[i]),'.rds'))
+    .systemcommand = paste0(.UPROCbin, .UPROCmode, .file.out, .UProCDB, .UProCmodel, .Allfiles[i],  ' 2>&1' )
 
     cat("systemcommand: ",.systemcommand,"\n")
     .ret = system(.systemcommand, intern = TRUE)
@@ -60,7 +61,8 @@ start.DNAnoRNA <- function(Object.job.path,Object.data.big,object.save.FLAG)
     
     #process.uproc.scores(.file.out,0)
     Object.job.path <- appendInputdata(Object.job.path,FILETYPE.UproC,.file.out)
-
+    Object.job.path <- appendInputdata(Object.job.path,FILETYPE.RDS,.file.out.RDS)
+    
   .Z <- process.storeRDS(Object.data.big, Object.job.path, .Z,i)
   }
   
@@ -102,7 +104,7 @@ p <- ggplot(data = data.blame, aes(x=y,y=z, group = x))
 print(p + geom_line(aes(colour = x)))
 
   #rest
-return(list(Object.job.path,Object.data.big))
+return(list(Object.job.path,Object.data.big,'start_uproc'))
 }
 
 start.UProC <- function(ObjectUProCModus)

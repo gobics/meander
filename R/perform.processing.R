@@ -119,15 +119,24 @@ filter.uprocresult <- function( ko.key, KO.Filter)
 process.storeRDS <- function(Object.data.big,Object.job.path,tmp.data.frame,Sample)
 {
   .uproc.filein <- slot(Object.job.path,FILETYPE.UproC)[Sample]
+  .RDS.fileout <- slot(Object.job.path,FILETYPE.RDS)[Sample]
   cat('shit:',.uproc.filein,'\n')
+  options(warn=-1)
   .Return <- fread(.uproc.filein, nrows=-1, select = c(1,3,8,9,10,11))
+  options(warn=1)
   setnames(.Return,c('V1','V3','V8','V9','V10','V11'),c('seq.no','length','ko','score','x','y'))
   .Return[,ko := as.integer(substr(.Return[,ko],2,100))]
   
   #get length of data.table
   .nLines <- length(.Return[,x])
   
+  
+  
   .Q <- filter.key.dt(.Return,'x',10010101)
+  
+  .All.to.filter <- logical(length(.Q))
+  .All.to.filter <- .All.to.filter | .Q
+  
   cat('filtered out by taxonomy:', sum(.Q),'\n',sep = '')
   
   .res <- rle(sort(round(.Return[, j = score, with = TRUE]*10)/10))
@@ -136,14 +145,10 @@ process.storeRDS <- function(Object.data.big,Object.job.path,tmp.data.frame,Samp
   
   
   .res <- rle(sort(round(.Return[i = .Q, j = score, with = TRUE]*10)/10))
-  cat('result:',.res$lengths,'\n')
   
   
   .nframe.lines = dim(tmp.data.frame)[1]
   .nRLElines = length(.res$lengths)
-  print(.nframe.lines)
-  
-  .nLen = sum()
   
   for (i in 1:.nRLElines)
   {
@@ -155,11 +160,10 @@ process.storeRDS <- function(Object.data.big,Object.job.path,tmp.data.frame,Samp
 
   
   .res <- rle(sort(round(.Return[i = !.Q, j = score, with = TRUE]*10)/10))
-  cat('result:',.res$lengths,'\n')
+
   
     .nframe.lines = dim(tmp.data.frame)[1]
   .nRLElines = length(.res$lengths)
-  print(.nframe.lines)
   
   for (i in 1:.nRLElines)
   {
@@ -169,19 +173,24 @@ process.storeRDS <- function(Object.data.big,Object.job.path,tmp.data.frame,Samp
   
   .Q <- filter.key.dt(.Return,'ko',0)
   cat('filtered out by ko:', sum(.Q),'\n',sep = '')
-  
+  .All.to.filter <- .All.to.filter | .Q
   
   .Q <- filter.multihit.dt(.Return, .nLines, 'ko', 'seq.no')
   cat('filtered out multihits:', sum(.Q),'\n',sep = '')
-  
+  .All.to.filter <- .All.to.filter | .Q
   
   #filter RNA out
   if (length(slot(Object.data.big,'SeqRNA')) != 0)
   {
   .Q <- filter.key.dt(.Return, 'seq.no', slot(Object.data.big,'SeqRNA')[[Sample]])
   cat('filtered out by RNA:', sum(.Q),'\n',sep = '')  
+  .All.to.filter <- .All.to.filter | .Q
   }
 
+  cat('filter:',sum(.All.to.filter),'\n')
+  
+  saveRDS(.Return[!.All.to.filter,],.RDS.fileout)
+  
   return(tmp.data.frame)
 }
 

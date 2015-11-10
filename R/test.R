@@ -79,3 +79,12 @@ BAD <- setClass (
   .RNA <- sample(.nSeq,as.integer((.nSeq*.fRNA)))
   return(.RNA)
 }
+
+
+
+test.func <- function(system.callboy)
+{
+  #QQ <- system('/home/hklingen/workspace/uproc-1.1.2_sl/uproc-dna -f -s -p -o /scratch/transcriptome/small/out/UPROC/Forst_12_R1.fasta.upoc /scratch/KEGG_2014-08_full_uproc_2 /home/hklingen/DB/PFAM/Comet/model/model /scratch/transcriptome/small/Forst_12_R1.fasta 2>&1',intern = TRUE)
+  QQ <- system(system.callboy, intern = TRUE)
+  print(QQ)
+}
