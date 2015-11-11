@@ -155,7 +155,15 @@
 ##TODO
 #nReq <- number of list it must have...number of #Samples etc.
 
-
+.Object.DATA.dataframes <- setClass(
+  "Object.DATA.dataframes",
+  slots = c(
+    Read.statistics = 'data.frame'
+  ),
+  prototype = list(
+    Read.statistics = data.frame(x = NULL, y = NULL, z = NULL)
+  )
+)
 
 
 .Object.DATA.BIG <- setClass (
@@ -163,10 +171,12 @@
   "Object.DATA.BIG",
   #slots
   slots = c(
-    SeqRNA = "list"
+    SeqRNA = "list",
+    CountDT = "data.table"
   ),
   prototype = list(
-    SeqRNA = list()
+    SeqRNA = list(),
+    CountDT = data.table()
   )
 )
 
@@ -188,6 +198,35 @@
   KEGG = "Object.DATA.KEGG"
   )
 )
+
+.Object.Job.Statistics <- setClass(
+  "Object.Job.Statistics",
+  slots = c(
+    UProCHits = 'numeric',
+    RNA = 'numeric',
+    reads = 'numeric',
+    filtered.multi = 'numeric',
+    filtered.rna = 'numeric',
+    filtered.tax = 'numeric',
+    filtered.ko = 'numeric',
+    filtered.combo = 'numeric',
+    filtered.score = 'numeric',
+    ScoreCutoff = 'numeric'
+  ),
+  prototype = list(
+    UProCHits = numeric(),
+    RNA = numeric(),
+    reads = numeric(),
+    filtered.multi = numeric(),
+    filtered.rna = numeric(),
+    filtered.tax = numeric(),
+    filtered.ko = numeric(),
+    filtered.combo = numeric(),
+    filtered.score = numeric(),
+    ScoreCutoff = numeric()
+  )
+)
+
 
 .Object.Job.Paths <- setClass (
   #Name
@@ -239,7 +278,8 @@
   #Slots
   slots = c(
     Paths = "Object.Job.Paths",
-    Config = "Object.Job.Config"
+    Config = "Object.Job.Config",
+    Statistics = "Object.Job.Statistics"
   )
 )
 

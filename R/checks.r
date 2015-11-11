@@ -149,7 +149,15 @@ return(OK())
 }
 
 
-
+check.someuproc.error <- function(returned.system.string)
+{
+#checks if uproc gives an error.  
+  if (!is.null(attr(returned.system.string,'status')))
+  {
+    #different errors depending of notice are possible...
+    FATAL_ERROR$new('I WILL FIND YOU AND I WILL KILL YOU')$throw()
+  }
+}
 
 
 

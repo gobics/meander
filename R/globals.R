@@ -9,7 +9,7 @@ set.globals <- function () {
 
 }
 
-
+DEBUG.PRINT <- TRUE
 
 
 OBJECT.ERROR.NOCLASSES <- 'no Classes.\n'
@@ -36,7 +36,7 @@ OBJECT.OK <- TRUE
 OBJECT.ERROR <- FALSE
 
 
-TAXONOMY.LEVELS = 1:8
+TAXONOMY.LEVELS = 8
 
 
 

@@ -27,7 +27,7 @@ meander.start <- function(
   Object.data.big <- .Object.DATA.BIG()
   
   Object.data.kegg <- .Object.DATA.KEGG()
-  
+  Object.job.statistics <- .Object.Job.Statistics()
   ##load fixed data
   #tax Mat
   Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS('/home/hklingen/projects/test123/data/TaxMat.rds'))
@@ -132,17 +132,20 @@ meander.start <- function(
   #ToDo: create shitty method for each...
   if (File.type == FILETYPE.DNA)
   {
-  .ret <- start.DNA(Object.job.path = Object.job.path, Object.data.big = Object.data.big, object.save.FLAG = FALSE)
+    #STEP1
+  .ret <- start.DNA(Object.job.path = Object.job.path, Object.data.big = Object.data.big, Object.job.statistics = Object.job.statistics, object.save.FLAG = FALSE)
   Object.job.path <- .ret[[1]]
   Object.data.big <- .ret[[2]]
-  print(.ret[[3]])
-  
-  .ret <- start.DNAnoRNA(Object.job.path,Object.data.big,TRUE)
+  Object.job.statistics <- .ret[[3]]
+  print(.ret[[4]])
+    #STEP2
+  .ret <- start.DNAnoRNA(Object.job.path,Object.data.big, Object.job.statistics = Object.job.statistics,TRUE)
   Object.job.path <- .ret[[1]]
   Object.data.big <- .ret[[2]]
-  print(.ret[[3]])
-  
-  .ret <- start.RDS(Object.job.path,Object.data.big)
+  Object.job.statistics <- .ret[[3]]
+  print(.ret[[4]])
+    #STEP3
+  .ret <- start.RDS(Object.job.path = Object.job.path, Object.data.big = Object.data.big, Object.job.statistics = Object.job.statistics, object.save.FLAG = FALSE)
   
   }
 
@@ -178,7 +181,9 @@ meander.start <- function(
 ###build complete object
   slot(slot(Object.Final,'Job'),'Paths') = Object.job.path
   slot(slot(Object.Final,'Job'),'Config') = Object.job.config
+  slot(slot(Object.Final,'Job'),'Statistics') = Object.job.statistics
   slot(slot(Object.Final,'DATA'),'BIG') = Object.data.big
+  slot(slot(Object.Final,'DATA'),'KEGG') = Object.data.kegg
   ###
   
   

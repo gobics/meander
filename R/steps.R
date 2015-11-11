@@ -1,5 +1,5 @@
 #
-start.DNA <- function(Object.job.path,Object.data.big,object.save.FLAG)
+start.DNA <- function(Object.job.path,Object.data.big,Object.job.statistics,object.save.FLAG)
 {
   #get all files
   .Allfiles <- slot(Object.job.path,FILETYPE.DNA)
@@ -25,14 +25,21 @@ Object.job.path <- setInputdata(Object.job.path,FILETYPE.DNAwoRNA,.Allfiles)
     print(.ret)
     cat("save Vec","\n") 
     Object.data.big <- appendInputdata(Object.data.big,'SeqRNA',list(.ret))
+    Object.job.statistics <- appendInputdata(Object.job.statistics,'RNA',length(.ret))
   }    
   
   #rest
-  return(list(Object.job.path,Object.data.big,'start.DNAnoRNA'))
+  return(
+    list(
+      Object.job.path,
+      Object.data.big,
+      Object.job.statistics,
+      'start.DNAnoRNA')
+    )
 }
 
 
-start.DNAnoRNA <- function(Object.job.path,Object.data.big,object.save.FLAG)
+start.DNAnoRNA <- function(Object.job.path, Object.data.big, Object.job.statistics, object.save.FLAG)
 {
   #start uproC
   cat("start uproC","\n")
@@ -40,7 +47,7 @@ start.DNAnoRNA <- function(Object.job.path,Object.data.big,object.save.FLAG)
   .nAllFiles <- length(.Allfiles)
   
   .UPROCbin = '/home/hklingen/workspace/uproc-1.1.2_sl/uproc-dna '
-  .UPROCmode = '-f -s -p -o '
+  .UPROCmode = '-f -O 0 -p -o '
   .UProCmodel = '/home/hklingen/DB/PFAM/Comet/model/model '
   .UProCDB = ' /scratch/KEGG_2014-08_full_uproc_2 '
   
@@ -55,19 +62,51 @@ start.DNAnoRNA <- function(Object.job.path,Object.data.big,object.save.FLAG)
     .file.out.RDS = file.path(slot(Object.job.path,'DirOut'),'RDS',paste0(basename(.Allfiles[i]),'.rds'))
     .systemcommand = paste0(.UPROCbin, .UPROCmode, .file.out, .UProCDB, .UProCmodel, .Allfiles[i],  ' 2>&1' )
 
-    cat("systemcommand: ",.systemcommand,"\n")
-    .ret = system(.systemcommand, intern = TRUE)
-    attemptExecution(test.someuproc.error(.ret))
-    cat('Ret:\n',.ret,'\n')
+    if (DEBUG.PRINT) {cat("systemcommand: ",.systemcommand,"\n")}
+    
+    print(
+      system.time(
+        {
+          .ret = system(.systemcommand, intern = TRUE)
+          #evaluates the message and test if everything went according to plan...
+          attemptExecution(check.someuproc.error(.ret))
+        }
+      )
+    )
+    
+
+    if (DEBUG.PRINT) {cat('Ret:\n',.ret,'\n')}
     
     #process.uproc.scores(.file.out,0)
     Object.job.path <- appendInputdata(Object.job.path,FILETYPE.UproC,.file.out)
     Object.job.path <- appendInputdata(Object.job.path,FILETYPE.RDS,.file.out.RDS)
     
-  .Z <- process.storeRDS(Object.data.big, Object.job.path, .Z,i)
+    cat('store&filtering UProC results:\n')
+    print(
+      system.time(
+        {
+          .ret <- process.storeRDS(Object.data.big, Object.job.path, Object.job.statistics, .Z,i)
+        }
+      )
+    )    
+  
+  .Z <- .ret[[1]]
+  Object.job.statistics <- .ret[[2]]
   }
   
+  
+  
+  nRes = 20
+  
+  Break.Vec = c(0,cumsum(rep(max(.Z$values)/(nRes+1),(nRes+1))))
 data.blame <- data.frame(x = NULL, y = NULL, z = NULL)
+
+
+cat('creating plot:\n')
+print(
+  system.time(
+    {
+
   for (i in 1:.nAllFiles)
   {
     x.sub <- subset(.Z, Sample == i)
@@ -96,16 +135,28 @@ data.blame <- data.frame(x = NULL, y = NULL, z = NULL)
     y = h.hit$mids
     z = h.hit$counts/sum(h.hit$counts)
     data.blame <- rbind(data.blame, data.frame(x = x, y = y, z = z))
+    
+    
+    Object.job.statistics <- appendInputdata(Object.job.statistics,'ScoreCutoff', .val)
   }
-x11()
-p <- ggplot(data.blame, aes(x=x,y=y))
-print(p + geom_tile(aes(fill=z)) + scale_fill_gradient(low="#eafeef", high="#7ccd7c"))
-x11()
-p <- ggplot(data = data.blame, aes(x=y,y=z, group = x))
-print(p + geom_line(aes(colour = x)))
+    }
+  )
+)   
+# x11()
+# p <- ggplot(data.blame, aes(x=x,y=y))
+# print(p + geom_tile(aes(fill=z)) + scale_fill_gradient(low="#eafeef", high="#7ccd7c"))
+# x11()
+# p <- ggplot(data = data.blame, aes(x=y,y=z, group = x))
+# print(p + geom_line(aes(colour = x)))
 
   #rest
-return(list(Object.job.path,Object.data.big,'start_uproc'))
+return(
+  list(
+    Object.job.path,
+    Object.data.big,
+    Object.job.statistics,
+    'start_uproc')
+  )
 }
 
 start.UProC <- function(ObjectUProCModus)
@@ -116,11 +167,14 @@ start.UProC <- function(ObjectUProCModus)
   start.RDS()
 }
 
-start.RDS <- function(ObjectPaths)
+start.RDS <- function(Object.job.path, Object.data.big, Object.job.statistics, object.save.FLAG)
 {
   
-  .AllFiles <- slot(ObjectPaths,FILETYPE.RDS)
+  .AllFiles <- slot(Object.job.path,FILETYPE.RDS)
   .nAllFiles <- length(.AllFiles)
+  
+  
+  
   for (i in 1:.nAllFiles)
   {
     #read RDS  
@@ -130,8 +184,7 @@ start.RDS <- function(ObjectPaths)
     #store Object?  
     cat("store Object? ","\n")
   }
-  start.Object()
-  #rest
+  
 }
 
 start.Object <- function()

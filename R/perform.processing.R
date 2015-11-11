@@ -83,17 +83,19 @@ filter.key.dt <- function(DT, key, Filter)
   return(.I)
 }
 
-filter.multihit.dt <- function(DT,.nRows, key.one, key.two)
+filter.multihit.dt <- function(DT,.nRows, key)
 {
   # count number of hits per sequence
   .I.singlehit <- vector(mode='logical', length = .nRows)
-  .HitCountVec <- DT[,length(key.one), by=key.two][['V1']]
-  .Pos <- cumsum(.HitCountVec[[2]]);
-  .Pos <- .Pos[.HitCountVec[[2]] != 1]
+  .HitCountVec <- DT[,.N, by=key][['N']]
+
+  .Pos <- cumsum(.HitCountVec);
+  .Pos <- .Pos[.HitCountVec == 1]
   
   # set single hits == TRUE
   .I.singlehit[.Pos] <- T  
-  return(.I.singlehit)
+  #mask all others
+  return(!.I.singlehit)
 }
 
 filter.uprocresult <- function( ko.key, KO.Filter)
@@ -116,7 +118,7 @@ filter.uprocresult <- function( ko.key, KO.Filter)
   
 }
 
-process.storeRDS <- function(Object.data.big,Object.job.path,tmp.data.frame,Sample)
+process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statistics, tmp.data.frame, Sample)
 {
   .uproc.filein <- slot(Object.job.path,FILETYPE.UproC)[Sample]
   .RDS.fileout <- slot(Object.job.path,FILETYPE.RDS)[Sample]
@@ -124,20 +126,32 @@ process.storeRDS <- function(Object.data.big,Object.job.path,tmp.data.frame,Samp
   options(warn=-1)
   .Return <- fread(.uproc.filein, nrows=-1, select = c(1,3,8,9,10,11))
   options(warn=1)
+  
+  .Return2 <- fread(.uproc.filein, nrows=1, skip = dim(.Return)[1])
+  
+  Object.job.statistics <- appendInputdata(Object.job.statistics,'UProCHits',.Return2[[1]])
+  Object.job.statistics <- appendInputdata(Object.job.statistics,'reads',.Return2[[3]])
+  
+  
+  
   setnames(.Return,c('V1','V3','V8','V9','V10','V11'),c('seq.no','length','ko','score','x','y'))
   .Return[,ko := as.integer(substr(.Return[,ko],2,100))]
   
   #get length of data.table
   .nLines <- length(.Return[,x])
   
-  
+  .filtered.out.taxonomy <- logical()
+  .filtered.out.ko <- logical()
+  .filtered.out.multihit <- logical()
+  .filtered.out.rna <- logical()
   
   .Q <- filter.key.dt(.Return,'x',10010101)
+  .filtered.out.taxonomy <- .Q
   
   .All.to.filter <- logical(length(.Q))
   .All.to.filter <- .All.to.filter | .Q
   
-  cat('filtered out by taxonomy:', sum(.Q),'\n',sep = '')
+  #cat('filtered out by taxonomy:', sum(.Q),'\n',sep = '')
   
   .res <- rle(sort(round(.Return[, j = score, with = TRUE]*10)/10))
   
@@ -172,93 +186,105 @@ process.storeRDS <- function(Object.data.big,Object.job.path,tmp.data.frame,Samp
   
   
   .Q <- filter.key.dt(.Return,'ko',0)
-  cat('filtered out by ko:', sum(.Q),'\n',sep = '')
+  .filtered.out.ko <- .Q
+
+  
+  #cat('filtered out by ko:', sum(.Q),'\n',sep = '')
   .All.to.filter <- .All.to.filter | .Q
   
-  .Q <- filter.multihit.dt(.Return, .nLines, 'ko', 'seq.no')
-  cat('filtered out multihits:', sum(.Q),'\n',sep = '')
+  .Q <- filter.multihit.dt(.Return, .nLines, 'seq.no')
+
+  .filtered.out.multihit <- .Q
+
+  #cat('filtered out multihits:', sum(.Q),'\n',sep = '')
   .All.to.filter <- .All.to.filter | .Q
   
   #filter RNA out
   if (length(slot(Object.data.big,'SeqRNA')) != 0)
   {
   .Q <- filter.key.dt(.Return, 'seq.no', slot(Object.data.big,'SeqRNA')[[Sample]])
-  cat('filtered out by RNA:', sum(.Q),'\n',sep = '')  
+  .filtered.out.rna <- .Q
+  #cat('filtered out by RNA:', sum(.Q),'\n',sep = '')  
   .All.to.filter <- .All.to.filter | .Q
   }
 
-  cat('filter:',sum(.All.to.filter),'\n')
+  
+  
+  ##find unique filtered elements...
+  .filtered.out.taxonomy
+  .filtered.out.ko
+  .filtered.out.multihit
+  
+  
+  if (length(.filtered.out.rna) == 0)
+  {
+    .filtered.out.rna <- logical(length = length(.filtered.out.taxonomy))
+  }
+  
+  .nfiltered.tax <- sum(.filtered.out.taxonomy & !.filtered.out.ko & !.filtered.out.multihit & !.filtered.out.rna)
+  .nfiltered.ko <- sum(!.filtered.out.taxonomy & .filtered.out.ko & !.filtered.out.multihit & !.filtered.out.rna)
+  .nfiltered.multihit <- sum(!.filtered.out.taxonomy & !.filtered.out.ko & .filtered.out.multihit & !.filtered.out.rna)
+  .nfiltered.rna <- sum(!.filtered.out.taxonomy & !.filtered.out.ko & !.filtered.out.multihit & .filtered.out.rna)
+  .nfiltered.multi <- sum(.All.to.filter) - .nfiltered.tax - .nfiltered.ko - .nfiltered.multihit - .nfiltered.rna
+  
+  Object.job.statistics <- appendInputdata(Object.job.statistics,'filtered.multi',.nfiltered.multihit)
+  Object.job.statistics <- appendInputdata(Object.job.statistics,'filtered.rna',.nfiltered.rna)
+  Object.job.statistics <- appendInputdata(Object.job.statistics,'filtered.tax',.nfiltered.tax)
+  Object.job.statistics <- appendInputdata(Object.job.statistics,'filtered.ko',.nfiltered.ko)
+  Object.job.statistics <- appendInputdata(Object.job.statistics,'filtered.combo',.nfiltered.multi)
+  
+    ##
+  
+  
+  
+  
+  
+  #cat('filter:',sum(.All.to.filter),'\n')
   
   saveRDS(.Return[!.All.to.filter,],.RDS.fileout)
-  
-  return(tmp.data.frame)
+  #saveRDS(.Return,.RDS.fileout)
+  return(list(tmp.data.frame,Object.job.statistics))
 }
 
-perform.dataconstruction.rds <- function(Object.data.big,Object.job.path,Object.data.kegg,Sample)
+perform.dataconstruction.rds <- function(Object.data.big, Object.job.path, Object.data.kegg, Object.job.statistics, Sample)
 {
 .file.in.rds <- slot(Object.job.path,'RDS')[Sample]  
 .FULLDT <- readRDS(.file.in.rds)  
 #remove scores below threshold
-.FULLDT = .FULLDT[score > 1]
+#get threshold
+.thresh <- sum( slot(Object.job.statistics,'ScoreCutoff')* (slot(Object.job.statistics,'UProCHits') / sum(slot(Object.job.statistics,'UProCHits'))))
+.FULLDT = .FULLDT[score > .thresh]
 
-  for (i in 0:TAXONOMY.LEVELS)
+DF2 <- data.table(Sample = numeric(), ko = numeric(), TaxID = numeric(), Previous = numeric() )
+
+  for (i in 1:TAXONOMY.LEVELS)
   {
-    .PARTDT <- .FULLDT[y <= i]
-    .TaxID = Object.data.kegg@TaxMat[.PARTDT[,x]+1,i+1]
+    .PARTDT <- .FULLDT[y <= i-1]
+    
+    .xVals = .PARTDT[,x]+1
+    
+    .TaxID = Object.data.kegg@TaxMat[.xVals,i]
     .KO = .PARTDT[,ko]
-    DF <- data.table(z = rep(Sample,length(.KO)), y = .KO, x = .TaxID )
-  }
-}
-
-process.uproc.scores <- function(uproc.filein,tmpmax)
-{
-  .Return <- fread(uproc.filein, nrows=-1, select = c(1,3,8,9,10,11))
-  setnames(.Return,c('V1','V3','V8','V9','V10','V11'),c('seq.no','length','ko','score','x','y'))
-  
-  
-  
-  
-  #get length of data.table
-  .nLines <- length(.Return[,x])
-  
-  ##TODO
-  #check if there are too few results...
-    ##
-  # sort out hits with no taxID
-  .I.Tax <- .Return[,x] != 10010101
-  # count number of hits per sequence
-  .I.singlehit <- vector(mode='logical', length = .nLines)
-  .HitCountVec <- .Return[,length(ko), by=seq.no]
-  .Pos <- cumsum(.HitCountVec[[2]]);
-  .Pos <- .Pos[.HitCountVec[[2]] == 1]
-  
-  # set single hits == TRUE
-  .I.singlehit[.Pos] <- T
-  
-  # get KO00000
-  .I.KO <- .Return[,x] != "K00000"
-  
-  .I.All <- .I.singlehit & .I.Tax & .I.KO
-  
-  
-  .nKO = sum(.I.KO & !.I.singlehit & !.I.Tax)
-  .nMulti = sum(!.I.KO & .I.singlehit & !.I.Tax)
-  .nTax = sum(!.I.KO & !.I.singlehit & .I.Tax)
-  
-  .nKO = sum(!.I.KO )
-  .nMulti = sum(!.I.singlehit)
-  .nTax = sum(!.I.Tax)
-  
-  .nAll = sum(.I.All)
-  cat(.nKO,'\t',.nMulti,'\t',.nTax,'\t',.nAll,'\n')
-  Cutoff <- mean(.Return[!.I.Tax,score]) + (0.5*sd(.Return[!.I.Tax,score]))
-  
-  #reduce data.table by removing multiple hits and unknown taxonomy
-  .Return <- .Return[.I.All,]
-    if (tmpmax < max(.Return[,score]))
+    .Prev = Object.data.kegg@TaxMat[.xVals,i+1]
+    if (is.null(.Prev))
     {
-      .Y = hist(.Return[,score],25,plot = FALSE)
-      return(list(TRUE,Cutoff,.Y$breaks))
+      DF <- data.table(Sample = rep(Sample,length(.KO)), ko = .KO, TaxID = .TaxID, Previous = rep(-1,length(.KO)) )
     }
-  return(list(FALSE,Cutoff,NULL))
+    
+    else
+    {
+      DF <- data.table(Sample = rep(Sample,length(.KO)), ko = .KO, TaxID = .TaxID, Previous = .Prev )  
+    }
+  DF2 <- rbindlist(list(DF2,DF))  
+  }
+
+DT <- DF2[,.N,by=c('TaxID','ko','Sample','Previous')]
+setnames(DT,c('TaxID','ko','Sample','Previous','N'),c('TaxID','ko','Sample','Previous','Counts'))
+
+DT2 <- slot(Object.data.big,'CountDT')
+DT <- rbindlist(list(DT2,DT)) 
+
+Object.data.big <- setInputdata(ObjectPart = Object.data.big, Type = 'CountDT', DT)
+
+return(list(Object.job.statistics,Object.data.big))
 }
