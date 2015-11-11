@@ -258,8 +258,8 @@ attemptExecution <- function(expr, nof.Attempts = 1)
         
         tryCatch(
             {
-                eval(expr = parse(text = expr))
-                success = T
+                expr
+              success = TRUE
             },
             error = handle.Error
         )

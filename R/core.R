@@ -25,6 +25,18 @@ meander.start <- function(
   Object.job.path <- .Object.Job.Paths()
   Object.job.config <- .Object.Job.Config()
   Object.data.big <- .Object.DATA.BIG()
+  
+  Object.data.kegg <- .Object.DATA.KEGG()
+  
+  ##load fixed data
+  #tax Mat
+  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS('/home/hklingen/projects/test123/data/TaxMat.rds'))
+  #ko2path
+  #kointax
+  #...
+  #png
+    ##
+  
   ##
   Object.Final <- Object();
   
@@ -129,6 +141,9 @@ meander.start <- function(
   Object.job.path <- .ret[[1]]
   Object.data.big <- .ret[[2]]
   print(.ret[[3]])
+  
+  .ret <- start.RDS(Object.job.path,Object.data.big)
+  
   }
 
   if (File.type == FILETYPE.DNAwoRNA)

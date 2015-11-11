@@ -171,12 +171,21 @@
 )
 
 
+.Object.DATA.KEGG <- setClass (
+  "Object.DATA.KEGG",
+  slots = c(
+    TaxMat = "data.frame"
+  )
+)
+
+
 .Object.DATA <- setClass (
   #Name
   "Object.DATA",
   #slots
   slots = c(
-  BIG = "Object.DATA.BIG"
+  BIG = "Object.DATA.BIG",
+  KEGG = "Object.DATA.KEGG"
   )
 )
 
@@ -284,22 +293,22 @@ setValidity ("ObjectRpackages",
                  return (retval)
              })
 
-setValidity ("ObjectJobConfig",
+setValidity ("Object.Job.Config",
              function ( object ){
                retval <- NULL
                if  (length(slot(object,'ClassVec')) == 0)
                {
-                 retval <- c ( retval , OBJECT.ERROR.NORESUME)
+                 retval <- c ( retval , 'OBJECT.ERROR.NORESUME')
                }
                
                if (slot(object,'requiredLength') == 0)
                {
-                 retval <- c ( retval , OBJECT.ERROR.NORESUME)
+                 retval <- c ( retval , 'OBJECT.ERROR.NORESUME2')
                }
                
                if (slot(object,'requiredLength') != length(slot(object,'ClassVec')))
                {
-                 retval <- c ( retval , OBJECT.ERROR.NORESUME)
+                 retval <- c ( retval , 'OBJECT.ERROR.NORESUME3')
                }
                
                if (length(slot(object,'ClassNames')) != length(unique(slot(object,'ClassVec'))))

@@ -57,6 +57,7 @@ start.DNAnoRNA <- function(Object.job.path,Object.data.big,object.save.FLAG)
 
     cat("systemcommand: ",.systemcommand,"\n")
     .ret = system(.systemcommand, intern = TRUE)
+    attemptExecution(test.someuproc.error(.ret))
     cat('Ret:\n',.ret,'\n')
     
     #process.uproc.scores(.file.out,0)

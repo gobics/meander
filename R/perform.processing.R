@@ -194,7 +194,21 @@ process.storeRDS <- function(Object.data.big,Object.job.path,tmp.data.frame,Samp
   return(tmp.data.frame)
 }
 
+perform.dataconstruction.rds <- function(Object.data.big,Object.job.path,Object.data.kegg,Sample)
+{
+.file.in.rds <- slot(Object.job.path,'RDS')[Sample]  
+.FULLDT <- readRDS(.file.in.rds)  
+#remove scores below threshold
+.FULLDT = .FULLDT[score > 1]
 
+  for (i in 0:TAXONOMY.LEVELS)
+  {
+    .PARTDT <- .FULLDT[y <= i]
+    .TaxID = Object.data.kegg@TaxMat[.PARTDT[,x]+1,i+1]
+    .KO = .PARTDT[,ko]
+    DF <- data.table(z = rep(Sample,length(.KO)), y = .KO, x = .TaxID )
+  }
+}
 
 process.uproc.scores <- function(uproc.filein,tmpmax)
 {
