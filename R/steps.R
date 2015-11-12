@@ -39,7 +39,7 @@ Object.job.path <- setInputdata(Object.job.path,FILETYPE.DNAwoRNA,.Allfiles)
 }
 
 
-start.DNAnoRNA <- function(Object.job.path, Object.data.big, Object.job.statistics, object.save.FLAG)
+start.DNAnoRNA <- function(Object.job.path, object.save.FLAG)
 {
   #start uproC
   cat("start uproC","\n")
@@ -59,7 +59,7 @@ start.DNAnoRNA <- function(Object.job.path, Object.data.big, Object.job.statisti
     
     #get basename, put a .uproc behind and put the dirout path to it...
     .file.out = file.path(slot(Object.job.path,'DirOut'),'UPROC',paste0(basename(.Allfiles[i]),'.upoc'))
-    .file.out.RDS = file.path(slot(Object.job.path,'DirOut'),'RDS',paste0(basename(.Allfiles[i]),'.rds'))
+    #.file.out.RDS = file.path(slot(Object.job.path,'DirOut'),'RDS',paste0(basename(.Allfiles[i]),'.rds'))
     .systemcommand = paste0(.UPROCbin, .UPROCmode, .file.out, .UProCDB, .UProCmodel, .Allfiles[i],  ' 2>&1' )
 
     if (DEBUG.PRINT) {cat("systemcommand: ",.systemcommand,"\n")}
@@ -79,69 +79,73 @@ start.DNAnoRNA <- function(Object.job.path, Object.data.big, Object.job.statisti
     
     #process.uproc.scores(.file.out,0)
     Object.job.path <- appendInputdata(Object.job.path,FILETYPE.UproC,.file.out)
-    Object.job.path <- appendInputdata(Object.job.path,FILETYPE.RDS,.file.out.RDS)
-    
-    cat('store&filtering UProC results:\n')
-    print(
-      system.time(
-        {
-          .ret <- process.storeRDS(Object.data.big, Object.job.path, Object.job.statistics, .Z,i)
-        }
-      )
-    )    
-  
-  .Z <- .ret[[1]]
-  Object.job.statistics <- .ret[[2]]
+#     Object.job.path <- appendInputdata(Object.job.path,FILETYPE.RDS,.file.out.RDS)
+#     
+#     cat('store&filtering UProC results:\n')
+#     print(
+#       system.time(
+#         {
+#           .ret <- process.storeRDS(Object.data.big, Object.job.path, Object.job.statistics, .Z,i)
+#         }
+#       )
+#     )    
+#   
+#   .Z <- .ret[[1]]
+#   Object.job.statistics <- .ret[[2]]
   }
   
   
-  
-  nRes = 20
-  
-  Break.Vec = c(0,cumsum(rep(max(.Z$values)/(nRes+1),(nRes+1))))
-data.blame <- data.frame(x = NULL, y = NULL, z = NULL)
+#   
+#   nRes = 20
+#   
+#   Break.Vec = c(0,cumsum(rep(max(.Z$values)/(nRes+1),(nRes+1))))
+# data.blame <- data.frame(x = NULL, y = NULL, z = NULL)
+# 
+# 
+# cat('creating plot:\n')
+# print(
+#   system.time(
+#     {
+# 
+#   for (i in 1:.nAllFiles)
+#   {
+#     x.sub <- subset(.Z, Sample == i)
+#     
+#     ntotalSample = sum(x.sub$length)
+#     
+#     x.hit <- subset(x.sub, type == 'hit')
+#     x.miss <-subset(x.sub, type == 'miss')
+#     ##smooth
+#     #lines(lowess(x.hit$length~x.hit$values,f = .25), col = ColVec[i])
+#     #lines(lowess(x.miss$length~x.miss$values,f = .25), col = ColVec[i])
+#     #raw
+#     #lines(x.hit$values,x.hit$length/ntotalSample, col = ColVec[i])
+#     #lines(x.miss$values,x.miss$length/ntotalSample, col = ColVec[i])
+#     ##hist
+#     h.hit <- hist(rep(x.hit$values, x.hit$length/min(x.hit$length)),breaks = Break.Vec, plot = FALSE)
+#     h.miss <- hist(rep(x.miss$values, x.miss$length/min(x.miss$length)), breaks = Break.Vec, plot = FALSE)
+#     .val <- (sd(rep(x.miss$values,x.miss$length/min(x.miss$length)))*0.5) + sum(x.miss$values * x.miss$length)/sum(x.miss$length)
+#     
+#     #.val <- (sd(rep(x.miss$values, x.miss$length))*0.5) + mean(rep(x.miss$values, x.miss$length))
+#     if (i == 2)
+#     {
+#       #abline(v = .val,col = 'red')
+#     }
+#     x = rep(i,length(h.hit$counts))
+#     y = h.hit$mids
+#     z = h.hit$counts/sum(h.hit$counts)
+#     data.blame <- rbind(data.blame, data.frame(x = x, y = y, z = z))
+#     
+#     
+#     Object.job.statistics <- appendInputdata(Object.job.statistics,'ScoreCutoff', .val)
+#   }
+#       
+#     }
+#   )
+#)
 
+#Object.data.dataframes <- setInputdata(Object.data.dataframes,'Scores.Samples',data.blame)
 
-cat('creating plot:\n')
-print(
-  system.time(
-    {
-
-  for (i in 1:.nAllFiles)
-  {
-    x.sub <- subset(.Z, Sample == i)
-    
-    ntotalSample = sum(x.sub$length)
-    
-    x.hit <- subset(x.sub, type == 'hit')
-    x.miss <-subset(x.sub, type == 'miss')
-    ##smooth
-    #lines(lowess(x.hit$length~x.hit$values,f = .25), col = ColVec[i])
-    #lines(lowess(x.miss$length~x.miss$values,f = .25), col = ColVec[i])
-    #raw
-    #lines(x.hit$values,x.hit$length/ntotalSample, col = ColVec[i])
-    #lines(x.miss$values,x.miss$length/ntotalSample, col = ColVec[i])
-    ##hist
-    h.hit <- hist(rep(x.hit$values, x.hit$length/min(x.hit$length)),breaks = Break.Vec, plot = FALSE)
-    h.miss <- hist(rep(x.miss$values, x.miss$length/min(x.miss$length)), breaks = Break.Vec, plot = FALSE)
-    .val <- (sd(rep(x.miss$values,x.miss$length/min(x.miss$length)))*0.5) + sum(x.miss$values * x.miss$length)/sum(x.miss$length)
-    
-    #.val <- (sd(rep(x.miss$values, x.miss$length))*0.5) + mean(rep(x.miss$values, x.miss$length))
-    if (i == 2)
-    {
-      #abline(v = .val,col = 'red')
-    }
-    x = rep(i,length(h.hit$counts))
-    y = h.hit$mids
-    z = h.hit$counts/sum(h.hit$counts)
-    data.blame <- rbind(data.blame, data.frame(x = x, y = y, z = z))
-    
-    
-    Object.job.statistics <- appendInputdata(Object.job.statistics,'ScoreCutoff', .val)
-  }
-    }
-  )
-)   
 # x11()
 # p <- ggplot(data.blame, aes(x=x,y=y))
 # print(p + geom_tile(aes(fill=z)) + scale_fill_gradient(low="#eafeef", high="#7ccd7c"))
@@ -153,19 +157,104 @@ print(
 return(
   list(
     Object.job.path,
-    Object.data.big,
-    Object.job.statistics,
     'start_uproc')
   )
 }
 
-start.UProC <- function(ObjectUProCModus)
+start.UProC <- function(Object.job.path,Object.job.statistics,Object.data.big,Object.data.dataframes)
 {
-  #read Uproc
-  cat("read Uproc","\n")
-  #rest
-  start.RDS()
+  .Allfiles <- slot(Object.job.path,FILETYPE.UproC)
+  .nAllFiles <- length(.Allfiles)
+  #data.frame to store plot
+  .Z <- data.frame(Sample = numeric(), length = numeric(), values= numeric(), type = character(), stringsAsFactors = FALSE)
+  for (i in 1:.nAllFiles)
+  {
+    
+    #get basename, put a .uproc behind and put the dirout path to it...
+    .file.out.RDS = file.path(slot(Object.job.path,'DirOut'),'RDS',paste0(basename(.Allfiles[i]),'.rds'))
+
+    
+    
+    #process.uproc.scores(.file.out,0)
+    Object.job.path <- appendInputdata(Object.job.path,FILETYPE.RDS,.file.out.RDS)
+    
+    cat('store&filtering UProC results:\n')
+    print(
+      system.time(
+        {
+          .ret <- process.storeRDS(Object.data.big, Object.job.path, Object.job.statistics, .Z,i)
+        }
+      )
+    )    
+    
+    .Z <- .ret[[1]]
+    Object.job.statistics <- .ret[[2]]
+  }
+  
+  
+  
+  nRes = 20
+  
+  Break.Vec = c(0,cumsum(rep(max(.Z$values)/(nRes+1),(nRes+1))))
+  data.blame <- data.frame(x = NULL, y = NULL, z = NULL)
+  
+  
+  cat('creating plot:\n')
+  print(
+    system.time(
+      {
+        
+        for (i in 1:.nAllFiles)
+        {
+          x.sub <- subset(.Z, Sample == i)
+          
+          ntotalSample = sum(x.sub$length)
+          
+          x.hit <- subset(x.sub, type == 'hit')
+          x.miss <-subset(x.sub, type == 'miss')
+          ##smooth
+          #lines(lowess(x.hit$length~x.hit$values,f = .25), col = ColVec[i])
+          #lines(lowess(x.miss$length~x.miss$values,f = .25), col = ColVec[i])
+          #raw
+          #lines(x.hit$values,x.hit$length/ntotalSample, col = ColVec[i])
+          #lines(x.miss$values,x.miss$length/ntotalSample, col = ColVec[i])
+          ##hist
+          h.hit <- hist(rep(x.hit$values, x.hit$length/min(x.hit$length)),breaks = Break.Vec, plot = FALSE)
+          h.miss <- hist(rep(x.miss$values, x.miss$length/min(x.miss$length)), breaks = Break.Vec, plot = FALSE)
+          .val <- (sd(rep(x.miss$values,x.miss$length/min(x.miss$length)))*0.5) + sum(x.miss$values * x.miss$length)/sum(x.miss$length)
+          
+          #.val <- (sd(rep(x.miss$values, x.miss$length))*0.5) + mean(rep(x.miss$values, x.miss$length))
+          if (i == 2)
+          {
+            #abline(v = .val,col = 'red')
+          }
+          x = rep(i,length(h.hit$counts))
+          y = h.hit$mids
+          z = h.hit$counts/sum(h.hit$counts)
+          data.blame <- rbind(data.blame, data.frame(x = x, y = y, z = z))
+          
+          
+          Object.job.statistics <- appendInputdata(Object.job.statistics,'ScoreCutoff', .val)
+        }
+        
+      }
+    )
+  )
+  Object.data.dataframes <- setInputdata(Object.data.dataframes,'Scores.Samples',data.blame)
+  
+return(
+  list(
+    Object.job.path,
+    Object.job.statistics,
+    Object.data.big,
+    Object.data.dataframes
+  )
+)  
 }
+
+
+
+
 
 start.RDS <- function(Object.data.big, Object.data.kegg, Object.job.path, Object.job.statistics, Object.data.refined, object.save.FLAG)
 {

@@ -32,9 +32,13 @@ check.RDS <- function(filepath)
 return(BAD())
 }
 
-check.uproc <- function()
+check.uproc <- function(filepath)
 {
-
+  if (file.exists(filepath))
+  {
+    return(OK())
+  }
+return(BAD())  
 }
 
 
@@ -105,8 +109,12 @@ check.input <- function(SelectedType,PartObject,filepaths)
   else if (SelectedType == FILETYPE.UproC)
   {
     #test against correct version of uproc
-
+    
     #test if file format is correct
+    for (i in 1:.nFiles)
+    {
+    .check <- check.uproc(filepaths[[i]])
+    }
   }
 
   else if (SelectedType == FILETYPE.RDS)

@@ -246,7 +246,11 @@ perform.dataconstruction.rds <- function(Object.data.big, Object.job.path, Objec
 .FULLDT <- readRDS(.file.in.rds)  
 #remove scores below threshold
 #get threshold
-.thresh <- sum( slot(Object.job.statistics,'ScoreCutoff')* (slot(Object.job.statistics,'UProCHits') / sum(slot(Object.job.statistics,'UProCHits'))))
+.thresh <- slot(Object.job.statistics,'FilteringScore')
+
+#set statistics
+Object.job.statistics <- appendInputdata(Object.job.statistics,'filtered.score',dim(.FULLDT[score <= .thresh])[1])
+
 .FULLDT = .FULLDT[score > .thresh]
 
 DF2 <- data.table(Sample = numeric(), ko = numeric(), TaxID = numeric(), Previous = numeric() )
@@ -289,4 +293,10 @@ perform.quickdatatable <- function(DT)
 DT2 <- DT[,sum(Counts),by=c('Sample','TaxID','Previous')]
 setnames(DT2,c('V1'),c('Counts'))
 return(DT2)
+}
+
+
+perform.rna.statistics <- function(Object.job.statistics)
+{
+  
 }

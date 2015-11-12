@@ -168,10 +168,12 @@
 .Object.DATA.dataframes <- setClass(
   "Object.DATA.dataframes",
   slots = c(
-    Read.statistics = 'data.frame'
+    Read.statistics = 'data.frame',
+    Scores.Samples = 'data.frame'
   ),
   prototype = list(
-    Read.statistics = data.frame(x = NULL, y = NULL, z = NULL)
+    Read.statistics = data.frame(x = NULL, y = NULL, z = NULL),
+    Scores.Samples = data.frame(x = NULL, y = NULL, z = NULL)
   )
 )
 
@@ -220,7 +222,8 @@
   slots = c(
   BIG = "Object.DATA.BIG",
   KEGG = "Object.DATA.KEGG",
-  Refined = "Object.DATA.Refined"
+  Refined = "Object.DATA.Refined",
+  DataFrames = "Object.DATA.dataframes"
   )
 )
 
@@ -236,7 +239,8 @@
     filtered.ko = 'numeric',
     filtered.combo = 'numeric',
     filtered.score = 'numeric',
-    ScoreCutoff = 'numeric'
+    ScoreCutoff = 'numeric',
+    FilteringScore = 'numeric'
   ),
   prototype = list(
     UProCHits = numeric(),
@@ -248,7 +252,8 @@
     filtered.ko = numeric(),
     filtered.combo = numeric(),
     filtered.score = numeric(),
-    ScoreCutoff = numeric()
+    ScoreCutoff = numeric(),
+    FilteringScore = numeric()
   )
 )
 

@@ -18,17 +18,19 @@ meander.start <- function(
   #
   Set.Conditions = NULL,
   Set.ConditionVec = NULL,
-  Set.ConditionNames = NULL
+  Set.ConditionNames = NULL,
+  Show.plots = TRUE
   )
 {
 ## load general config & load objects
   Object.job.path <- .Object.Job.Paths()
   Object.job.config <- .Object.Job.Config()
-  Object.data.big <- .Object.DATA.BIG()
+  Object.job.statistics <- .Object.Job.Statistics()
   
+  Object.data.big <- .Object.DATA.BIG()
   Object.data.kegg <- .Object.DATA.KEGG()
   Object.data.refined <- .Object.DATA.Refined()
-  Object.job.statistics <- .Object.Job.Statistics()
+  Object.data.dataframes <- .Object.DATA.dataframes()
   ##load fixed data
   #tax Mat
   Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS('/home/hklingen/projects/test123/data/TaxMat.rds'))
@@ -91,7 +93,7 @@ meander.start <- function(
 
       if( is.null(File.type) )
       {
-        .inList = c(FILETYPE.DNA,FILETYPE.DNAwoRNA,FILETYPE.UproC,FILETYPE.RDS)
+        .inList = c(FILETYPE.DNA,FILETYPE.DNAwoRNA,FILETYPE.UproC)
         File.type <- select.List(FLAG = FALSE, Choices = .inList)
       }
   
@@ -120,55 +122,76 @@ meander.start <- function(
   .res@handle()
     if (DEBUG.PRINT) {  cat('OK\n') }
   
-  ##set next function
-  
-  
-  
   ## set conditions
+  Object.job.config <- set.Conditions(List = File.list, Object.job.config = Object.job.config, FALSE)
+  
+    ##
+  Object.job.config <- set.selected.Conditions(FALSE,Object.job.config)
+  ## select conditions
   
   
+    ##
   
   ## save Object for the first time.
   
-  #ToDo: create shitty method for each...
-  if (File.type == FILETYPE.DNA)
+  #ToDo: create shitty method for each..
+  
+  
+  #STEP1
+  if (File.type %in% INPUTDEPENDENTSTEPS.LIST.ONE)
   {
-    #STEP1
+    cat('STEP1\n')
   .ret <- start.DNA(Object.job.path = Object.job.path, Object.data.big = Object.data.big, Object.job.statistics = Object.job.statistics, object.save.FLAG = FALSE)
   Object.job.path <- .ret[[1]]
   Object.data.big <- .ret[[2]]
   Object.job.statistics <- .ret[[3]]
   print(.ret[[4]])
-    #STEP2
-  .ret <- start.DNAnoRNA(Object.job.path,Object.data.big, Object.job.statistics = Object.job.statistics,TRUE)
+  }
+  
+  #STEP2
+  if (File.type %in% INPUTDEPENDENTSTEPS.LIST.TWO)
+  {
+    cat('STEP2\n')
+  .ret <- start.DNAnoRNA(Object.job.path = Object.job.path,TRUE)
   Object.job.path <- .ret[[1]]
-  Object.data.big <- .ret[[2]]
-  Object.job.statistics <- .ret[[3]]
-  print(.ret[[4]])
+  print(.ret[[2]])
+  }
+  
+  
+
+  
     #STEP3
-  .ret <- start.RDS(Object.data.big = Object.data.big, Object.job.path = Object.job.path, Object.data.kegg = Object.data.kegg, Object.job.statistics = Object.job.statistics, Object.data.refined =  Object.data.refined, object.save.FLAG = FALSE)
+  if (File.type %in% INPUTDEPENDENTSTEPS.LIST.THREE)
+  {
+    cat('STEP3\n')
+    .ret <- start.UProC(Object.job.path,Object.job.statistics,Object.data.big,Object.data.dataframes)
+    Object.job.path = .ret[[1]]
+    Object.job.statistics = .ret[[2]]
+    Object.data.big = .ret[[3]]
+    Object.data.dataframes = .ret[[4]]
+  }
+  
+  
+
+          if (Show.plots)
+        {
+        plot.uproc.scores(Object.job.statistics = Object.job.statistics,Object.data.dataframes = Object.data.dataframes) 
+          
+        }
+        
+        #set score threshold
+        if (!is.null(UPRoCScore))
+        {
+        
+        }  
+  
+
+    .ret <- start.RDS(Object.data.big = Object.data.big, Object.job.path = Object.job.path, Object.data.kegg = Object.data.kegg, Object.job.statistics = Object.job.statistics, Object.data.refined =  Object.data.refined, object.save.FLAG = FALSE)
   Object.data.big <- .ret[[2]]
   Object.job.statistics <- .ret[[1]]
-  Object.data.refined <- .ret[[3]]
-  }
+  Object.data.refined <- .ret[[3]]  
 
-  if (File.type == FILETYPE.DNAwoRNA)
-  {
-    .ret <- start.DNAnoRNA(Object.job.path,Object.data.big,TRUE)
-    Object.job.path <- .ret[[1]]
-    Object.data.big <- .ret[[2]]
-    print(.ret[[3]])
-  }
-  
-  if (File.type == FILETYPE.UproC)
-  {
-    .ret <- start.UProC(NULL)
-  }
-  
-  if (File.type == FILETYPE.RDS)
-  {
-    .ret <- start.RDS(Object.job.path)
-  }
+
   
   #set selected conditions
   
@@ -185,9 +208,11 @@ meander.start <- function(
   slot(slot(Object.Final,'Job'),'Paths') = Object.job.path
   slot(slot(Object.Final,'Job'),'Config') = Object.job.config
   slot(slot(Object.Final,'Job'),'Statistics') = Object.job.statistics
+  
   slot(slot(Object.Final,'DATA'),'BIG') = Object.data.big
   slot(slot(Object.Final,'DATA'),'KEGG') = Object.data.kegg
   slot(slot(Object.Final,'DATA'),'Refined') = Object.data.refined
+  slot(slot(Object.Final,'DATA'),'DataFrames') =  Object.data.dataframes
   ###
   
   

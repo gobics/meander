@@ -48,3 +48,31 @@ plot.points <- function(plot.frame,colorVec,xLabel,yLabel,mainTitle,shapes.FLAG,
   }
   
 }
+
+plot.uproc.scores <- function(Object.job.statistics,Object.data.dataframes,Type = 'QQQQQQQQ')
+{
+  .DF <- slot(Object.data.dataframes,'Scores.Samples')
+  .thresh <- sum( slot(Object.job.statistics,'ScoreCutoff')* (slot(Object.job.statistics,'UProCHits') / sum(slot(Object.job.statistics,'UProCHits'))))
+  
+  .setThresh = slot(Object.job.statistics,'FilteringScore')
+  
+  x11()
+  p <- ggplot(data = .DF, aes(x=x,y=y))
+  print(p + geom_tile(aes(fill=z)) + scale_fill_gradient(low="#eafeef", high="#7ccd7c"))
+  x11()
+  p <- ggplot(data = .DF, aes(x=y,y=z, group = factor(x)))
+  p <- p + geom_vline(xintercept = .thresh,colour = 'blue')
+    if (length(.setThresh) == 1)
+    {
+    p <- p + geom_vline(xintercept = .setThresh, colour = 'red')
+    }
+  print(p + 
+          geom_line(aes(colour =factor( x)))+ 
+          stat_summary(fun.x = mean, geom="line") + 
+          xlab("UProC Score") + 
+          ylab("Fraction of Counts") +
+          scale_colour_grey(name = "Samples")
+        ) 
+  
+  
+}
