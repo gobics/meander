@@ -167,7 +167,7 @@ start.UProC <- function(ObjectUProCModus)
   start.RDS()
 }
 
-start.RDS <- function(Object.job.path, Object.data.big, Object.job.statistics, object.save.FLAG)
+start.RDS <- function(Object.data.big, Object.data.kegg, Object.job.path, Object.job.statistics, Object.data.refined, object.save.FLAG)
 {
   
   .AllFiles <- slot(Object.job.path,FILETYPE.RDS)
@@ -181,10 +181,26 @@ start.RDS <- function(Object.job.path, Object.data.big, Object.job.statistics, o
     cat("read RDS","\n")
     #store concentrated in Object
     cat("store concentrated in Object","\n")
-    #store Object?  
+    #store Object?
+    .ret <- perform.dataconstruction.rds(Object.data.big = Object.data.big, Object.job.path = Object.job.path, Object.data.kegg = Object.data.kegg, Object.job.statistics = Object.job.statistics, i)
+    
+    Object.job.statistics <- .ret[[1]]
+    Object.data.big <- .ret[[2]]
+    
     cat("store Object? ","\n")
   }
   
+  #create smaller, condensed DT for Taxonomy
+  .QDT <- perform.quickdatatable(slot(Object.data.big,'CountDT'))
+  
+  Object.data.refined <- setInputdata(Object.data.refined,'QuickDT',.QDT)
+return(
+  list(
+    Object.job.statistics,
+    Object.data.big,
+    Object.data.refined
+  )
+)  
 }
 
 start.Object <- function()

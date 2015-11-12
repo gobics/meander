@@ -70,12 +70,6 @@ process.uproc <- function(uproc.filein, rds.fileout, writeoutput.FLAG, keepinput
   return(TRUE)
 }
 
-
-process.storeRDS <- function(Obj,fileout)
-{
-  saveRDS(object = Obj, file = fileout)
-}
-
 filter.key.dt <- function(DT, key, Filter)
 {
   #returns logical Vector of all hits matching the Filter
@@ -279,7 +273,7 @@ DF2 <- data.table(Sample = numeric(), ko = numeric(), TaxID = numeric(), Previou
   }
 
 DT <- DF2[,.N,by=c('TaxID','ko','Sample','Previous')]
-setnames(DT,c('TaxID','ko','Sample','Previous','N'),c('TaxID','ko','Sample','Previous','Counts'))
+setnames(DT,c('N'),c('Counts'))
 
 DT2 <- slot(Object.data.big,'CountDT')
 DT <- rbindlist(list(DT2,DT)) 
@@ -287,4 +281,12 @@ DT <- rbindlist(list(DT2,DT))
 Object.data.big <- setInputdata(ObjectPart = Object.data.big, Type = 'CountDT', DT)
 
 return(list(Object.job.statistics,Object.data.big))
+}
+
+
+perform.quickdatatable <- function(DT)
+{
+DT2 <- DT[,sum(Counts),by=c('Sample','TaxID','Previous')]
+setnames(DT2,c('V1'),c('Counts'))
+return(DT2)
 }

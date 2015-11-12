@@ -155,6 +155,16 @@
 ##TODO
 #nReq <- number of list it must have...number of #Samples etc.
 
+.Object.Global.Config <- setClass(
+  "Object.Global.Config",
+  slots = c(
+    trash = 'character'
+  )
+)
+
+
+
+
 .Object.DATA.dataframes <- setClass(
   "Object.DATA.dataframes",
   slots = c(
@@ -181,6 +191,20 @@
 )
 
 
+.Object.DATA.Refined <- setClass (
+  #Name
+  "Object.DATA.Refined",
+  #slots
+  slots = c(
+    QuickDT = "data.table",
+    CountDT = "data.table"
+  ),
+  prototype = list(
+    QuickDT = data.table(),
+    CountDT = data.table()
+  )
+)
+
 .Object.DATA.KEGG <- setClass (
   "Object.DATA.KEGG",
   slots = c(
@@ -195,7 +219,8 @@
   #slots
   slots = c(
   BIG = "Object.DATA.BIG",
-  KEGG = "Object.DATA.KEGG"
+  KEGG = "Object.DATA.KEGG",
+  Refined = "Object.DATA.Refined"
   )
 )
 

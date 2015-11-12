@@ -27,6 +27,7 @@ meander.start <- function(
   Object.data.big <- .Object.DATA.BIG()
   
   Object.data.kegg <- .Object.DATA.KEGG()
+  Object.data.refined <- .Object.DATA.Refined()
   Object.job.statistics <- .Object.Job.Statistics()
   ##load fixed data
   #tax Mat
@@ -145,8 +146,10 @@ meander.start <- function(
   Object.job.statistics <- .ret[[3]]
   print(.ret[[4]])
     #STEP3
-  .ret <- start.RDS(Object.job.path = Object.job.path, Object.data.big = Object.data.big, Object.job.statistics = Object.job.statistics, object.save.FLAG = FALSE)
-  
+  .ret <- start.RDS(Object.data.big = Object.data.big, Object.job.path = Object.job.path, Object.data.kegg = Object.data.kegg, Object.job.statistics = Object.job.statistics, Object.data.refined =  Object.data.refined, object.save.FLAG = FALSE)
+  Object.data.big <- .ret[[2]]
+  Object.job.statistics <- .ret[[1]]
+  Object.data.refined <- .ret[[3]]
   }
 
   if (File.type == FILETYPE.DNAwoRNA)
@@ -184,6 +187,7 @@ meander.start <- function(
   slot(slot(Object.Final,'Job'),'Statistics') = Object.job.statistics
   slot(slot(Object.Final,'DATA'),'BIG') = Object.data.big
   slot(slot(Object.Final,'DATA'),'KEGG') = Object.data.kegg
+  slot(slot(Object.Final,'DATA'),'Refined') = Object.data.refined
   ###
   
   
