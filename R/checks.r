@@ -1,34 +1,48 @@
-.check.DNA <- function(filepath)
+check.DNA <- function(filepath)
 {
   con <- file(filepath, "r", blocking = FALSE)
   linn=readLines(con,1)
     if (substr(linn,1,1) != '>')
     {
-    return(FALSE)
+    close(con = con)
+    return(BAD())
     }
   linn=readLines(con,1)
-gregexpr("[a,c,t,g,u,A,C,T,G,U]", linn)
-
-
+  .nNucl = nchar(linn)
+  #count nucleotide occurances
+  .Q <- gregexpr("[a,c,t,g,u,A,C,T,G,U]", linn)
+  .nMatches = sum(attributes(.Q[[1]])$match.length)
+  close(con = con)
+  
+    if ((.nNucl/.nMatches) < 0.8)
+    {
+    return(BAD())
+    }
+  
+return(OK())
 }
 
-.check.RDS <- function(filepath)
+check.RDS <- function(filepath)
 {
   .x <- try(readRDS(filepath))
-  if (!isClass(x,"try-error"))
+  if ((class(.x)[1] != "try-error"))
   {
-  return(TRUE)
+  return(OK())
   }
-return(FALSE)
+return(BAD())
 }
 
-.check.uproc <- function()
+check.uproc <- function(filepath)
 {
-
+  if (file.exists(filepath))
+  {
+    return(OK())
+  }
+return(BAD())  
 }
 
 
-.check.package <- function(test.package)
+check.package <- function(test.package)
 {
   #check if package is availible
   if(test.package %in% rownames(installed.packages()))
@@ -41,79 +55,117 @@ return(FALSE)
 
 
 
-.check_RLSQ <- function()
+check_RLSQ <- function()
 {
   #check if libary is loaded
   #is.loaded("fragmentlength", "test123", "")
   dyn.load("baz.so")
   if (sample(100,1) > 50)
   {
-    return(TRUE)
+    return(OK())
   }
-  return(FALSE)
+  return(BAD())
 }
 
 # check.uprocversion('/home/hklingen/Tool/uproc-1.1.2_sl/uproc-dna -v')
-.check.uprocversion <- function(Command,ObjectPart)
+check.uprocversion <- function(Command,ObjectPart)
 {
   #checks if the version of UProc is the correct one
   #works on linux and windows
   .Q <- system(Command,intern=TRUE)
   if (.Q[2] == "uproc tax")
   {
-    return(TRUE)
+    return(OK())
   }
-  return(FALSE)
+  return(BAD())
 }
 
-.check.input <- function(SelectedType,PartObject,filepath)
+check.input <- function(SelectedType,PartObject,filepaths)
 {
-  #takes the selected file "filepath" and various checks are performed depending on Filetyp.
+  #takes the selected files "filepaths" and various checks are performed depending on Filetyp.
   # -> TRUE/FALSE
   #checks if the selected input type (DNA, ProteinonlyDNA, UProc, RDS) is processable
-  if (SelectedType == 'DNAin')
+  
+  .nFiles = length(filepaths)
+  
+  if (SelectedType == FILETYPE.DNA)
   {
     #test if file format is correct
-
+    for (i in 1:.nFiles)
+    {
+      .check <- check.DNA(filepaths[[i]])  
+    }
   }
 
-  else if (SelectedType == 'DNAwithoutRNAin')
+  else if (SelectedType == FILETYPE.DNAwoRNA)
   {
     #test if file format is correct
+    for (i in 1:.nFiles)
+    {
+    .check <- check.DNA(filepaths[[i]])  
+    }
   }
 
-  else if (SelectedType == 'UPRoCin')
+  else if (SelectedType == FILETYPE.UproC)
   {
     #test against correct version of uproc
-
+    
     #test if file format is correct
+    for (i in 1:.nFiles)
+    {
+    .check <- check.uproc(filepaths[[i]])
+    }
   }
 
-  else if (SelectedType == 'RDSin')
+  else if (SelectedType == FILETYPE.RDS)
   {
-    #test if file format is correct
-    if(.check.RDS)
+    for (i in 1:.nFiles)
     {
-      return(TRUE)
+      .check <- check.RDS(filepaths[[i]])
+      
     }
+    #test if file format is correct
 
-    else
+  }
+  
+  else
+  {
+  return(BAD())  
+  }
+  
+return(.check)  
+}
+
+
+#test if each directory exists
+check.dir <- function(outDir,ListOfDirs)
+{
+nDirlength = nchar(outDir)
+  if (substr(outDir,nDirlength,nDirlength) == .Platform$file.sep)
+  {
+  outDir = substr(outDir,1,(nDirlength-1))
+  }
+  
+  for (i in 1:length(ListOfDirs))
+  {
+    if (!file.exists(file.path(outDir,ListOfDirs[[i]])))
     {
-
+    return(BAD())
     }
   }
-  return(FALSE)
+return(OK())
 }
 
 
-
-.check.combination <- function()
+check.someuproc.error <- function(returned.system.string)
 {
-
+#checks if uproc gives an error.  
+  if (!is.null(attr(returned.system.string,'status')))
+  {
+    #different errors depending of notice are possible...
+    FATAL_ERROR$new('I WILL FIND YOU AND I WILL KILL YOU')$throw()
+  }
 }
-
-
-
 
 
 

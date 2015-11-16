@@ -259,7 +259,7 @@ attemptExecution <- function(expr, nof.Attempts = 1)
         tryCatch(
             {
                 expr
-                success = T
+              success = TRUE
             },
             error = handle.Error
         )
