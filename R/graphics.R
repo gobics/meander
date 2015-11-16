@@ -1,3 +1,41 @@
+
+# **************************************************************************************************
+#   CLASS DEFINITIONS 
+# **************************************************************************************************
+
+GraphicalWindow <- setRefClass(
+    'GraphicalWindow',
+    
+    fields = list(
+        windowHandle = 'character',
+        
+        dim = 'integer'
+        )
+    
+#    methods = list(
+#        create,  
+#        init,    
+#        setVisibility, 
+#        disable, 
+#        determine.Window.InnerDimension, 
+#        determine.Window.CenteredPosition, 
+#        initialize 
+#        )
+)
+MainWindow <- setRefClass(
+    'MainWindow',
+    
+    contains = 'GraphicalWindow',
+    
+    fields = list(
+        title = 'character'
+        )
+    
+#   create = MainWindow.methodDefinition_create,
+#   initialize = MainWindow.methodDefinition_initialize
+)
+
+
 # **************************************************************************************************
 #   CONSTANTS
 # **************************************************************************************************
@@ -14,6 +52,7 @@ TCLTK.POSITION_SEPARATOR = '+'
 
 TCLTK.REQUIRED_VERSION = '8.5'
 
+
 # **************************************************************************************************
 #   GLOBAL VARIABLES
 # **************************************************************************************************
@@ -28,17 +67,18 @@ WINDOW_DECORATION_SIZE = c(0, 0)
 #   BEGIN CLASS: GraphicalWindow
 # -------------------------------------------------------------------------------------------------- 
 
-GraphicalWindow.methodDefinition_determine.Window.InnerDimension <- function()
+Graphical.Window$methods(list(
+determin.window.InnerDimension = function()
 {
     dim - WINDOW_DECORATION_SIZE
-}
+},
 
-GraphicalWindow.methodDefinition_determine.Window.CenteredPosition <- function()
+determine.Window.CenteredPosition = function()
 {
     floor((determine.Screen.Dimension() - dim) / 2)
-}
+},
 
-GraphicalWindow.methodDefinition_create <- function(...)
+create <- function(...)
 {
     geometry = parse.TCLTK.Geometry(determine.Window.CenteredPosition(), dim)
     
@@ -46,27 +86,27 @@ GraphicalWindow.methodDefinition_create <- function(...)
         windowHandle,
         geometry
         )
-}
+},
 
-GraphicalWindow.methodDefinition_init <- function(...)
+init <- function(...)
 {
     # ABSTRACT METHOD STUB    
-}
+},
 
-GraphicalWindow.methodDefinition_setVisibility <- function(visible)
+setVisibility <- function(visible)
 {
     if (visible)
         tkwm.deiconify(windowHandle)
     else
         tkwm.withdraw(windowHandle)
-}
+},
 
-GraphicalWindow.methodDefinition_disable <- function()
+disable <- function()
 {
     
-}
+},
 
-GraphicalWindow.methodDefinition_initialize <- function(width = MINIMUM_SCREEN_WIDTH, height = MINIMUM_SCREEN_HEIGHT, visible = TRUE, ...)
+initialize <- function(width = MINIMUM_SCREEN_WIDTH, height = MINIMUM_SCREEN_HEIGHT, visible = TRUE, ...)
 {
     tclServiceMode(F)
     
@@ -85,6 +125,7 @@ GraphicalWindow.methodDefinition_initialize <- function(width = MINIMUM_SCREEN_W
     
     tclServiceMode(T)
 }
+))
 
 # -------------------------------------------------------------------------------------------------- 
 #   END CLASS: GraphicalWindow
@@ -109,44 +150,6 @@ MainWindow.methodDefinition_create <- function(title = '')
 # -------------------------------------------------------------------------------------------------- 
 #   END CLASS: MainWindow
 # -------------------------------------------------------------------------------------------------- 
-
-# **************************************************************************************************
-#   CLASS DEFINITIONS 
-# **************************************************************************************************
-
-GraphicalWindow <- setRefClass(
-    'GraphicalWindow',
-    
-    fields = list(
-        windowHandle = 'character',
-        dim = 'integer'
-        ),
-    
-    methods = list(
-        create     = GraphicalWindow.methodDefinition_create,
-        init       = GraphicalWindow.methodDefinition_init,
-        setVisibility = GraphicalWindow.methodDefinition_setVisibility,
-        disable    = GraphicalWindow.methodDefinition_disable,
-        determine.Window.InnerDimension = GraphicalWindow.methodDefinition_determine.Window.InnerDimension,
-        determine.Window.CenteredPosition = GraphicalWindow.methodDefinition_determine.Window.CenteredPosition,
-        initialize  = GraphicalWindow.methodDefinition_initialize
-        )
-)
-
-MainWindow <- setRefClass(
-    'MainWindow',
-    
-    contains = 'GraphicalWindow',
-    
-    fields = list(
-        title = 'character'
-        ),
-    
-    methods = list(
-        create = MainWindow.methodDefinition_create,
-        initialize = MainWindow.methodDefinition_initialize
-    )
-)
 
 # **************************************************************************************************
 #   AUXILIARY FUNCTIONS AND STATIC METHODS
