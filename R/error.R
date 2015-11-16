@@ -250,7 +250,7 @@ attemptExecution <- function(expr, nof.Attempts = 1)
 {
     index.Attempt = 0
     success = F
-   
+    
     suppressWarnings( 
     while(!success && index.Attempt < nof.Attempts) 
     {
@@ -258,7 +258,7 @@ attemptExecution <- function(expr, nof.Attempts = 1)
         
         tryCatch(
             {
-                eval(expr = parse(text = expr))
+                expr
                 success = T
             },
             error = handle.Error
