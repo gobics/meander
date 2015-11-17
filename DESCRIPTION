@@ -1,0 +1,12 @@
+Package: MeandeR
+Type: Package
+Title: Sebastian verruecktmachen
+Version: 0.0.0.0.0.0.0.0.0.0.0.0.1.0.1
+Date: 1015-13-32
+Author: Dein Schwarm
+Maintainer: Who to complain to <root@127.0.0.1>
+Description: it does Stuff!
+License: Pay2Win
+LazyData: FALSE
+Imports:stats, data.table
+Depends: stats, data.table
