@@ -67,8 +67,9 @@ WINDOW_DECORATION_SIZE = c(0, 0)
 #   BEGIN CLASS: GraphicalWindow
 # -------------------------------------------------------------------------------------------------- 
 
-Graphical.Window$methods(list(
-determin.window.InnerDimension = function()
+GraphicalWindow$methods(
+list(
+determine.Window.InnerDimension = function()
 {
     dim - WINDOW_DECORATION_SIZE
 },
@@ -78,7 +79,7 @@ determine.Window.CenteredPosition = function()
     floor((determine.Screen.Dimension() - dim) / 2)
 },
 
-create <- function(...)
+create = function(...)
 {
     geometry = parse.TCLTK.Geometry(determine.Window.CenteredPosition(), dim)
     
@@ -88,12 +89,12 @@ create <- function(...)
         )
 },
 
-init <- function(...)
+init = function(...)
 {
     # ABSTRACT METHOD STUB    
 },
 
-setVisibility <- function(visible)
+setVisibility = function(visible)
 {
     if (visible)
         tkwm.deiconify(windowHandle)
@@ -101,12 +102,12 @@ setVisibility <- function(visible)
         tkwm.withdraw(windowHandle)
 },
 
-disable <- function()
+disable = function()
 {
     
 },
 
-initialize <- function(width = MINIMUM_SCREEN_WIDTH, height = MINIMUM_SCREEN_HEIGHT, visible = TRUE, ...)
+initialize = function(width = MINIMUM_SCREEN_WIDTH, height = MINIMUM_SCREEN_HEIGHT, visible = TRUE, ...)
 {
     tclServiceMode(F)
     

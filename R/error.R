@@ -125,7 +125,7 @@ ERROR.methodDefinition_handle <- function()
     print(.self$get.ClassName())
     print(.self$description)
     print(.self$message)
-    print(.self$variables)
+#    print(.self$variables)
     lapply(.self$callStack, print) 
     
     
@@ -157,7 +157,7 @@ ERROR.methodDefinition_initialize <- function(message = '', description = 'ERROR
 {
     callSuper(message, description, ...)
 
-    callingFrame = sys.frame(-ERROR.CALLING_FRAME_OFFSET-1)
+    callingFrame = sys.frame(-ERROR.CALLING_FRAME_OFFSET - 1)
     
     varNames = ls(envir = callingFrame)
     
