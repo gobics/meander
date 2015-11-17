@@ -52,12 +52,13 @@ plot.points <- function(plot.frame,colorVec,xLabel,yLabel,mainTitle,shapes.FLAG,
 plot.uproc.scores <- function(Object.job.statistics,Object.data.dataframes,Type = 'QQQQQQQQ')
 {
   .DF <- slot(Object.data.dataframes,'Scores.Samples')
-  .thresh <- sum( slot(Object.job.statistics,'ScoreCutoff')* (slot(Object.job.statistics,'UProCHits') / sum(slot(Object.job.statistics,'UProCHits'))))
+  .thresh <- calc.FilteringScore(Object.job.statistics)
   
   .setThresh = slot(Object.job.statistics,'FilteringScore')
   
   x11()
   p <- ggplot(data = .DF, aes(x=x,y=y))
+  p + geom_hline(xintercept = .thresh,colour = 'blue')
   print(p + geom_tile(aes(fill=z)) + scale_fill_gradient(low="#eafeef", high="#7ccd7c"))
   x11()
   p <- ggplot(data = .DF, aes(x=y,y=z, group = factor(x)))
