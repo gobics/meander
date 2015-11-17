@@ -127,6 +127,8 @@ ERROR.methodDefinition_handle <- function()
     print(.self$message)
     print(.self$variables)
     lapply(.self$callStack, print) 
+    
+    
 }
 
 ERROR.methodDefinition_throw <- function()
