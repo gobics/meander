@@ -1,5 +1,5 @@
 
-.libPaths(new = '/home/hklingen/projects/TMP/R')
+#.libPaths(new = '/home/hklingen/projects/TMP/R')
 
 Method.primary = c('DESeq2','edgeR','samr')
 
@@ -15,7 +15,7 @@ biocondURL = "https://bioconductor.org/biocLite.R"
 biocondURLnoHTTPS = "http://bioconductor.org/biocLite.R"
 
 
-source(biocondURLnoHTTPS)
+#source(biocondURLnoHTTPS)
 
 
 install.additional.packages <- function(PackageVec,TypeVec)
