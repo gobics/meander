@@ -157,14 +157,19 @@ ERROR.methodDefinition_initialize <- function(message = '', description = 'ERROR
 {
     callSuper(message, description, ...)
 
-    callingFrame = sys.frame(-ERROR.CALLING_FRAME_OFFSET - 1)
+    #print(sys.nframe())
     
-    varNames = ls(envir = callingFrame)
-    
-    variables <<- lapply(varNames, get, envir = callingFrame)
-    names(variables) <<- varNames
-    
-    callStack <<- obtain.callStack(sys.nframe() - ERROR.CALLING_FRAME_OFFSET)
+#     if (sys.nframe() > ERROR.CALLING_FRAME_OFFSET + 1)
+#     {
+#       callingFrame = sys.frame(- ERROR.CALLING_FRAME_OFFSET - 1)
+#       
+#       varNames = ls(envir = callingFrame)
+#       
+#       variables <<- lapply(varNames, get, envir = callingFrame)
+#       names(variables) <<- varNames
+#       
+#       callStack <<- obtain.callStack(sys.nframe() - ERROR.CALLING_FRAME_OFFSET)
+#     }
         
     # INCREASE STACK POINTER
     ERROR.STACK_POINTER <<- as.integer(ERROR.STACK_POINTER + 1)
@@ -183,7 +188,7 @@ ERROR.methodDefinition_obtain.callStack <- function(peak)
 # DUMMY-STUB
 FATAL_ERROR.methodDefinition_handle <- function()
 {
-    stop(get.ClassName())
+    stop(.self$get.ClassName())
 }
 
 NOTIFICATION.methodDefinition_issue <- function()
@@ -197,6 +202,12 @@ WARNING.methodDefinition_initialize <- function(message = '', description = 'WAR
 {
     callSuper(message = message, description = description, ...)
 }
+
+MY_WARNING.methodDefinition_initialize <- function(samples, message = '', description = 'WARNING', ...)
+{
+  message <<- sprintf()
+}
+
 # ************************************************************************************************** 
 #   CLASS DEFINITIONS
 # ************************************************************************************************** 
@@ -264,6 +275,16 @@ WARNING = setRefClass(
     methods = list(
         initialize = WARNING.methodDefinition_initialize
         )
+)
+
+MY_WARNING = setRefClass(
+  'MY_WARNING',
+  
+  contains = 'WARNING',
+  
+  methods = list(
+    initialize = MY_WARNING.methodDefinition_initialize
+  )
 )
 
 # ************************************************************************************************** 
