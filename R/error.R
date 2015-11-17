@@ -1,7 +1,5 @@
 
 
-
-
 # GIVEN AN OBJECT `obj` THAT WAS CREATED BY `obj = setRefClass(...)`
 # THE FOLLWING WOULD BE RETURNED BY `class(obj)`
 REFERENCE_CLASS.NAME_STRING = 'refObjectGenerator'
@@ -13,6 +11,8 @@ WARNING_CLASS.NAME_STRING = 'WARNING'
 ERROR.NAME_ID_DELIMITER = ':'
 
 ERROR.ID_PREFIX = 'ID_'
+
+ERROR.CALLING_FRAME_OFFSET = 11
 
 ERROR.REGEX_VALID_ERROR_STRING = bindStrings(
     '^[[:alpha:]\\.]+[[:alnum:]_\\.]*', ERROR.NAME_ID_DELIMITER,
@@ -122,9 +122,13 @@ obtain.IDString <- function(ID)
 
 ERROR.methodDefinition_handle <- function() 
 {
-    print(
-        toupper('The Answer to the Great Question of Life, the Universe and Everything ...')
-    )
+    print(.self$get.ClassName())
+    print(.self$description)
+    print(.self$message)
+    print(.self$variables)
+    lapply(.self$callStack, print) 
+    
+    
 }
 
 ERROR.methodDefinition_throw <- function()
@@ -152,11 +156,28 @@ StatusMessage.methodDefinition_initialize <- function(message = '', description 
 ERROR.methodDefinition_initialize <- function(message = '', description = 'ERROR', ...)
 {
     callSuper(message, description, ...)
-     
+
+    callingFrame = sys.frame(-ERROR.CALLING_FRAME_OFFSET-1)
+    
+    varNames = ls(envir = callingFrame)
+    
+    variables <<- lapply(varNames, get, envir = callingFrame)
+    names(variables) <<- varNames
+    
+    callStack <<- obtain.callStack(sys.nframe() - ERROR.CALLING_FRAME_OFFSET)
+        
     # INCREASE STACK POINTER
     ERROR.STACK_POINTER <<- as.integer(ERROR.STACK_POINTER + 1)
 
     initFields(ID = ERROR.STACK_POINTER)
+}
+
+ERROR.methodDefinition_obtain.callStack <- function(peak)
+{
+    lapply(
+        1 : peak,
+        sys.call
+        )
 }
 
 # DUMMY-STUB
@@ -200,7 +221,9 @@ ERROR = setRefClass(
     contains = 'StatusMessage',
     
     fields = list(
-        ID = 'integer'
+        ID = 'integer',
+        variables = 'list',
+        callStack = 'list'
         ),
     
     methods = list(
@@ -208,8 +231,9 @@ ERROR = setRefClass(
        throw  = ERROR.methodDefinition_throw,
        obtain.formattedThrowString = ERROR.methodDefinition_obtain.formattedThrowString,
        initialize = ERROR.methodDefinition_initialize,
-       addTo.ErrorStack = ERROR.methodDefinition_addTo.ErrorStack
-        )
+       addTo.ErrorStack = ERROR.methodDefinition_addTo.ErrorStack,
+       obtain.callStack = ERROR.methodDefinition_obtain.callStack
+       )
 )
 
 FATAL_ERROR = setRefClass(
@@ -250,7 +274,7 @@ attemptExecution <- function(expr, nof.Attempts = 1)
 {
     index.Attempt = 0
     success = F
-   
+    
     suppressWarnings( 
     while(!success && index.Attempt < nof.Attempts) 
     {
@@ -259,7 +283,7 @@ attemptExecution <- function(expr, nof.Attempts = 1)
         tryCatch(
             {
                 expr
-              success = TRUE
+                success = TRUE
             },
             error = handle.Error
         )

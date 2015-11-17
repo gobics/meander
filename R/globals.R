@@ -161,3 +161,10 @@ RDS_FILE_EXTENSION = 'Rds'
 # ******************************************************************************
 # END     :   FILE CONSTANTS
 # ******************************************************************************
+
+APPLICATION_TITLE = 'meandeR'
+
+# RUNNING_MODES
+RUNNING_MODE_BATCH = 'BATCH'
+RUNNING_MODE_INTERACTIVE = 'INTERACTIVE'
+RUNNING_MODE_FRONTEND = 'FRONTEND'
