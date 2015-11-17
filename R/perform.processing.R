@@ -92,26 +92,6 @@ filter.multihit.dt <- function(DT,.nRows, key)
   return(!.I.singlehit)
 }
 
-filter.uprocresult <- function( ko.key, KO.Filter)
-{
-  #DT data.table with UProC results
-  
-  
-  #get dimensions
-  .tmp <- dim(DT)
-  .nRows <- .tmp[1]
-  .nCol <- .tmp[2]
-  
-  
-
-  
-
-  
-  
-  
-  
-}
-
 process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statistics, tmp.data.frame, Sample)
 {
   .uproc.filein <- slot(Object.job.path,FILETYPE.UproC)[Sample]
@@ -121,10 +101,10 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
   .Return <- fread(.uproc.filein, nrows=-1, select = c(1,3,8,9,10,11))
   options(warn=1)
   
-  .Return2 <- fread(.uproc.filein, nrows=1, skip = dim(.Return)[1])
+  #.Return2 <- fread(.uproc.filein, nrows=1, skip = dim(.Return)[1])
   
-  Object.job.statistics <- appendInputdata(Object.job.statistics,'UProCHits',.Return2[[1]])
-  Object.job.statistics <- appendInputdata(Object.job.statistics,'reads',.Return2[[3]])
+  #Object.job.statistics <- appendInputdata(Object.job.statistics,'UProCHits',.Return2[[1]])
+  #Object.job.statistics <- appendInputdata(Object.job.statistics,'reads',.Return2[[3]])
   
   
   
@@ -140,7 +120,10 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
   .filtered.out.rna <- logical()
   
   .Q <- filter.key.dt(.Return,'x',10010101)
-  .filtered.out.taxonomy <- .Q
+  
+  #combine to per sequence, not per uproc hit
+  .tmp = data.table(x = .Return[,seq.no], y = .Q)
+  .filtered.out.taxonomy <- .tmp[,sum(y),by=x][['V1']] > 0
   
   .All.to.filter <- logical(length(.Q))
   .All.to.filter <- .All.to.filter | .Q
@@ -180,7 +163,12 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
   
   
   .Q <- filter.key.dt(.Return,'ko',0)
-  .filtered.out.ko <- .Q
+  
+  #combine to per sequence, not per uproc hit
+  .tmp = data.table(x = .Return[,seq.no], y = .Q)
+  .filtered.out.ko <- .tmp[,sum(y),by=x][['V1']] > 0
+  
+  
 
   
   #cat('filtered out by ko:', sum(.Q),'\n',sep = '')
@@ -188,7 +176,10 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
   
   .Q <- filter.multihit.dt(.Return, .nLines, 'seq.no')
 
-  .filtered.out.multihit <- .Q
+  #combine to per sequence, not per uproc hit
+  .tmp = data.table(x = .Return[,seq.no], y = .Q)
+  .filtered.out.multihit <- .tmp[,sum(y),by=x][['V1']] > 0
+
 
   #cat('filtered out multihits:', sum(.Q),'\n',sep = '')
   .All.to.filter <- .All.to.filter | .Q
@@ -197,7 +188,11 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
   if (length(slot(Object.data.big,'SeqRNA')) != 0)
   {
   .Q <- filter.key.dt(.Return, 'seq.no', slot(Object.data.big,'SeqRNA')[[Sample]])
-  .filtered.out.rna <- .Q
+  
+  #combine to per sequence, not per uproc hit
+  .tmp = data.table(x = .Return[,seq.no], y = .Q)
+  .filtered.out.rna <- .tmp[,sum(y),by=x][['V1']] > 0
+  
   #cat('filtered out by RNA:', sum(.Q),'\n',sep = '')  
   .All.to.filter <- .All.to.filter | .Q
   }
@@ -299,4 +294,60 @@ return(DT2)
 perform.rna.statistics <- function(Object.job.statistics)
 {
   
+}
+
+
+calc.FilteringScore <- function(Object.job.statistics)
+{
+  if (sum(slot(Object.job.statistics,'UProCHits')) > 0)
+  {
+  return(sum(slot(Object.job.statistics,'ScoreCutoff') * ( slot(Object.job.statistics,'UProCHits') / sum(slot(Object.job.statistics,'UProCHits')))))  
+  }
+  
+  else
+  {
+    return(mean(slot(Object.job.statistics,'ScoreCutoff')))
+    
+  }
+}
+
+change.uprocscorethreshold <- function(Object.job.statistics,Object.data.dataframes) 
+{
+  .val <- calc.FilteringScore(Object.job.statistics = Object.job.statistics) 
+  cat('suggested UProC filtering Score is :',.val,'\n')
+  .loop = TRUE
+  while(.loop)
+  {
+    .loop2 = TRUE
+    while(.loop2)
+    {
+      .ret <- set.string(FALSE,'change it to:\n')
+      .ret = type.convert(.ret, as.is = TRUE)
+      if (class(.ret) != class(character()))
+      {
+        .ret = as.numeric(.ret)  
+        if (length(.ret) == 1)
+        {
+          
+          .loop2 = FALSE 
+        }
+        
+        else
+        {
+          cat('only one entry allowed.\n')
+        }
+      }
+      
+      else
+      {
+        cat('please enter a numeric value\n')  
+      }
+    }
+    slot(Object.job.statistics,'FilteringScore') <- .ret
+    plot.uproc.scores(Object.job.statistics = Object.job.statistics,Object.data.dataframes = Object.data.dataframes) 
+    .loop = !get.yesno(FALSE)
+  }
+  
+  
+return(list(Object.job.statistics))  
 }

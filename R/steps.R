@@ -241,7 +241,8 @@ start.UProC <- function(Object.job.path,Object.job.statistics,Object.data.big,Ob
     )
   )
   Object.data.dataframes <- setInputdata(Object.data.dataframes,'Scores.Samples',data.blame)
-  
+  Object.job.statistics <- setInputdata(Object.job.statistics,'FilteringScore',calc.FilteringScore(Object.job.statistics))
+
 return(
   list(
     Object.job.path,

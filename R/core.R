@@ -175,7 +175,7 @@ meander.start <- function(
 
           if (Show.plots)
         {
-        plot.uproc.scores(Object.job.statistics = Object.job.statistics,Object.data.dataframes = Object.data.dataframes) 
+            plot.uproc.scores(Object.job.statistics = Object.job.statistics,Object.data.dataframes = Object.data.dataframes) 
           
         }
         
@@ -185,8 +185,18 @@ meander.start <- function(
         
         }  
   
+  usesuggestedscore = FALSE
 
-    .ret <- start.RDS(Object.data.big = Object.data.big, Object.job.path = Object.job.path, Object.data.kegg = Object.data.kegg, Object.job.statistics = Object.job.statistics, Object.data.refined =  Object.data.refined, object.save.FLAG = FALSE)
+  if (!usesuggestedscore)
+  {
+    .ret <- change.uprocscorethreshold(Object.job.statistics,Object.data.dataframes) 
+    Object.job.statistics <- .ret[[1]]
+  }
+  
+  
+  
+  
+  .ret <- start.RDS(Object.data.big = Object.data.big, Object.job.path = Object.job.path, Object.data.kegg = Object.data.kegg, Object.job.statistics = Object.job.statistics, Object.data.refined =  Object.data.refined, object.save.FLAG = FALSE)
   Object.data.big <- .ret[[2]]
   Object.job.statistics <- .ret[[1]]
   Object.data.refined <- .ret[[3]]  

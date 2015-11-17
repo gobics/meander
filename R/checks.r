@@ -167,6 +167,24 @@ check.someuproc.error <- function(returned.system.string)
   }
 }
 
-
+check.testforpackage <- function(test.package,LOAD.FLAG)
+{
+  #check if package is availible
+  if(test.package %in% rownames(installed.packages()))
+  {
+    #load package
+    if (LOAD.FLAG)
+    {
+      return(library(test.package,character.only = TRUE, logical.return = TRUE))
+    }
+    
+    else
+    {
+    return(TRUE)
+    }
+    
+  }
+  return(FALSE)
+}
 
 
