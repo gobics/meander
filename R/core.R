@@ -203,12 +203,17 @@ meander.start <- function(
 
 
   
-  #set selected conditions
+  #select taxonomy
+    #perform pca
   
-  #.ret <- set.selected.Conditions(FALSE,slot())
+    #create Matrix
   
-  #.ret <- start.Object()
   
+  
+  #create final matrix
+  
+  .Mat <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
+  Object.data.big <- setInputdata(Object.data.big,'Matrix',.Mat)
   
   
   

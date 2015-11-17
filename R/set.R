@@ -125,7 +125,7 @@ set.selected.Conditions <- function(TCLTKFLAG,Object.job.config)
       cat('select 2, or else...\n');
       }
     }
-  .Selected = which(.ret %in% Choices)
+  .Selected = which(Choices %in% .ret)
   Object.job.config <- setInputdata(Object.job.config,'SelectedClasses',.Selected)
 return(Object.job.config)
 }

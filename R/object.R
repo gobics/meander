@@ -184,11 +184,13 @@
   #slots
   slots = c(
     SeqRNA = "list",
-    CountDT = "data.table"
+    CountDT = "data.table",
+    Matrix = "matrix"
   ),
   prototype = list(
     SeqRNA = list(),
-    CountDT = data.table()
+    CountDT = data.table(),
+    Matrix = matrix
   )
 )
 

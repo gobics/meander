@@ -351,3 +351,42 @@ change.uprocscorethreshold <- function(Object.job.statistics,Object.data.datafra
   
 return(list(Object.job.statistics))  
 }
+
+
+
+create.matrix <- function(Object.DATA.BIG,Object.Job.Config)
+{
+  #takes objects and puts out a matrix for use in PCA
+  .DT <- slot(Object.DATA.BIG,'CountDT');
+  .selectedTax <- slot(Object.Job.Config,'SelectedTax');
+  .ClassVec <- slot(Object.Job.Config,'ClassVec');
+  
+  #reduce table accordingly
+    if (.selectedTax == -1)
+    {
+      .DT <- .DT[Previous == .selectedTax]
+    }
+  
+    else
+    {
+      .DT <- .DT[TaxID == .selectedTax]
+    }
+
+  .nMaxKO <- max(.DT[,ko])
+  .nSamples = max(.DT[,Sample])
+  
+  XMat = matrix(data = 0, nrow = .nMaxKO, ncol = .nSamples)
+  #XMat[.DT[,ko],.DT[,Sample]] = .DT[,V1]
+    for (i in 1:.nSamples)
+    {
+      .red = .DT[Sample == i,]
+      XMat[.red[,ko],i] = .red[,Counts]
+    }
+  #warning if too few counts...
+  .I.Col = which(colSums(XMat) < 1000)
+    if (length(.I.Col) != 0)
+    {
+      cat("WARNING!!!!!!",.I.Col,"\n")
+    }
+  return(XMat)
+}
