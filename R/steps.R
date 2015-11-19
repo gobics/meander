@@ -308,3 +308,35 @@ start.Object <- function()
   #output
   cat("output ","\n")
 }
+
+
+
+start.consensus <- function(Object.data.big,Object.Job.Config)
+{
+  
+  .Method <- slot(Object.Job.Config,'Methods');
+  .nMethods = length(.Method)
+  
+  .Ret <- extract.Matrix(Object.data.big,Object.Job.Config)
+  
+    .Counts = .Ret[[1]]
+  .DiffCon = .Ret[[2]]
+  Something = c()
+  
+  for (i in 1:)
+  
+
+  
+  
+  
+  .Val <- perform.samr(.Counts,.DiffCon)
+  
+  Something = cbind(Something,.Val)
+  
+  .Val <- perform.deseq2(.Counts,.DiffCon)
+  Something = cbind(Something,.Val)
+  .Val <- perform.edger(.Counts,.DiffCon)
+  Something = cbind(Something,.Val)
+  
+  return(Something)
+}

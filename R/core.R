@@ -204,9 +204,14 @@ meander.start <- function(
 
   
   #select taxonomy
-    #perform pca
+  Object.job.config <- setInputdata(Object.job.config,'SelectedTax',33090)
   
     #create Matrix
+  .Mat <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
+  Object.data.big <- setInputdata(Object.data.big,'Matrix',.Mat)
+    #perform pca
+  plot.pca(Q@Job@Config,Q@Job@Statistics,Q@DATA@BIG)
+    
   
   
   
@@ -216,8 +221,11 @@ meander.start <- function(
   Object.data.big <- setInputdata(Object.data.big,'Matrix',.Mat)
   
   
+  #consensus methods
+  X <- start.consensus(Object.data.big, Object.job.config)
+  Y = rowSums(X < 0.05)
   
-  
+  #'select' consensus
   
 ###build complete object
   slot(slot(Object.Final,'Job'),'Paths') = Object.job.path

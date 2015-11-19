@@ -154,7 +154,7 @@
 
 ##TODO
 #nReq <- number of list it must have...number of #Samples etc.
-
+#UProC, 
 .Object.Global.Config <- setClass(
   "Object.Global.Config",
   slots = c(
@@ -190,7 +190,7 @@
   prototype = list(
     SeqRNA = list(),
     CountDT = data.table(),
-    Matrix = matrix
+    Matrix = matrix()
   )
 )
 
@@ -242,7 +242,8 @@
     filtered.combo = 'numeric',
     filtered.score = 'numeric',
     ScoreCutoff = 'numeric',
-    FilteringScore = 'numeric'
+    FilteringScore = 'numeric',
+    PCA = 'prcomp'
   ),
   prototype = list(
     UProCHits = numeric(),
@@ -292,7 +293,8 @@
     ClassNames = 'vector',
     SelectedClasses = 'vector',
     SelectedTax = 'numeric',
-    requiredLength = 'numeric'
+    requiredLength = 'numeric',
+    Methods  = 'character'  #the (up to 3) used methods
   ),
   # default
   prototype=list(
@@ -300,7 +302,8 @@
     ClassNames = vector(),
     SelectedClasses = vector(),
     SelectedTax = -1,
-    requiredLength = 0
+    requiredLength = 0,
+    Methods = character()
   )
 )
 

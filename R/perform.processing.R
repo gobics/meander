@@ -244,7 +244,7 @@ perform.dataconstruction.rds <- function(Object.data.big, Object.job.path, Objec
 .thresh <- slot(Object.job.statistics,'FilteringScore')
 
 #set statistics
-Object.job.statistics <- appendInputdata(Object.job.statistics,'filtered.score',dim(.FULLDT[score <= .thresh])[1])
+Object.job.statistics <- appendInputdata(Object.job.statistics,'filtered.score',dim(.FULLDT[score < .thresh])[1])
 
 .FULLDT = .FULLDT[score > .thresh]
 
@@ -389,4 +389,15 @@ create.matrix <- function(Object.DATA.BIG,Object.Job.Config)
       cat("WARNING!!!!!!",.I.Col,"\n")
     }
   return(XMat)
+}
+
+perform.consensusselecion <- function(Type = 'Consensus', O.Job.Config)
+{
+  .Methods = slot(O.Job.Config,'Methods')
+  .nMethods = length(.Methods)
+  #type consensus
+    if (Type == )
+  #type one method
+  
+  #type all
 }

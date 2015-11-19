@@ -1,14 +1,22 @@
-perform.samr <- function(Object.Job.Config,count.matrix)
+extract.Matrix <- function(Object.data.big,Object.Job.Config)
 {
   .Class.Vec <- slot(Object.Job.Config,'ClassVec')
   .Selected.Vec <- slot(Object.Job.Config,'SelectedClasses')
   
+  .Mat <- slot(Object.data.big,'Matrix')
+  
   .I = .Class.Vec %in% .Selected.Vec
   
   
-  count.matrix = count.matrix[,.I]
+  .Mat = .Mat[,.I]
   DiffCond = .Class.Vec[.I]
-  
+  return(list(.Mat,DiffCond))
+}
+
+
+
+perform.samr <- function(count.matrix,DiffCond)
+{
   rownames(count.matrix) <- c(1:dim(count.matrix)[1])
   I.SAM <- which(rowSums(count.matrix) > 0);
   Samcount.matrix <-count.matrix[I.SAM,]
@@ -26,17 +34,8 @@ perform.samr <- function(Object.Job.Config,count.matrix)
   return(SAMseq.FDRFULL)
 }
 
-perform.deseq2 <- function(Object.Job.Config,count.matrix)
+perform.deseq2 <- function(count.matrix,DiffCond)
 {
-  .Class.Vec <- slot(Object.Job.Config,'ClassVec')
-  .Selected.Vec <- slot(Object.Job.Config,'SelectedClasses')
-  
-  .I = .Class.Vec %in% .Selected.Vec
-  
-  
-  count.matrix = count.matrix[,.I]
-  DiffCond = .Class.Vec[.I]
-  
   colData<-data.frame(condition=factor(DiffCond),type=rep('single-read',length(DiffCond)))
   dds <- DESeqDataSetFromMatrix(countData = count.matrix, colData = colData, design = ~ condition)
   dds <- DESeq(dds)
@@ -47,17 +46,8 @@ perform.deseq2 <- function(Object.Job.Config,count.matrix)
   return(res$padj)
 }
 
-perform.deseq <- function(Object.Job.Config,count.matrix)
+perform.deseq <- function(count.matrix,DiffCond)
 {
-  .Class.Vec <- slot(Object.Job.Config,'ClassVec')
-  .Selected.Vec <- slot(Object.Job.Config,'SelectedClasses')
-  
-  .I = .Class.Vec %in% .Selected.Vec
-  
-  
-  count.matrix = count.matrix[,.I]
-  DiffCond = .Class.Vec[.I]
-  
   print(.I)
   print(DiffCond)
   return()
@@ -73,17 +63,8 @@ return(res$padj)
 }
 ##############TODO!##
 
-perform.edger <- function(Object.Job.Config,count.matrix)
+perform.edger <- function(count.matrix,DiffCond)
 {
-  .Class.Vec <- slot(Object.Job.Config,'ClassVec')
-  .Selected.Vec <- slot(Object.Job.Config,'SelectedClasses')
-  
-  .I = .Class.Vec %in% .Selected.Vec
-  
-  
-  count.matrix = count.matrix[,.I]
-  DiffCond = .Class.Vec[.I]
-  
   edgeR.dgelist = DGEList(counts = count.matrix, group = factor(DiffCond))
   edgeR.dgelist = calcNormFactors(edgeR.dgelist, method = "TMM")
   edgeR.dgelist = estimateCommonDisp(edgeR.dgelist)
