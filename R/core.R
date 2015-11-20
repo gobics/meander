@@ -137,6 +137,11 @@ meander.start <- function(
   #ToDo: create shitty method for each..
   
   
+  #set availibe methods
+  
+  
+  
+  
   #STEP1
   if (File.type %in% INPUTDEPENDENTSTEPS.LIST.ONE)
   {
@@ -218,12 +223,13 @@ meander.start <- function(
   #create final matrix
   
   .Mat <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
-  Object.data.big <- setInputdata(Object.data.big,'Matrix',.Mat)
+  Object.data.refined <- setInputdata(Object.data.refined,'ConsensusMat',.Mat)
   
   
   #consensus methods
   X <- start.consensus(Object.data.big, Object.job.config)
-  Y = rowSums(X < 0.05)
+  Object.job.config <- setInputdata(Object.job.config,'SelectedTax',33090)
+  
   
   #'select' consensus
   

@@ -391,13 +391,42 @@ create.matrix <- function(Object.DATA.BIG,Object.Job.Config)
   return(XMat)
 }
 
-perform.consensusselecion <- function(Type = 'Consensus', O.Job.Config)
+perform.consensusselecion <- function(Type = 'Consensus', O.Job.Config, O.DATA.Refined)
 {
   .Methods = slot(O.Job.Config,'Methods')
   .nMethods = length(.Methods)
-  #type consensus
-    if (Type == )
-  #type one method
   
+  print(.nMethods)
+  
+  .ConMat = slot(O.DATA.Refined,'ConsensusMat')
+  
+  .pThresh = slot(O.Job.Config,'pValThresh')
+  
+  
+  .ConMat <- .ConMat <= .pThresh
+  
+  #type consensus
+    if (Type == 'Consensus')
+    {
+      .Vec <- rowSums(.ConMat) >= (.nMethods/2)
+    }
+  #type one method
+    else if (Type %in% .Methods)
+    {
+      .Vec <- .ConMat[,.Methods %in% Type]
+    }
   #type all
+    else if (Type == 'all')
+    {
+      .Vec <- rowSums(.ConMat) == .nMethods
+    }
+  
+    else
+    {
+      #ERROR
+      .Vec = FALSE
+    }
+  O.DATA.Refined <- setInputdata(O.DATA.Refined,'ConsensusVec', .Vec)
+  
+  return(O.DATA.Refined)
 }

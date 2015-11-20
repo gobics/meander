@@ -201,11 +201,15 @@
   #slots
   slots = c(
     QuickDT = "data.table",
-    CountDT = "data.table"
+    CountDT = "data.table",
+    ConsensusMat = "matrix",
+    ConsensusVec = "vector"
   ),
   prototype = list(
     QuickDT = data.table(),
-    CountDT = data.table()
+    CountDT = data.table(),
+    ConsensusMat = matrix(),
+    ConsensusVec = vector()
   )
 )
 
@@ -294,7 +298,8 @@
     SelectedClasses = 'vector',
     SelectedTax = 'numeric',
     requiredLength = 'numeric',
-    Methods  = 'character'  #the (up to 3) used methods
+    Methods  = 'character',  #the (up to 3) used methods
+    pValThresh = 'numeric'
   ),
   # default
   prototype=list(
@@ -303,7 +308,8 @@
     SelectedClasses = vector(),
     SelectedTax = -1,
     requiredLength = 0,
-    Methods = character()
+    Methods = character(),
+    pValThresh = 0.05
   )
 )
 

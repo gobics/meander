@@ -51,9 +51,18 @@ PLOTTYPE = PLOTCHOICES[1]
 TAXONOMY.LEVELS = 8
 
 
+METHOD.REPLACEMENT <- list(
+                    'DESeq2' = c('DESeq2','DESeq'),
+                    'edgeR' = c('edgeR','limma'),
+                    'samr' = 'samr'
+                    )
+
 METHOD.REPLACEMENT.DESEQ2 = c('DESeq2','DESeq');
 METHOD.REPLACEMENT.EDGER = c('edgeR','limma');
-METHOD.REPLACEMENT.EDGER = c('samr')
+METHOD.REPLACEMENT.SAMR = c('samr')
+
+
+
 
 
 
