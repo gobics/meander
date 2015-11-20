@@ -45,12 +45,14 @@ meander.start <- function(
   
   DEBUG.PRINT <- TRUE
   
-# TODO put into Object
-  set.globals()
+  
 
 ## Where to start?
   # preselected parameters?
 
+    #set availibe methods
+    attemptExecution(Object.job.config <- set.methods(Object.job.config))
+  
   #set input dir if missing
   if( is.null(Dir.in) & is.null(File.list))
   {
@@ -102,9 +104,6 @@ meander.start <- function(
     .full.filepaths = file.path(Dir.in,File.list)
     #check if files are what is claimed
     .res <- check.input(File.type,NULL,.full.filepaths)
-    .res@handle()
-    
-    
     
     
     #add to objectpart
@@ -119,7 +118,7 @@ meander.start <- function(
   
   ##check if error.
     if (DEBUG.PRINT) {  cat('checking for error : \t') }
-  .res@handle()
+
     if (DEBUG.PRINT) {  cat('OK\n') }
   
   ## set conditions
@@ -133,14 +132,7 @@ meander.start <- function(
     ##
   
   ## save Object for the first time.
-  
-  #ToDo: create shitty method for each..
-  
-  
-  #set availibe methods
-  
-  
-  
+
   
   #STEP1
   if (File.type %in% INPUTDEPENDENTSTEPS.LIST.ONE)
@@ -207,7 +199,7 @@ meander.start <- function(
   Object.data.refined <- .ret[[3]]  
 
 
-  
+  ## LOOP
   #select taxonomy
   Object.job.config <- setInputdata(Object.job.config,'SelectedTax',33090)
   
@@ -215,19 +207,22 @@ meander.start <- function(
   .Mat <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
   Object.data.big <- setInputdata(Object.data.big,'Matrix',.Mat)
     #perform pca
-  plot.pca(Q@Job@Config,Q@Job@Statistics,Q@DATA@BIG)
+  plot.pca(Object.Job.Config = Object.job.config,Object.Job.Statistics = Object.job.statistics,Object.Data.Big = Object.data.big)
     
-  
+    ##
   
   
   #create final matrix
   
   .Mat <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
-  Object.data.refined <- setInputdata(Object.data.refined,'ConsensusMat',.Mat)
+  Object.data.big <- setInputdata(Object.data.big,'Matrix',.Mat)
   
   
   #consensus methods
-  X <- start.consensus(Object.data.big, Object.job.config)
+  .X <- start.consensus(Object.data.big, Object.job.config)
+  Object.data.refined <- setInputdata(Object.data.refined,'ConsensusMat',.X)
+  
+  
   Object.job.config <- setInputdata(Object.job.config,'SelectedTax',33090)
   
   

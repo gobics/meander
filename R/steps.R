@@ -319,19 +319,17 @@ start.consensus <- function(Object.data.big,Object.Job.Config)
   
   .Ret <- extract.Matrix(Object.data.big,Object.Job.Config)
   
-    .Counts = .Ret[[1]]
+  .Counts = .Ret[[1]]
   .DiffCon = .Ret[[2]]
+  
   Something = c()
 
-  
-  .Val <- perform.samr(.Counts,.DiffCon)
-  
+  for (i in 1:.nMethods)
+  {
+  M.Obj <- slot(METHOD.LIST,.Method[i])
+  .Val <- executeMethod(M.Obj,.Counts,.DiffCon)
   Something = cbind(Something,.Val)
-  
-  .Val <- perform.deseq2(.Counts,.DiffCon)
-  Something = cbind(Something,.Val)
-  .Val <- perform.edger(.Counts,.DiffCon)
-  Something = cbind(Something,.Val)
-  
+  }
+
   return(Something)
 }

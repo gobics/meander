@@ -208,7 +208,7 @@ plot.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.
   
   
   
-  smallGraph = data.frame(X= 0:2, Y=colSums(TF.Mat))
+  smallGraph = data.frame(X= 0:(nMethods-1), Y=colSums(TF.Mat))
   
   
   

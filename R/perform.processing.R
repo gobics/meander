@@ -345,6 +345,7 @@ change.uprocscorethreshold <- function(Object.job.statistics,Object.data.datafra
     }
     slot(Object.job.statistics,'FilteringScore') <- .ret
     plot.uproc.scores(Object.job.statistics = Object.job.statistics,Object.data.dataframes = Object.data.dataframes) 
+    cat('Use selected Score?\n')
     .loop = !get.yesno(FALSE)
   }
   

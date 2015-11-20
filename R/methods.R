@@ -48,16 +48,15 @@ perform.deseq2 <- function(count.matrix,DiffCond)
 
 perform.deseq <- function(count.matrix,DiffCond)
 {
-  print(.I)
-  print(DiffCond)
-  return()
-  
 UCond = unique(factor(DiffCond))  
 
 cds = newCountDataSet(as.data.frame(count.matrix), factor(DiffCond))
 cds = estimateSizeFactors( cds )
 cds = estimateDispersions( cds )
 res = nbinomTest( cds, UCond[1], UCond[2] )
+
+res$padj[is.na(res$padj)] = 1
+
 return(res$padj)
 
 }

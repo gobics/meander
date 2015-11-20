@@ -151,7 +151,7 @@ set.methods <- function(O.Job.Config)
           if (j != 1)
           {
             #Warning
-            cat('low QL method selected!\n')
+            WARNING_DIFFERENT_METHOD(rep.method = METHOD.REPLACEMENT[[i]][j], ori.method = names(METHOD.REPLACEMENT)[i])$issue(TRUE)
           }
           
           
@@ -163,7 +163,7 @@ set.methods <- function(O.Job.Config)
         #NO alternative can be loaded for this methodslot
         if (j  == length(METHOD.REPLACEMENT[[i]]))
         {
-          cat('shiiiiiit\t1\n') 
+          WARNING_NO_REPLACEMENT(names(METHOD.REPLACEMENT)[i])$issue()
         }
       }
     }
