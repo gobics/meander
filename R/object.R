@@ -159,6 +159,9 @@
   "Object.Global.Config",
   slots = c(
     trash = 'character'
+  ),
+  prototype = list(
+    trash = character()
   )
 )
 

@@ -223,10 +223,24 @@ meander.start <- function(
   Object.data.refined <- setInputdata(Object.data.refined,'ConsensusMat',.X)
   
   
-  Object.job.config <- setInputdata(Object.job.config,'SelectedTax',33090)
+  
+  #plot method agreement
+  plot.vennreplacement(slot(Object.job.config,'Methods'), slot(Object.data.refined,'ConsensusMat'))
   
   
-  #'select' consensus
+  #select Consensus
+  
+  .ret <- perform.consensusselecion(Type = 'Consensus', O.Job.Config = Object.job.config, O.DATA.Refined = Object.data.refined)
+  Object.data.refined <- .ret
+  
+  #calculate pathways
+  
+  
+  #output
+  
+  
+  
+  
   
 ###build complete object
   slot(slot(Object.Final,'Job'),'Paths') = Object.job.path

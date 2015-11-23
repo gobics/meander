@@ -1,3 +1,20 @@
+# ALL Objects as a Vector
+OBJECTS.ALL <- list(
+  "Object.Global.Config",
+  "Object.DATA.dataframes",
+  "Object.DATA.BIG",
+  "Object.DATA.Refined",
+  "Object.DATA.KEGG",
+  "Object.DATA",
+  "Object.Job.Statistics",
+  "Object.Job.Paths",
+  "Object.Job.Config",
+  "Object.Job",
+  "MeandeRObject"
+  )
+
+
+
 
 .Class.DESeq2 <- setClass (
   "Class.DESeq2",
@@ -89,3 +106,23 @@ setMethod ("executeMethod", "Class.samr",
            function(z, x, y){
              perform.samr(x,y)
            })
+
+
+
+setGeneric("saveObject", function(x,y,z) 
+{
+  standardGeneric("saveObject")
+}
+)
+
+
+for (i in 1:length(OBJECTS.ALL))
+{
+  setMethod("saveObject", OBJECTS.ALL[[i]],
+          function(x,y,z)
+          {
+            filepath = file.path(slot(z,'DirOut'),'OBJECT',y)
+            saveRDS(object = x, file = filepath)
+          }
+          )
+}
