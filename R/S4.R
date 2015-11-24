@@ -109,7 +109,7 @@ setMethod ("executeMethod", "Class.samr",
 
 
 
-setGeneric("saveObject", function(x,y,z) 
+setGeneric("saveObject", function(x,z) 
 {
   standardGeneric("saveObject")
 }
@@ -119,10 +119,14 @@ setGeneric("saveObject", function(x,y,z)
 for (i in 1:length(OBJECTS.ALL))
 {
   setMethod("saveObject", OBJECTS.ALL[[i]],
-          function(x,y,z)
+          function(x,z)
           {
-            filepath = file.path(slot(z,'DirOut'),'OBJECT',y)
+            print(str(getClass(x)))
+            filepath = file.path(slot(z,'DirOut'),'OBJECT',paste0(class(x)[1],'.rds'))
             saveRDS(object = x, file = filepath)
           }
           )
 }
+
+
+

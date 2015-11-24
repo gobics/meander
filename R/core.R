@@ -34,8 +34,11 @@ meander.start <- function(
   ##load fixed data
   #tax Mat
   Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS('/home/hklingen/projects/test123/data/TaxMat.rds'))
+  
   #ko2path
+  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KEGG2PATH', value = as.matrix(readRDS('/home/hklingen/projects/test123/data/KEGG2PATH.rds')))
   #kointax
+  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KOinTax', value = readRDS('/home/hklingen/projects/test123/data/KOlist.rds'))
   #...
   #png
     ##
@@ -198,7 +201,18 @@ meander.start <- function(
   Object.job.statistics <- .ret[[1]]
   Object.data.refined <- .ret[[3]]  
 
-
+  #set base KO
+  .Ret <- process.kowithmincounts(slot(Object.data.big,'CountDT'),O.Job.Config = Object.job.config, nMin = 5)
+  Object.data.refined <- setInputdata(Object.data.refined,'ALLKOabove',.Ret)
+  
+  
+  
+  .df <- perform.plot.statistics(O.Job.Statistic = Object.job.statistics)
+  #plot
+  plot.statistics.plot(.df)
+  #ggplot
+  plot.statistics.ggplot2(.df)
+  
   ## LOOP
   #select taxonomy
   Object.job.config <- setInputdata(Object.job.config,'SelectedTax',33090)
@@ -215,7 +229,7 @@ meander.start <- function(
   #create final matrix
   
   .Mat <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
-  Object.data.big <- setInputdata(Object.data.big,'Matrix',.Mat)
+  Object.data.refined <- setInputdata(Object.data.refined,'Matrix',.Mat)
   
   
   #consensus methods

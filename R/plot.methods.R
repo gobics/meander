@@ -56,11 +56,11 @@ plot.uproc.scores <- function(Object.job.statistics,Object.data.dataframes,Type 
   
   .setThresh = slot(Object.job.statistics,'FilteringScore')
   
-  x11()
+
   p <- ggplot(data = .DF, aes(x=x,y=y))
   p + geom_hline(xintercept = .thresh,colour = 'blue')
   print(p + geom_tile(aes(fill=z)) + scale_fill_gradient(low="#eafeef", high="#7ccd7c"))
-  x11()
+
   p <- ggplot(data = .DF, aes(x=y,y=z, group = factor(x)))
   p <- p + geom_vline(xintercept = .thresh,colour = 'blue')
     if (length(.setThresh) == 1)
@@ -143,10 +143,10 @@ plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,mi
          y = paste('2. PC',sprintf('[%.2f',100*.Var.Vec[2]),'% of variance]',sep=' ')) + geom_text(alpha = 1, hjust=-1, vjust=0, show_guide = FALSE) +
     xlim(.xMin-.xAdd, .xMax + .xAdd) +
     ylim(.yMin-.yAdd, .yMax + .yAdd)
-  x11()
+
   print(c)
   #normal Plot.
-  x11()
+
   plot(main = 'PCA plot!',df$x,df$y,type = 'n',
        xlab = paste('1. PC',sprintf('[%.2f',100*.Var.Vec[1]),'% of variance]',sep=' '),
        ylab = paste('2. PC',sprintf('[%.2f',100*.Var.Vec[2]),'% of variance]',sep=' '),
@@ -323,4 +323,33 @@ plot.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.
   gA$heights[2:5] <- as.list(maxHight)
   grid.arrange(gC,gB,gD,gA, layout_matrix=cbind(c(1,1,3),c(2,2,4),c(2,2,4),c(2,2,4)))
   
+}
+
+
+
+
+
+
+plot.statistics.plot <- function(df)
+{
+  
+
+ooze <- unique(df$y)
+  rekt <- sapply(ooze, function(x) 
+  {
+    .t.df <-  df[df$y == x,]
+    unlist(.t.df['x'])
+  }
+  )
+
+colnames(rekt) <- ooze
+rownames(rekt) <- c('reads','UProCHits','filtered.score','filtered.combo','filtered.ko','filtered.tax','filtered.rna','filtered.multi','RNA')
+colz = rainbow(length(ooze))
+barplot(rekt,beside = TRUE, col = colz)
+legend('right', col = colz,legend = c('reads','UProCHits','filtered.score','filtered.combo','filtered.ko','filtered.tax','filtered.rna','filtered.multi','RNA'))
+}
+
+plot.statistics.ggplot2 <- function(df)
+{
+  ggplot(df,aes(x = y, y = x, fill = z)) + geom_bar(stat="identity")
 }

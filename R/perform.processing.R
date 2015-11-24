@@ -101,10 +101,13 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
   .Return <- fread(.uproc.filein, nrows=-1, select = c(1,3,8,9,10,11))
   options(warn=1)
   
-  #.Return2 <- fread(.uproc.filein, nrows=1, skip = dim(.Return)[1])
   
-  #Object.job.statistics <- appendInputdata(Object.job.statistics,'UProCHits',.Return2[[1]])
-  #Object.job.statistics <- appendInputdata(Object.job.statistics,'reads',.Return2[[3]])
+  
+  # if this does not work, approximate the read counts... ... ... .. .. .
+  .Return2 <- fread(.uproc.filein, nrows=1, skip = dim(.Return)[1])
+  
+  Object.job.statistics <- appendInputdata(Object.job.statistics,'UProCHits',.Return2[[1]])
+  Object.job.statistics <- appendInputdata(Object.job.statistics,'reads',.Return2[[3]])
   
   
   
@@ -195,9 +198,11 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
   
   #cat('filtered out by RNA:', sum(.Q),'\n',sep = '')  
   .All.to.filter <- .All.to.filter | .Q
+
   }
 
-  
+  .tmp = data.table(x = .Return[,seq.no], y = .All.to.filter)
+  .filtered.out.multi <- .tmp[,sum(y),by=x][['V1']] > 0  
   
   ##find unique filtered elements...
   .filtered.out.taxonomy
@@ -214,7 +219,7 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
   .nfiltered.ko <- sum(!.filtered.out.taxonomy & .filtered.out.ko & !.filtered.out.multihit & !.filtered.out.rna)
   .nfiltered.multihit <- sum(!.filtered.out.taxonomy & !.filtered.out.ko & .filtered.out.multihit & !.filtered.out.rna)
   .nfiltered.rna <- sum(!.filtered.out.taxonomy & !.filtered.out.ko & !.filtered.out.multihit & .filtered.out.rna)
-  .nfiltered.multi <- sum(.All.to.filter) - .nfiltered.tax - .nfiltered.ko - .nfiltered.multihit - .nfiltered.rna
+  .nfiltered.multi <- sum(.filtered.out.multi) - .nfiltered.tax - .nfiltered.ko - .nfiltered.multihit - .nfiltered.rna
   
   Object.job.statistics <- appendInputdata(Object.job.statistics,'filtered.multi',.nfiltered.multihit)
   Object.job.statistics <- appendInputdata(Object.job.statistics,'filtered.rna',.nfiltered.rna)
@@ -431,3 +436,173 @@ perform.consensusselecion <- function(Type = 'Consensus', O.Job.Config, O.DATA.R
   
   return(O.DATA.Refined)
 }
+
+
+
+
+perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
+{
+  
+  #parts of object
+  TaxID <- as.character(slot(O.Job.Config,'SelectedTax'))
+  KEGG2Path <- slot(O.Data.Kegg,'KEGG2PATH')
+  
+  #select all possible KO for the species
+  KO.Hits <- which(slot(O.Data.Refined,'ConsensusVec'))
+  ALLKO.Hits <- slot(O.Data.Refined,'ALLKOabove')
+    #NAME.getData(Object = Object, LEVEL1 = 'Results', LEVEL2 = 'Consensus',LEVEL3 = 'KOwithHits')
+  
+  PossibleKO = slot(O.Data.Kegg,'KOinTax')[[TaxID]]
+  #PossibleKO = NAME.getData(Object = Object, LEVEL1 = 'Parameter', LEVEL2 = 'Output',LEVEL3 = 'KOinTax')[[TaxID]]
+  
+  ##FLASGS
+  #.PathMode <- NAME.getData(Object = Object, LEVEL1 = 'Parameter',LEVEL2 = 'R', LEVEL3 = 'SelectedPathMode')
+  #.PathKOMode <- NAME.getData(Object = Object, LEVEL1 = 'Parameter',LEVEL2 = 'R', LEVEL3 = 'SelectedPathKOMode')
+  .PathMode = 'inTax'
+  .PathKOMode = 'all'
+  
+  
+  ##Settings
+  #.Threshold <- NAME.getData(Object = Object, LEVEL1 = 'Parameter',LEVEL2 = 'R', LEVEL3 = 'SelectedThreshold')
+  .Threshold = 0.05
+  
+  
+  
+  
+  
+  nKO = dim(KEGG2Path)[1]
+  nPath <- dim(KEGG2Path)[2]
+  
+  cat(nKO,nPath,'\n')
+  
+  ReducedPossibleKO = PossibleKO[PossibleKO <= nKO]
+  
+  PathMat <- matrix(0,ncol=nPath,nrow=nKO)
+  PathMat[ReducedPossibleKO,] = KEGG2Path[ReducedPossibleKO,]
+  #Find allowed KO
+  
+  
+  
+  if (.PathMode == 'inTax')
+  {
+    .Vec <- sapply(1:nPath, function(x) which(PathMat[,x] == 1))
+  }
+  
+  else if (.PathMode == 'all')
+  {
+    .Vec <- sapply(1:nPath, function(x) which(KEGG2Path[,x] == 1))
+  }
+  
+  
+  SigKOCountVec <- sapply(1:nPath, function(x) sum(.Vec[[x]] %in% KO.Hits))
+  PossibleKOCountVec <- sapply(1:nPath, function(x) length(.Vec[[x]]))
+  
+  
+  
+  if (.PathKOMode == 'inTax')
+  {
+    .nPossKO <- length(ReducedPossibleKO)
+  }
+  
+  else if (.PathKOMode == 'all')
+  {
+    .nPossKO <- sum(rowSums(KEGG2Path) > 0)
+  }
+  
+  
+  nSig = length(KO.Hits)
+  
+  #phyper(62-1, 1998, 5260-1998, 131, lower.tail=FALSE)`
+  .Vals <- unlist(lapply(c(1:nPath), function(x) phyper(SigKOCountVec[x]-1, PossibleKOCountVec[x], .nPossKO-PossibleKOCountVec[x], nSig, lower.tail = F, log.p = FALSE)))
+  
+  .padjVals = p.adjust(.Vals, method = 'BH');
+  .SigPaths <- which(.padjVals < .Threshold);
+  
+  
+  .AllPaths <- colSums(KEGG2Path[ALLKO.Hits[ALLKO.Hits <= nKO],]);
+  .AllPathsTax <- colSums(PathMat[ALLKO.Hits[ALLKO.Hits <= nKO],]);
+  
+  
+  cat(.SigPaths,'\n')
+  cat(.padjVals,'\n')
+  
+  return()
+  
+  
+  
+  Z <- NAME.addData(Object,LEVEL1 = 'Results',LEVEL2 = 'SigPaths', value = .SigPaths)
+  if (1 == 2)
+  {
+    return(Z)
+  }
+  Z <- NAME.addData(Z,LEVEL1 = 'Results',LEVEL2 = 'AllPaths', value = .AllPaths)
+  if (1 == 2)
+  {
+    return(Z)
+  }
+  Z <- NAME.addData(Z,LEVEL1 = 'Results',LEVEL2 = 'AllPathsTax', value = .AllPathsTax)
+  if (1 == 2)
+  {
+    return(Z)
+  }
+  Z <- NAME.addData(Z,LEVEL1 = 'Results',LEVEL2 = 'PathwayPval', value = .padjVals)
+  
+  
+  return(Z)
+}
+
+
+
+process.kowithmincounts <- function(DT,O.Job.Config,nMin = 5)
+{
+#returns all ko in the selected samples whith rowsum > nMin
+  Sample.Ind <- which(slot(O.Job.Config,'ClassVec') %in% slot(O.Job.Config,'SelectedClasses'))  
+  
+  XX <- DT[Previous == -1 & Sample %in% Sample.Ind ,sum(Counts),by = ko]
+return(sort(XX[XX[,V1] <= nMin,ko]))
+}
+  
+
+
+perform.plot.statistics <- function(O.Job.Statistic)
+{
+  df = data.frame(x = NULL, y = NULL, z = NULL, stringsAsFactors = FALSE)  
+  if (length(slot(O.Job.Statistic,'RNA')) == 0)
+  {
+    .RNA <- vector(mode = 'numeric', length = length(slot(O.Job.Statistic,'ScoreCutoff')))  
+  }
+  
+  else
+  {
+    .RNA <- slot(O.Job.Statistic,'RNA')
+  }
+  
+  .filtered.score <- slot(O.Job.Statistic,'filtered.score')
+  .filtered.combo <- slot(O.Job.Statistic,'filtered.combo')
+  .filtered.ko <- slot(O.Job.Statistic,'filtered.ko')
+  .filtered.tax <- slot(O.Job.Statistic,'filtered.tax')
+  .filtered.rna <- slot(O.Job.Statistic,'filtered.rna')
+  .filtered.multi <-slot(O.Job.Statistic,'filtered.multi')
+  .reads <- slot(O.Job.Statistic,'reads')
+  .UProCHits <- slot(O.Job.Statistic,'UProCHits')
+  
+  .reads <- .reads - .UProCHits
+  
+  .UProCHits <- .UProCHits - (.filtered.score+.filtered.combo+.filtered.multi+.filtered.rna+.filtered.tax+.filtered.ko)
+  
+  df <- rbind(df,data.frame(x = .reads, y = 1:length(.RNA), z = rep('reads',length(.RNA))))
+  df <- rbind(df,data.frame(x = .UProCHits, y = 1:length(.RNA), z = rep('UProCHits',length(.RNA))))
+  df <- rbind(df,data.frame(x = .filtered.score, y = 1:length(.RNA), z = rep('filtered.score',length(.RNA))))
+  df <- rbind(df,data.frame(x = .filtered.combo, y = 1:length(.RNA), z = rep('filtered.combo',length(.RNA))))
+  df <- rbind(df,data.frame(x = .filtered.ko, y = 1:length(.RNA), z = rep('filtered.ko',length(.RNA))))
+  df <- rbind(df,data.frame(x = .filtered.tax, y = 1:length(.RNA), z = rep('filtered.tax',length(.RNA))))
+  df <- rbind(df,data.frame(x = .filtered.rna, y = 1:length(.RNA), z = rep('filtered.rna',length(.RNA))))
+  df <- rbind(df,data.frame(x = .filtered.multi, y = 1:length(.RNA), z = rep('filtered.multi',length(.RNA))))
+  
+  
+  df <- rbind(df,data.frame(x = .RNA, y = 1:length(.RNA), z = rep('RNA',length(.RNA))))
+  
+  
+  return(df)
+}
+  

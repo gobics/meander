@@ -158,10 +158,22 @@
 .Object.Global.Config <- setClass(
   "Object.Global.Config",
   slots = c(
-    trash = 'character'
+    trash = 'character',
+    uproc_bin = 'character',
+    uproc_db = 'character',
+    uproc_model = 'character',
+    uproc_mode = 'character',
+    PathKOMode = 'character',
+    PathMode = 'character'
   ),
   prototype = list(
-    trash = character()
+    trash = character(),
+    uproc_bin = character(),
+    uproc_db = character(),
+    uproc_model = character(),
+    uproc_mode = character(),
+    PathKOMode = 'all',          #list(all,inTax)
+    PathMode = 'inTax'           #list(all,inTax)
   )
 )
 
@@ -206,22 +218,36 @@
     QuickDT = "data.table",
     CountDT = "data.table",
     ConsensusMat = "matrix",
-    ConsensusVec = "vector"
+    ConsensusVec = "vector",
+    Matrix = "matrix",
+    ALLKOabove = "vector"
+    
   ),
   prototype = list(
     QuickDT = data.table(),
     CountDT = data.table(),
     ConsensusMat = matrix(),
-    ConsensusVec = vector()
+    ConsensusVec = vector(),
+    Matrix = matrix(),
+    ALLKOabove = vector()
   )
 )
 
 .Object.DATA.KEGG <- setClass (
   "Object.DATA.KEGG",
   slots = c(
-    TaxMat = "data.frame"
+    TaxMat = "data.frame",
+    KEGG2PATH = "matrix",
+    KOinTax = "list"
+    
   )
 )
+
+
+
+
+
+
 
 
 .Object.DATA <- setClass (

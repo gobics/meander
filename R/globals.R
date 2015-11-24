@@ -47,9 +47,9 @@ TAXONOMY.LEVELS = 8
 
 #### METHOD
 METHOD.REPLACEMENT <- list(
-                    'DESeq2' = c('DESeq3','DESeq'),
+                    'DESeq2' = c('DESeq2','DESeq'),
                     'edgeR' = c('edgeR','limma'),
-                    'samr' = 'samQQQQ'
+                    'samr' = 'samr'
                     )
 
 
