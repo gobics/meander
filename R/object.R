@@ -154,11 +154,26 @@
 
 ##TODO
 #nReq <- number of list it must have...number of #Samples etc.
-
+#UProC, 
 .Object.Global.Config <- setClass(
   "Object.Global.Config",
   slots = c(
-    trash = 'character'
+    trash = 'character',
+    uproc_bin = 'character',
+    uproc_db = 'character',
+    uproc_model = 'character',
+    uproc_mode = 'character',
+    PathKOMode = 'character',
+    PathMode = 'character'
+  ),
+  prototype = list(
+    trash = character(),
+    uproc_bin = character(),
+    uproc_db = character(),
+    uproc_model = character(),
+    uproc_mode = character(),
+    PathKOMode = 'all',          #list(all,inTax)
+    PathMode = 'inTax'           #list(all,inTax)
   )
 )
 
@@ -184,11 +199,13 @@
   #slots
   slots = c(
     SeqRNA = "list",
-    CountDT = "data.table"
+    CountDT = "data.table",
+    Matrix = "matrix"
   ),
   prototype = list(
     SeqRNA = list(),
-    CountDT = data.table()
+    CountDT = data.table(),
+    Matrix = matrix()
   )
 )
 
@@ -199,20 +216,38 @@
   #slots
   slots = c(
     QuickDT = "data.table",
-    CountDT = "data.table"
+    CountDT = "data.table",
+    ConsensusMat = "matrix",
+    ConsensusVec = "vector",
+    Matrix = "matrix",
+    ALLKOabove = "vector"
+    
   ),
   prototype = list(
     QuickDT = data.table(),
-    CountDT = data.table()
+    CountDT = data.table(),
+    ConsensusMat = matrix(),
+    ConsensusVec = vector(),
+    Matrix = matrix(),
+    ALLKOabove = vector()
   )
 )
 
 .Object.DATA.KEGG <- setClass (
   "Object.DATA.KEGG",
   slots = c(
-    TaxMat = "data.frame"
+    TaxMat = "data.frame",
+    KEGG2PATH = "matrix",
+    KOinTax = "list"
+    
   )
 )
+
+
+
+
+
+
 
 
 .Object.DATA <- setClass (
@@ -240,7 +275,8 @@
     filtered.combo = 'numeric',
     filtered.score = 'numeric',
     ScoreCutoff = 'numeric',
-    FilteringScore = 'numeric'
+    FilteringScore = 'numeric',
+    PCA = 'prcomp'
   ),
   prototype = list(
     UProCHits = numeric(),
@@ -290,7 +326,9 @@
     ClassNames = 'vector',
     SelectedClasses = 'vector',
     SelectedTax = 'numeric',
-    requiredLength = 'numeric'
+    requiredLength = 'numeric',
+    Methods  = 'character',  #the (up to 3) used methods
+    pValThresh = 'numeric'
   ),
   # default
   prototype=list(
@@ -298,7 +336,9 @@
     ClassNames = vector(),
     SelectedClasses = vector(),
     SelectedTax = -1,
-    requiredLength = 0
+    requiredLength = 0,
+    Methods = character(),
+    pValThresh = 0.05
   )
 )
 

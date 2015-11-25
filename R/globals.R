@@ -1,13 +1,10 @@
-set.globals <- function () {
+##  WARNINGS
   #Methods
-  assign("method.ONE.A", "DEseq2", envir = .GlobalEnv)
-  assign("method.ONE.B", "DEseq", envir = .GlobalEnv)
-  assign("method.TWO.A", "edgeR", envir = .GlobalEnv)
-  assign("method.THREE.A", "samr", envir = .GlobalEnv)
-  
-  #Filetypes
+    WARNING_MESSAGE_NOREPLACEMENT = 'No replacement for method %s found.\n'
+    WARNING_MESSAGE_DIFFERENTMETHOD = 'Replacement Method %s selected for %s.\n'
+    #
+  ##
 
-}
 
 DEBUG.PRINT <- TRUE
 
@@ -46,14 +43,47 @@ PLOTCHOICES = c('ggplot2','plot')
 
 PLOTTYPE = PLOTCHOICES[1]
 
-
-
 TAXONOMY.LEVELS = 8
 
+#### METHOD
+METHOD.REPLACEMENT <- list(
+                    'DESeq2' = c('DESeq2','DESeq'),
+                    'edgeR' = c('edgeR','limma'),
+                    'samr' = 'samr'
+                    )
 
-METHOD.REPLACEMENT.DESEQ2 = c('DESeq2','DESeq');
-METHOD.REPLACEMENT.EDGER = c('edgeR','limma');
-METHOD.REPLACEMENT.EDGER = c('samr')
+
+DESEQ2.CLASS <- new("Class.DESeq2")
+DESEQ.CLASS <- new("Class.DESeq")
+EDGER.CLASS <- new("Class.edgeR")
+LIMMA.CLASS <- new("Class.limma")
+SAMR.CLASS <- new("Class.samr")
+
+  #########
+
+METHOD.CALLS <- setClass (
+  "METHOD.CALLS",
+  slots = c(
+    DESeq2 = "Class.DESeq2",
+    DESeq = "Class.DESeq",
+    edgeR = "Class.edgeR",
+    limma = "Class.limma",
+    samr = "Class.samr"
+  ),
+  prototype = list(
+    DESeq2 = DESEQ2.CLASS,
+    DESeq = DESEQ.CLASS,
+    edgeR = EDGER.CLASS,
+    limma = LIMMA.CLASS,
+    samr = SAMR.CLASS
+  )
+)
+
+
+
+METHOD.LIST <- new("METHOD.CALLS")
+
+
 
 
 

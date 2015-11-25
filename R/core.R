@@ -34,8 +34,11 @@ meander.start <- function(
   ##load fixed data
   #tax Mat
   Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS('/home/hklingen/projects/test123/data/TaxMat.rds'))
+  
   #ko2path
+  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KEGG2PATH', value = as.matrix(readRDS('/home/hklingen/projects/test123/data/KEGG2PATH.rds')))
   #kointax
+  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KOinTax', value = readRDS('/home/hklingen/projects/test123/data/KOlist.rds'))
   #...
   #png
     ##
@@ -45,12 +48,14 @@ meander.start <- function(
   
   DEBUG.PRINT <- TRUE
   
-# TODO put into Object
-  set.globals()
+  
 
 ## Where to start?
   # preselected parameters?
 
+    #set availibe methods
+    attemptExecution(Object.job.config <- set.methods(Object.job.config))
+  
   #set input dir if missing
   if( is.null(Dir.in) & is.null(File.list))
   {
@@ -102,9 +107,6 @@ meander.start <- function(
     .full.filepaths = file.path(Dir.in,File.list)
     #check if files are what is claimed
     .res <- check.input(File.type,NULL,.full.filepaths)
-    .res@handle()
-    
-    
     
     
     #add to objectpart
@@ -119,7 +121,7 @@ meander.start <- function(
   
   ##check if error.
     if (DEBUG.PRINT) {  cat('checking for error : \t') }
-  .res@handle()
+
     if (DEBUG.PRINT) {  cat('OK\n') }
   
   ## set conditions
@@ -133,9 +135,7 @@ meander.start <- function(
     ##
   
   ## save Object for the first time.
-  
-  #ToDo: create shitty method for each..
-  
+
   
   #STEP1
   if (File.type %in% INPUTDEPENDENTSTEPS.LIST.ONE)
@@ -201,14 +201,56 @@ meander.start <- function(
   Object.job.statistics <- .ret[[1]]
   Object.data.refined <- .ret[[3]]  
 
-
+  #set base KO
+  .Ret <- process.kowithmincounts(slot(Object.data.big,'CountDT'),O.Job.Config = Object.job.config, nMin = 5)
+  Object.data.refined <- setInputdata(Object.data.refined,'ALLKOabove',.Ret)
   
-  #set selected conditions
   
-  #.ret <- set.selected.Conditions(FALSE,slot())
   
-  #.ret <- start.Object()
+  .df <- perform.plot.statistics(O.Job.Statistic = Object.job.statistics)
+  #plot
+  plot.statistics.plot(.df)
+  #ggplot
+  plot.statistics.ggplot2(.df)
   
+  ## LOOP
+  #select taxonomy
+  Object.job.config <- setInputdata(Object.job.config,'SelectedTax',33090)
+  
+    #create Matrix
+  .Mat <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
+  Object.data.big <- setInputdata(Object.data.big,'Matrix',.Mat)
+    #perform pca
+  plot.pca(Object.Job.Config = Object.job.config,Object.Job.Statistics = Object.job.statistics,Object.Data.Big = Object.data.big)
+    
+    ##
+  
+  
+  #create final matrix
+  
+  .Mat <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
+  Object.data.refined <- setInputdata(Object.data.refined,'Matrix',.Mat)
+  
+  
+  #consensus methods
+  .X <- start.consensus(Object.data.big, Object.job.config)
+  Object.data.refined <- setInputdata(Object.data.refined,'ConsensusMat',.X)
+  
+  
+  
+  #plot method agreement
+  plot.vennreplacement(slot(Object.job.config,'Methods'), slot(Object.data.refined,'ConsensusMat'))
+  
+  
+  #select Consensus
+  
+  .ret <- perform.consensusselecion(Type = 'Consensus', O.Job.Config = Object.job.config, O.DATA.Refined = Object.data.refined)
+  Object.data.refined <- .ret
+  
+  #calculate pathways
+  
+  
+  #output
   
   
   

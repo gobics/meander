@@ -155,14 +155,19 @@ ERROR.methodDefinition_initialize <- function(message = '', description = 'ERROR
 {
     callSuper(message, description, ...)
 
-    callingFrame = sys.frame(-ERROR.CALLING_FRAME_OFFSET - 1)
+    #print(sys.nframe())
     
-    varNames = ls(envir = callingFrame)
-    
-    variables <<- lapply(varNames, get, envir = callingFrame)
-    names(variables) <<- varNames
-    
-    callStack <<- obtain.callStack(sys.nframe() - ERROR.CALLING_FRAME_OFFSET)
+#     if (sys.nframe() > ERROR.CALLING_FRAME_OFFSET + 1)
+#     {
+#       callingFrame = sys.frame(- ERROR.CALLING_FRAME_OFFSET - 1)
+#       
+#       varNames = ls(envir = callingFrame)
+#       
+#       variables <<- lapply(varNames, get, envir = callingFrame)
+#       names(variables) <<- varNames
+#       
+#       callStack <<- obtain.callStack(sys.nframe() - ERROR.CALLING_FRAME_OFFSET)
+#     }
         
     # INCREASE STACK POINTER
     ERROR.STACK_POINTER <<- as.integer(ERROR.STACK_POINTER + 1)
@@ -181,7 +186,7 @@ ERROR.methodDefinition_obtain.callStack <- function(peak)
 # DUMMY-STUB
 FATAL_ERROR.methodDefinition_handle <- function()
 {
-    stop(get.ClassName())
+    stop(.self$get.ClassName())
 }
 
 NOTIFICATION.methodDefinition_issue <- function()
@@ -195,6 +200,44 @@ WARNING.methodDefinition_initialize <- function(message = '', description = 'WAR
 {
     callSuper(message = message, description = description, ...)
 }
+
+MY_WARNING.methodDefinition_initialize <- function(samples, message = '', description = 'WARNING', ...)
+{
+  #message = sprintf('%s %d\n',message,number)
+  callSuper(message = sprintf(WARNING_MESSAGE_NOREPLACEMENT,message), description = description, ...)
+}
+
+MY_WARNING2.methodDefinition_initialize <- function(message = '', number = 4, description = 'WARNING', ...)
+{
+  message <<- sprintf('%s %d\n',message,number)
+#  tk_messageBox(type = "ok",
+#                message = ret, caption = "", default = "", ...)
+}
+
+WARNING.methodDefinition_issue <- function(TKFLAG = FALSE)
+{
+  callSuper()
+    if (TKFLAG)
+    {
+      tk_messageBox(type = "ok", message = message, caption = "", default = "")
+    }
+}
+
+
+WARNING_DIFFERENT_METHOD.methodDefinition_initialize <- function(rep.method, ori.method, message = '', description = 'WARNING', ...)
+{
+  #message = sprintf('%s %d\n',message,number)
+  callSuper(message = sprintf(WARNING_MESSAGE_DIFFERENTMETHOD,rep.method,ori.method), description = description, ...)
+}
+
+
+WARNING_NO_REPLACEMENT.methodDefinition_initialize <- function(message = '', description = 'WARNING', ...)
+{
+  #message = sprintf('%s %d\n',message,number)
+  callSuper(message = sprintf(WARNING_MESSAGE_NOREPLACEMENT,message), description = description, ...)
+}
+
+
 # ************************************************************************************************** 
 #   CLASS DEFINITIONS
 # ************************************************************************************************** 
@@ -260,8 +303,49 @@ WARNING = setRefClass(
     contains = 'NOTIFICATION',
     
     methods = list(
-        initialize = WARNING.methodDefinition_initialize
+        initialize = WARNING.methodDefinition_initialize,
+        issue = WARNING.methodDefinition_issue
         )
+)
+
+MY_WARNING = setRefClass(
+  'MY_WARNING',
+  
+  contains = 'WARNING',
+  
+  methods = list(
+    initialize = MY_WARNING.methodDefinition_initialize
+  )
+)
+
+MY_WARNING2 = setRefClass(
+  'MY_WARNIN2G',
+  
+  contains = 'WARNING',
+  
+  methods = list(
+    initialize = MY_WARNING2.methodDefinition_initialize
+  )
+)
+
+WARNING_DIFFERENT_METHOD = setRefClass(
+  'WARNING_DIFFERENT_METHOD',
+  
+  contains = 'WARNING',
+  
+  methods = list(
+    initialize = WARNING_DIFFERENT_METHOD.methodDefinition_initialize
+  )
+)
+
+WARNING_NO_REPLACEMENT = setRefClass(
+  'WARNING_NO_REPLACEMENT',
+  
+  contains = 'WARNING',
+  
+  methods = list(
+    initialize = WARNING_NO_REPLACEMENT.methodDefinition_initialize
+  )
 )
 
 # ************************************************************************************************** 

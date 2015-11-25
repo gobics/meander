@@ -125,7 +125,92 @@ set.selected.Conditions <- function(TCLTKFLAG,Object.job.config)
       cat('select 2, or else...\n');
       }
     }
-  .Selected = which(.ret %in% Choices)
+  .Selected = which(Choices %in% .ret)
   Object.job.config <- setInputdata(Object.job.config,'SelectedClasses',.Selected)
 return(Object.job.config)
+}
+
+
+
+set.methods <- function(O.Job.Config)
+{
+  #try to load all methods
+  
+  #find how many diff methods should be used
+  nDiff.Methods = length(METHOD.REPLACEMENT)
+  
+    for (i in 1:nDiff.Methods)
+    {
+      #look for first existing library
+      for (j in 1:length(METHOD.REPLACEMENT[[i]]))
+      {
+        cat(METHOD.REPLACEMENT[[i]][j],'\n')
+        if (METHOD.REPLACEMENT[[i]][j] %in% rownames(installed.packages()))
+        {
+          #only non-default method availible, if method availible at all
+          if (j != 1)
+          {
+            #Warning
+            WARNING_DIFFERENT_METHOD(rep.method = METHOD.REPLACEMENT[[i]][j], ori.method = names(METHOD.REPLACEMENT)[i])$issue(TRUE)
+          }
+          
+          
+          O.Job.Config <- appendInputdata(O.Job.Config,'Methods',METHOD.REPLACEMENT[[i]][j])
+          library(package = METHOD.REPLACEMENT[[i]][j],character.only = TRUE)
+          break  
+        }
+        
+        #NO alternative can be loaded for this methodslot
+        if (j  == length(METHOD.REPLACEMENT[[i]]))
+        {
+          WARNING_NO_REPLACEMENT(names(METHOD.REPLACEMENT)[i])$issue()
+        }
+      }
+    }
+  
+  
+  return(O.Job.Config)
+  
+    for (i in 1:length(METHOD.REPLACEMENT.DESEQ2))
+    {
+      if (METHOD.REPLACEMENT.DESEQ2[i] %in% rownames(installed.packages()))
+      {
+      O.Job.Config <- appendInputdata(O.Job.Config,'Methods',METHOD.REPLACEMENT.DESEQ2[i])
+      library(A,character.only = TRUE)
+        break  
+      }
+      
+      if (i  == length(METHOD.REPLACEMENT.DESEQ2))
+      {
+       cat('shiiiiiit\t1\n') 
+      }
+    }
+  #try to get second method
+    for (i in 1:length(METHOD.REPLACEMENT.EDGER))
+    {
+      if (METHOD.REPLACEMENT.EDGER[i] %in% rownames(installed.packages()))
+      {
+        O.Job.Config <- appendInputdata(O.Job.Config,'Methods',METHOD.REPLACEMENT.EDGER[i])
+        break  
+      }
+      
+      if (i  == length(METHOD.REPLACEMENT.EDGER))
+      {
+        cat('shiiiiiit\t2\n') 
+      }
+    }
+  #try to get third method  
+    for (i in 1:length(METHOD.REPLACEMENT.SAMR))
+    {
+      if (METHOD.REPLACEMENT.SAMR[i] %in% rownames(installed.packages()))
+      {
+        O.Job.Config <- appendInputdata(O.Job.Config,'Methods',METHOD.REPLACEMENT.SAMR[i])
+      break  
+      }
+      
+      if (i  == length(METHOD.REPLACEMENT.SAMR))
+      {
+        cat('shiiiiiit\t3\n') 
+      }
+    }
 }
