@@ -104,10 +104,24 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
   
   
   # if this does not work, approximate the read counts... ... ... .. .. .
-  .Return2 <- fread(.uproc.filein, nrows=1, skip = dim(.Return)[1])
+  .Return2 <- try(fread(.uproc.filein, nrows=1, skip = dim(.Return)[1]))
   
-  Object.job.statistics <- appendInputdata(Object.job.statistics,'UProCHits',.Return2[[1]])
-  Object.job.statistics <- appendInputdata(Object.job.statistics,'reads',.Return2[[3]])
+                  if (class(.Return2) == "try-error")
+                  {
+                    cat("no stuff with stuff...\n")
+                    #set #reads to highest seen read in results
+                    Object.job.statistics <- appendInputdata(Object.job.statistics,'reads',max(.Return[,V1]))
+                    #set #hits to #unique hits
+                    Object.job.statistics <- appendInputdata(Object.job.statistics,'UProCHits',length(unique(.Return[,V1])))
+                  }
+                  
+                  else
+                  {
+                  Object.job.statistics <- appendInputdata(Object.job.statistics,'UProCHits',.Return2[[1]])
+                  Object.job.statistics <- appendInputdata(Object.job.statistics,'reads',.Return2[[3]])                    
+                  }
+  
+
   
   
   
@@ -590,17 +604,28 @@ perform.plot.statistics <- function(O.Job.Statistic)
   
   .UProCHits <- .UProCHits - (.filtered.score+.filtered.combo+.filtered.multi+.filtered.rna+.filtered.tax+.filtered.ko)
   
-  df <- rbind(df,data.frame(x = .reads, y = 1:length(.RNA), z = rep('reads',length(.RNA))))
-  df <- rbind(df,data.frame(x = .UProCHits, y = 1:length(.RNA), z = rep('UProCHits',length(.RNA))))
-  df <- rbind(df,data.frame(x = .filtered.score, y = 1:length(.RNA), z = rep('filtered.score',length(.RNA))))
-  df <- rbind(df,data.frame(x = .filtered.combo, y = 1:length(.RNA), z = rep('filtered.combo',length(.RNA))))
-  df <- rbind(df,data.frame(x = .filtered.ko, y = 1:length(.RNA), z = rep('filtered.ko',length(.RNA))))
-  df <- rbind(df,data.frame(x = .filtered.tax, y = 1:length(.RNA), z = rep('filtered.tax',length(.RNA))))
-  df <- rbind(df,data.frame(x = .filtered.rna, y = 1:length(.RNA), z = rep('filtered.rna',length(.RNA))))
-  df <- rbind(df,data.frame(x = .filtered.multi, y = 1:length(.RNA), z = rep('filtered.multi',length(.RNA))))
   
   
-  df <- rbind(df,data.frame(x = .RNA, y = 1:length(.RNA), z = rep('RNA',length(.RNA))))
+  
+  df <- rbind(df,data.frame(x = .reads, y = 1:length(.RNA), z = rep('no match',length(.RNA))))
+  df <- rbind(df,data.frame(x = .UProCHits, y = 1:length(.RNA), z = rep('high QL match',length(.RNA))))
+  df <- rbind(df,data.frame(x = (.filtered.score+.filtered.combo+.filtered.multi+.filtered.rna+.filtered.tax+.filtered.ko), y = 1:length(.RNA), z = rep('low QL match',length(.RNA))))
+  
+  
+  
+  
+  
+  #df <- rbind(df,data.frame(x = .reads, y = 1:length(.RNA), z = rep('reads',length(.RNA))))
+  #df <- rbind(df,data.frame(x = .UProCHits, y = 1:length(.RNA), z = rep('UProCHits',length(.RNA))))
+  #df <- rbind(df,data.frame(x = .filtered.score, y = 1:length(.RNA), z = rep('filtered.score',length(.RNA))))
+  #df <- rbind(df,data.frame(x = .filtered.combo, y = 1:length(.RNA), z = rep('filtered.combo',length(.RNA))))
+  #df <- rbind(df,data.frame(x = .filtered.ko, y = 1:length(.RNA), z = rep('filtered.ko',length(.RNA))))
+  #df <- rbind(df,data.frame(x = .filtered.tax, y = 1:length(.RNA), z = rep('filtered.tax',length(.RNA))))
+  #df <- rbind(df,data.frame(x = .filtered.rna, y = 1:length(.RNA), z = rep('filtered.rna',length(.RNA))))
+  #df <- rbind(df,data.frame(x = .filtered.multi, y = 1:length(.RNA), z = rep('filtered.multi',length(.RNA))))
+  
+  
+  #df <- rbind(df,data.frame(x = .RNA, y = 1:length(.RNA), z = rep('RNA',length(.RNA))))
   
   
   return(df)
