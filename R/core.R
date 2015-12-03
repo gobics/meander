@@ -249,11 +249,21 @@ meander.start <- function(
   .ret <- perform.consensusselecion(Type = 'Consensus', O.Job.Config = Object.job.config, O.DATA.Refined = Object.data.refined)
   Object.data.refined <- .ret
   
+  
+  
+  
+  
+  
+  
+  
   #calculate pathways
+  REEEEED <- perform.pathwaydetection(Object.job.config,Object.data.kegg,Object.data.refined)
+
+  Object.data.refined <- prepare.svgvectors.colour(Object.data.refined,Object.data.kegg,Object.job.config)
   
-  
+
   #output
-  
+  .df <- perform.SVGcreation(Object.data.refined)
   
   
   

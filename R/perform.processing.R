@@ -549,7 +549,7 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   cat(.SigPaths,'\n')
   cat(.padjVals,'\n')
   
-  return()
+  return(list(.SigPaths,.padjVals))
   
   
   
@@ -639,33 +639,66 @@ perform.plot.statistics <- function(O.Job.Statistic)
   
   return(df)
 }
-  
 
-
-prepare.svgvectors <- function(O.data.refined, O.data.kegg)
+prepare.svgvectors.colour <- function(O.data.refined, O.data.kegg, O.job.config)
 {
+  .Tax <- slot(O.job.config,'SelectedTax')
+  .Sig.Ko <- slot(O.data.refined,'ConsensusVec')
+  .AllowedKO <- slot(O.data.kegg,'KOinTax')[[as.character(.Tax)]]
+  
+  
+  
   .Mat <- slot(O.data.refined,'Matrix')
   
-  .Mat.I <- rowSums(.Mat) > 5
+  nMax.dim <- max(c(max(.AllowedKO),dim(.Mat)[1]))
   
-  .Vec <- vector(mode = 'numeric', length = length(.Mat.I)) + 1
+  Vec.ratio <- vector(mode = 'numeric', length = nMax.dim) + 1
+  Vec.Col = vector(mode = 'character', length = nMax.dim)
+  
+  #find rows with min counts
+  .Mat.I <- rowSums(.Mat) > 0
   
   .Mat.Label <- slot(O.data.refined,'Matrix.label')
-  
   U.label = unique(.Mat.Label)
   
+  #spit the two conditions
   Cond.A <- .Mat.Label == U.label[1]
   Cond.B <- .Mat.Label == U.label[2]
   
   
-  
+  #create rank matrix
   .Mat.rank <- sapply(1:length(.Mat.Label), function(x) rank(.Mat[.Mat.I,x]))
   
   .Counts.A <- rowMeans(.Mat.rank[,Cond.A])
   .Counts.B <- rowMeans(.Mat.rank[,Cond.B])
   
-  .Vec[.Mat.I] = .Counts.A / .Counts.B
+  Vec.ratio[which(.Mat.I)] = .Counts.A / .Counts.B
   
-  return(.Vec)
+  #All my KO
+  KO.hit.all <- which(rowSums(.Mat) > 0)
+  KO.hit.tax <- KO.hit.all[KO.hit.all %in% .AllowedKO]
+  KO.hit.extra <- KO.hit.all[(KO.hit.all %in% .AllowedKO) == FALSE]
+  KO.miss <- .AllowedKO[(.AllowedKO %in% KO.hit.all) == FALSE]
+  
+  KO.hit.sig <- which(.Sig.Ko)
+  KO.hit.usig <- KO.hit.tax[(KO.hit.tax %in% KO.hit.sig) == FALSE]
+  
+  KO.greater <- which(Vec.ratio > 1)
+  KO.smaller <- which(Vec.ratio < 1)
+  
+  cat(length(KO.hit.all),length(KO.hit.tax),length(KO.hit.extra),length(KO.miss),length(KO.hit.sig),length(KO.hit.usig),length(KO.greater),length(KO.smaller),'\n')
+
+  
+  Vec.Col[1:nMax.dim] <- NOT_MAPPED_AND_SHOULD_NOT_DEFAULT_COLOR
+  Vec.Col[KO.hit.sig[KO.hit.sig %in% KO.smaller]] <- SIGNIFICANT_DOWN_REGULATED_DEFAULT_COLOR
+  Vec.Col[KO.hit.sig[KO.hit.sig %in% KO.greater]] <- SIGNIFICANT_UP_REGULATED_DEFAULT_COLOR
+  Vec.Col[KO.hit.usig[KO.hit.usig %in% KO.smaller]] <- INSIGNIFICANT_DOWN_REGULATED_DEFAULT_COLOR
+  Vec.Col[KO.hit.usig[KO.hit.usig %in% KO.greater]] <- INSIGNIFICANT_UP_REGULATED_DEFAULT_COLOR
+  Vec.Col[KO.hit.extra] <- MAPPED_AND_SHOULD_NOT_DEFAULT_COLOR
+  Vec.Col[KO.miss] <- NOT_MAPPED_AND_SHOULD_DEFAULT_COLOR
+  
+  
+  O.data.refined <- setInputdata(O.data.refined,'ColorVec',Vec.Col)
+  return(O.data.refined)
 }
 

@@ -179,7 +179,6 @@
 
 
 
-
 .Object.DATA.dataframes <- setClass(
   "Object.DATA.dataframes",
   slots = c(
@@ -224,10 +223,7 @@
     ALLKOabove = "vector",        #KO above threshold counts in a row
 #SVG relevant
     ConsensusVec = "vector",      #significant differences detected by x method[s]    
-    Direction = "vector",         #direction in favour of the first condition?
-    Hit.correct = "vector",       #Normal Hit
-    Hit.false = "vector",         #KO hit but not included in pathway for the taxonomy
-    Hit.missed = "vector"         #KO without a hit but should have gotten one
+    ColorVec = 'vector'           #HEX color code
     
   ),
   prototype = list(
@@ -237,10 +233,7 @@
     ConsensusVec = vector(),
     Matrix = matrix(),
     ALLKOabove = vector(),
-    Direction = vector(),
-    Hit.correct = vector(),
-    Hit.false = vector(),
-    Hit.missed = vector()
+    ColorVec = vector()
   )
 )
 
