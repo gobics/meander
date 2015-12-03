@@ -168,6 +168,21 @@ BAD <- setClass (
 # DATE: 2015-11-01
 
 # ******************************************************************************
+# BEGIN     :   GENERAL       
+# ******************************************************************************
+
+APPLICATION_TITLE = 'meandeR'
+
+# RUNNING_MODES
+RUNNING_MODE_BATCH = 'BATCH'
+RUNNING_MODE_INTERACTIVE = 'INTERACTIVE'
+RUNNING_MODE_FRONTEND = 'FRONTEND'
+
+# ******************************************************************************
+# > END     :   GENERAL       
+# ******************************************************************************
+
+# ******************************************************************************
 # BEGIN     :   FILE CONSTANTS
 # ******************************************************************************
 
@@ -188,13 +203,45 @@ ICON_PATH = file.path(system.file(package=getPackageName()), ICON_DIR_NAME)
 RDS_PATH = DATA_PATH
 RDS_FILE_EXTENSION = 'Rds'
 
+HTML_OUTPUT_SUBDIR = 'html'
+ORTHOLOG_TABLE_SUBDIR	= 'ortholog'
+PATHWAY_TABLE_SUBDIR	= 'pathway'
+
+SVG_OUTPUT_SUBDIR = 'svg'
+
 # ******************************************************************************
-# END     :   FILE CONSTANTS
+# > END     :   FILE CONSTANTS
 # ******************************************************************************
 
-APPLICATION_TITLE = 'meandeR'
+# ******************************************************************************
+# BEGIN     :   COLORS
+# ******************************************************************************
 
-# RUNNING_MODES
-RUNNING_MODE_BATCH = 'BATCH'
-RUNNING_MODE_INTERACTIVE = 'INTERACTIVE'
-RUNNING_MODE_FRONTEND = 'FRONTEND'
+SIGNIFICANT_UP_REGULATED_DEFAULT_COLOR = '#DB0030'
+INSIGNIFICANT_UP_REGULATED_DEFAULT_COLOR = '#E08000'
+SIGNIFICANT_DOWN_REGULATED_DEFAULT_COLOR = '#00DB30'
+INSIGNIFICANT_DOWN_REGULATED_DEFAULT_COLOR = '#BBE000'
+MAPPED_AND_SHOULD_NOT_DEFAULT_COLOR = '#80B0F0'
+NOT_MAPPED_AND_SHOULD_DEFAULT_COLOR = '#9080F0'
+NOT_MAPPED_AND_SHOULD_NOT_DEFAULT_COLOR = '#808080'
+
+SIGNIFICANT_UP_REGULATED_COLORBLIND_COLOR = '#DB0030'
+INSIGNIFICANT_UP_REGULATED_COLORBLIND_COLOR = '#E08000'
+SIGNIFICANT_DOWN_REGULATED_COLORBLIND_COLOR = '#00DB30'
+INSIGNIFICANT_DOWN_REGULATED_COLORBLIND_COLOR = '#BBE000'
+MAPPED_AND_SHOULD_NOT_COLORBLIND_COLOR = '#80B0F0'
+NOT_MAPPED_AND_SHOULD_COLORBLIND_COLOR = '#9080F0'
+NOT_MAPPED_AND_SHOULD_NOT_COLORBLIND_COLOR = '#808080'
+
+# ******************************************************************************
+# > END     :   COLORS
+# ******************************************************************************
+
+# ******************************************************************************
+# BEGIN     :   %TEMPLATE%
+# ******************************************************************************
+
+# ******************************************************************************
+# > END     :   %TEMPLATE%
+# ******************************************************************************
+
