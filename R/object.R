@@ -215,12 +215,19 @@
   "Object.DATA.Refined",
   #slots
   slots = c(
-    QuickDT = "data.table",
-    CountDT = "data.table",
-    ConsensusMat = "matrix",
-    ConsensusVec = "vector",
-    Matrix = "matrix",
-    ALLKOabove = "vector"
+    QuickDT = "data.table",       #smaller data.table to find counts for taxonomy
+    CountDT = "data.table",       #
+    ConsensusMat = "matrix",      #p.val in a matrix
+
+    Matrix = "matrix",            #count matrix
+    Matrix.label = 'vector',      #selected condition label
+    ALLKOabove = "vector",        #KO above threshold counts in a row
+#SVG relevant
+    ConsensusVec = "vector",      #significant differences detected by x method[s]    
+    Direction = "vector",         #direction in favour of the first condition?
+    Hit.correct = "vector",       #Normal Hit
+    Hit.false = "vector",         #KO hit but not included in pathway for the taxonomy
+    Hit.missed = "vector"         #KO without a hit but should have gotten one
     
   ),
   prototype = list(
@@ -229,7 +236,11 @@
     ConsensusMat = matrix(),
     ConsensusVec = vector(),
     Matrix = matrix(),
-    ALLKOabove = vector()
+    ALLKOabove = vector(),
+    Direction = vector(),
+    Hit.correct = vector(),
+    Hit.false = vector(),
+    Hit.missed = vector()
   )
 )
 
@@ -239,7 +250,6 @@
     TaxMat = "data.frame",
     KEGG2PATH = "matrix",
     KOinTax = "list"
-    
   )
 )
 

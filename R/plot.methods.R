@@ -376,12 +376,14 @@ ooze <- unique(df$y)
     unlist(.t.df['x'])
   }
   )
+  
+  
 
 colnames(rekt) <- ooze
-rownames(rekt) <- c('reads','UProCHits','filtered.score','filtered.combo','filtered.ko','filtered.tax','filtered.rna','filtered.multi','RNA')
+rownames(rekt) <- c('no match','high QL match','low QL match')
 colz = rainbow(length(ooze))
 barplot(rekt,beside = TRUE, col = colz)
-legend('right', col = colz,legend = c('reads','UProCHits','filtered.score','filtered.combo','filtered.ko','filtered.tax','filtered.rna','filtered.multi','RNA'))
+legend('right', col = colz,legend = c('no match','high QL match','low QL match'))
 }
 
 plot.statistics.ggplot2 <- function(df)

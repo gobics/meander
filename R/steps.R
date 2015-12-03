@@ -318,7 +318,8 @@ start.consensus <- function(Object.data.big,Object.Job.Config)
   .nMethods = length(.Method)
   
   .Ret <- extract.Matrix(Object.data.big,Object.Job.Config)
-  
+  cat('Error?!\n')
+  print(colSums(.Ret[[1]]))
   .Counts = .Ret[[1]]
   .DiffCon = .Ret[[2]]
   

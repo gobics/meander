@@ -106,6 +106,8 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
   # if this does not work, approximate the read counts... ... ... .. .. .
   .Return2 <- try(fread(.uproc.filein, nrows=1, skip = dim(.Return)[1]))
   
+              if (length(.Return2) == 1)
+              {
                   if (class(.Return2) == "try-error")
                   {
                     cat("no stuff with stuff...\n")
@@ -120,9 +122,13 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
                   Object.job.statistics <- appendInputdata(Object.job.statistics,'UProCHits',.Return2[[1]])
                   Object.job.statistics <- appendInputdata(Object.job.statistics,'reads',.Return2[[3]])                    
                   }
-  
+              }
 
-  
+  else
+  {
+    Object.job.statistics <- appendInputdata(Object.job.statistics,'UProCHits',.Return2[[1]])
+    Object.job.statistics <- appendInputdata(Object.job.statistics,'reads',.Return2[[3]])                    
+  }
   
   
   setnames(.Return,c('V1','V3','V8','V9','V10','V11'),c('seq.no','length','ko','score','x','y'))
@@ -380,6 +386,9 @@ create.matrix <- function(Object.DATA.BIG,Object.Job.Config)
   .DT <- slot(Object.DATA.BIG,'CountDT');
   .selectedTax <- slot(Object.Job.Config,'SelectedTax');
   .ClassVec <- slot(Object.Job.Config,'ClassVec');
+  .SelectedClasses <- slot(Object.Job.Config,'SelectedClasses');
+  
+  .Allowed.Samples <- which(.ClassVec %in% .SelectedClasses)
   
   #reduce table accordingly
     if (.selectedTax == -1)
@@ -408,7 +417,7 @@ create.matrix <- function(Object.DATA.BIG,Object.Job.Config)
     {
       cat("WARNING!!!!!!",.I.Col,"\n")
     }
-  return(XMat)
+  return(list(XMat,.ClassVec[.Allowed.Samples]))
 }
 
 perform.consensusselecion <- function(Type = 'Consensus', O.Job.Config, O.DATA.Refined)
@@ -631,3 +640,32 @@ perform.plot.statistics <- function(O.Job.Statistic)
   return(df)
 }
   
+
+
+prepare.svgvectors <- function(O.data.refined, O.data.kegg)
+{
+  .Mat <- slot(O.data.refined,'Matrix')
+  
+  .Mat.I <- rowSums(.Mat) > 5
+  
+  .Vec <- vector(mode = 'numeric', length = length(.Mat.I)) + 1
+  
+  .Mat.Label <- slot(O.data.refined,'Matrix.label')
+  
+  U.label = unique(.Mat.Label)
+  
+  Cond.A <- .Mat.Label == U.label[1]
+  Cond.B <- .Mat.Label == U.label[2]
+  
+  
+  
+  .Mat.rank <- sapply(1:length(.Mat.Label), function(x) rank(.Mat[.Mat.I,x]))
+  
+  .Counts.A <- rowMeans(.Mat.rank[,Cond.A])
+  .Counts.B <- rowMeans(.Mat.rank[,Cond.B])
+  
+  .Vec[.Mat.I] = .Counts.A / .Counts.B
+  
+  return(.Vec)
+}
+

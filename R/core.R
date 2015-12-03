@@ -218,8 +218,9 @@ meander.start <- function(
   Object.job.config <- setInputdata(Object.job.config,'SelectedTax',33090)
   
     #create Matrix
-  .Mat <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
-  Object.data.big <- setInputdata(Object.data.big,'Matrix',.Mat)
+  #returns count matrix [1] and label [2]
+  .Ret <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
+  Object.data.big <- setInputdata(Object.data.big,'Matrix',.Ret[[1]])
     #perform pca
   plot.pca(Object.Job.Config = Object.job.config,Object.Job.Statistics = Object.job.statistics,Object.Data.Big = Object.data.big)
     
@@ -228,10 +229,11 @@ meander.start <- function(
   
   #create final matrix
   
-  .Mat <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
-  Object.data.refined <- setInputdata(Object.data.refined,'Matrix',.Mat)
-  
-  
+  #returns count matrix [1] and label [2]
+  .Ret <- create.matrix(Object.DATA.BIG = Object.data.big,Object.Job.Config = Object.job.config)
+  Object.data.refined <- setInputdata(Object.data.refined,'Matrix',.Ret[[1]])
+  Object.data.refined <- setInputdata(Object.data.refined,'Matrix.label',.Ret[[2]])
+  Object.data.big <- setInputdata(Object.data.big,'Matrix',.Ret[[1]])
   #consensus methods
   .X <- start.consensus(Object.data.big, Object.job.config)
   Object.data.refined <- setInputdata(Object.data.refined,'ConsensusMat',.X)
