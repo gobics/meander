@@ -325,7 +325,42 @@ plot.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.
   
 }
 
-
+plot.axis.function <- function(l)
+{
+  charZ = character()
+  print(l)
+  print(length(l))
+  print(class(l))
+  for (i in 1:length(l))
+  {
+    
+    if (l[i]/1000000000 > 1)
+    {
+    .val = l[i]/1000000000
+    charZ[i] = paste0(sprintf('%.2f',.val),' billion')
+    }
+    
+    else if (l[i]/1000000 > 1)
+    {
+      .val = l[i]/1000000
+      charZ[i] = paste0(sprintf('%.2f',.val),' million')
+    }
+    
+    else if (l[i]/1000 > 1)
+    {
+      .val = l[i]/1000
+      charZ[i] = paste0(sprintf('%.2f',.val),' thousand')
+    }
+    
+    else
+    {
+    charZ[i] = as.character(l[i])
+    }
+    
+  }
+  
+  return(charZ)
+}
 
 
 
@@ -351,5 +386,10 @@ legend('right', col = colz,legend = c('reads','UProCHits','filtered.score','filt
 
 plot.statistics.ggplot2 <- function(df)
 {
-  ggplot(df,aes(x = y, y = x, fill = z)) + geom_bar(stat="identity")
+  ggplot(df,aes(x = y, y = x, fill = z)) + geom_bar(stat="identity") +
+    scale_fill_manual(values = c("#545454", "#238E23", "#A68064"),name="type of match") +
+    labs(title = 'Sample read statistics', y = 'counts', x = 'Sample') +
+    theme(legend.position="bottom") +
+    scale_y_continuous(labels=plot.axis.function) +
+    scale_x_discrete()
 }
