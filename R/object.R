@@ -237,12 +237,25 @@
   )
 )
 
+
+# HELPER OBJECT
+Object.Data.Pathview <- setClass(
+  "Object.Data.Pathview",
+  slots = c(
+    Matrix = "matrix",
+    Names = "list"
+  )
+  
+)
+
+
 .Object.DATA.KEGG <- setClass (
   "Object.DATA.KEGG",
   slots = c(
     TaxMat = "data.frame",
     KEGG2PATH = "matrix",
-    KOinTax = "list"
+    KOinTax = "list",
+    ko2br.pathway = "Object.Data.Pathview"
   )
 )
 

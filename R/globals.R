@@ -6,6 +6,23 @@
   ##
 
 
+    
+    
+    
+    
+    
+############
+    THREE_COL_FUNCTION <- colorRampPalette(c("pink", "purple","darkblue"))    
+    
+    
+    
+    #############
+    
+    
+    
+    
+    
+    
 DEBUG.PRINT <- TRUE
 
 

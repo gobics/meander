@@ -382,7 +382,7 @@ ooze <- unique(df$y)
 colnames(rekt) <- ooze
 rownames(rekt) <- c('no match','high QL match','low QL match')
 colz = rainbow(length(ooze))
-barplot(rekt,beside = TRUE, col = colz)
+barplot(rekt,beside = FALSE, col = colz)
 legend('right', col = colz,legend = c('no match','high QL match','low QL match'))
 }
 
@@ -394,4 +394,62 @@ plot.statistics.ggplot2 <- function(df)
     theme(legend.position="bottom") +
     scale_y_continuous(labels=plot.axis.function) +
     scale_x_discrete()
+}
+
+
+
+do.plot.naow <- function(df,title,x,y)
+{
+  #colfunc<-colorRampPalette(c("red","yellow","springgreen","royalblue"))
+  df <- transform(df, y=reorder(y, z) ) 
+  p <- ggplot(df,aes(x = y, y = x, fill = z) ) +
+    geom_bar(stat = "identity") + 
+    coord_flip() + 
+    labs(title = title, y = y, x = x) +
+    #scale_fill_manual( values = colfunc(8) )
+    #scale_fill_gradient2(low = "black",  high = "lightblue", midpoint = mean(range(df$x)))
+    scale_fill_gradient2(midpoint = ceiling(mean(range(df$z))), space = 'Lab',
+                         low = 'pink', mid = 'purple', high = 'darkblue'
+    )
+  print(p)
+}
+
+ko2br.path <- function(O.data.kegg,O.data.refined)
+{
+OJ <- slot(O.data.kegg,'ko2br.pathway')            # get ko2br object
+KoZ <- which(slot(O.data.refined,'ConsensusVec'))  # find significant functions
+
+KoZ.Ind <- KoZ <= dim(slot(OJ,'Matrix'))[1]
+KoZ.red <- KoZ[KoZ.Ind]
+
+X <- colSums(slot(OJ,'Matrix')[KoZ.red,])
+Z <- colSums(slot(OJ,'Matrix')) 
+
+df2 = data.frame(x = X/Z, y = unlist(slot(OJ,'Names')), z = X, stringsAsFactors = FALSE)
+
+df2 = df2[df2$z != 0,]
+
+  #ggplot
+do.plot.naow(df2,'BRITE fraction significant','function','fraction')
+  #plot
+I.order = order(df2$z)
+df <- df2[I.order,]
+COOLCOLZ = THREE_COL_FUNCTION(max(df$z)+1)
+x11();
+par(oma = c(0, 15, 0, 0))
+barplot(height = df$x, names.arg = df$y, horiz = TRUE, cex.names = 1, space = c(0,2), xpd = FALSE, col = COOLCOLZ[df$z+1], las = 1)
+legend('bottomright',legend = rev(c(min(df$z),ceiling(mean(df$z)),max(df$z))), fill = rev(c(COOLCOLZ[min(df$z)+1],COOLCOLZ[ceiling(mean(df$z))],COOLCOLZ[max(df$z)])), title = '#Counts color code')
+par(oma = c(0, 0, 0, 0))
+return(df2)
+}
+
+
+
+phancy.plot <- function(O.data.kegg,O.data.refined, O.job.config)
+{
+  I.order = order(df2$z)
+  df <- df2[I.order,]
+  COOLCOLZ = THREE_COL_FUNCTION(max(df$z)+1)
+  barplot(height = df$x, names.arg = df$y, horiz = TRUE, cex.names = 1, space = c(0,2), xpd = FALSE, col = COOLCOLZ[df$z+1], las = 1)
+  
 }

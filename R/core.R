@@ -33,13 +33,15 @@ meander.start <- function(
   Object.data.dataframes <- .Object.DATA.dataframes()
   ##load fixed data
   #tax Mat
-  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS('/home/hklingen/projects/test123/data/TaxMat.rds'))
+  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS('./data/TaxMat.rds'))
   
   #ko2path
-  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KEGG2PATH', value = as.matrix(readRDS('/home/hklingen/projects/test123/data/KEGG2PATH.rds')))
+  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KEGG2PATH', value = as.matrix(readRDS('./data/KEGG2PATH.rds')))
   #kointax
-  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KOinTax', value = readRDS('/home/hklingen/projects/test123/data/KOlist.rds'))
+  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KOinTax', value = readRDS('./data/KOlist.rds'))
   #...
+  Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'ko2br.pathway', value = readRDS('./data/ko2br_pathway.rds'))
+  
   #png
     ##
   
