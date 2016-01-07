@@ -478,13 +478,12 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   PossibleKO = slot(O.Data.Kegg,'KOinTax')[[TaxID]]
   #PossibleKO = NAME.getData(Object = Object, LEVEL1 = 'Parameter', LEVEL2 = 'Output',LEVEL3 = 'KOinTax')[[TaxID]]
   
-  ##FLASGS
-  #.PathMode <- NAME.getData(Object = Object, LEVEL1 = 'Parameter',LEVEL2 = 'R', LEVEL3 = 'SelectedPathMode')
-  #.PathKOMode <- NAME.getData(Object = Object, LEVEL1 = 'Parameter',LEVEL2 = 'R', LEVEL3 = 'SelectedPathKOMode')
+  ##FLAGS
   .PathMode = 'inTax'
+  #.PathMode = 'all'
+  
+  #.PathKOMode = 'inTax'
   .PathKOMode = 'all'
-  
-  
   ##Settings
   #.Threshold <- NAME.getData(Object = Object, LEVEL1 = 'Parameter',LEVEL2 = 'R', LEVEL3 = 'SelectedThreshold')
   .Threshold = 0.05
@@ -534,9 +533,9 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   
   
   nSig = length(KO.Hits)
-  
-  #phyper(62-1, 1998, 5260-1998, 131, lower.tail=FALSE)`
-  .Vals <- unlist(lapply(c(1:nPath), function(x) phyper(SigKOCountVec[x]-1, PossibleKOCountVec[x], .nPossKO-PossibleKOCountVec[x], nSig, lower.tail = F, log.p = FALSE)))
+  cat(nSig,.nPossKO,'\n')
+  #phyper(62-1, 1998, 5260-1998, 131, lower.tail=FALSE)
+  .Vals <- unlist(lapply(c(1:nPath), function(x) phyper(SigKOCountVec[x]-1, PossibleKOCountVec[x], .nPossKO-PossibleKOCountVec[x], nSig, lower.tail = FALSE, log.p = FALSE)))
   
   .padjVals = p.adjust(.Vals, method = 'BH');
   .SigPaths <- which(.padjVals < .Threshold);
@@ -549,29 +548,7 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   cat(.SigPaths,'\n')
   cat(.padjVals,'\n')
   
-  return(list(.SigPaths,.padjVals))
-  
-  
-  
-  Z <- NAME.addData(Object,LEVEL1 = 'Results',LEVEL2 = 'SigPaths', value = .SigPaths)
-  if (1 == 2)
-  {
-    return(Z)
-  }
-  Z <- NAME.addData(Z,LEVEL1 = 'Results',LEVEL2 = 'AllPaths', value = .AllPaths)
-  if (1 == 2)
-  {
-    return(Z)
-  }
-  Z <- NAME.addData(Z,LEVEL1 = 'Results',LEVEL2 = 'AllPathsTax', value = .AllPathsTax)
-  if (1 == 2)
-  {
-    return(Z)
-  }
-  Z <- NAME.addData(Z,LEVEL1 = 'Results',LEVEL2 = 'PathwayPval', value = .padjVals)
-  
-  
-  return(Z)
+  return(list(.SigPaths,.padjVals,SigKOCountVec,PossibleKOCountVec))
 }
 
 
@@ -702,3 +679,9 @@ prepare.svgvectors.colour <- function(O.data.refined, O.data.kegg, O.job.config)
   return(O.data.refined)
 }
 
+
+perform.pvalcalc <- function(O.data.refined)
+{
+.pMat <- slot(O.data.refined,'ConsensusMat')
+.p.Val <- sapply(1:dim(.pMat)[1], function(x) median(.pMat[x,]))
+}

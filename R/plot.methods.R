@@ -59,7 +59,7 @@ plot.uproc.scores <- function(Object.job.statistics,Object.data.dataframes,Type 
 
   p <- ggplot(data = .DF, aes(x=x,y=y))
   p + geom_hline(xintercept = .thresh,colour = 'blue')
-  print(p + geom_tile(aes(fill=z)) + scale_fill_gradient(low="#eafeef", high="#7ccd7c"))
+  #print(p + geom_tile(aes(fill=z)) + scale_fill_gradient(low="#eafeef", high="#7ccd7c"))
 
   p <- ggplot(data = .DF, aes(x=y,y=z, group = factor(x)))
   p <- p + geom_vline(xintercept = .thresh,colour = 'blue')
@@ -141,31 +141,32 @@ plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,mi
     labs(title = "PCA ggplot2", 
          x = paste('1. PC',sprintf('[%.2f',100*.Var.Vec[1]),'% of variance]',sep=' '),
          y = paste('2. PC',sprintf('[%.2f',100*.Var.Vec[2]),'% of variance]',sep=' ')) + geom_text(alpha = 1, hjust=-1, vjust=0, show_guide = FALSE) +
+     +
     xlim(.xMin-.xAdd, .xMax + .xAdd) +
     ylim(.yMin-.yAdd, .yMax + .yAdd)
 
   print(c)
-  #normal Plot.
-
-  plot(main = 'PCA plot!',df$x,df$y,type = 'n',
-       xlab = paste('1. PC',sprintf('[%.2f',100*.Var.Vec[1]),'% of variance]',sep=' '),
-       ylab = paste('2. PC',sprintf('[%.2f',100*.Var.Vec[2]),'% of variance]',sep=' '),
-       xlim=c(.xMin-.xAdd, .xMax + .xAdd), 
-       ylim=c(.yMin-.yAdd, .yMax + .yAdd)
-       )
-  with(df,points(x[z == .Names.Vec[1]],y[z == .Names.Vec[1]], pch = 1, col = 'blue'))
-  with(df,points(x[z == .Names.Vec[2]],y[z == .Names.Vec[2]], pch = 2, col = 'red'))
-
-
-  #other are there
-  if (3 %in% df$z)
-  {
-  .legend.label <- c(.legend.label,"other")
-  .legend.symbol <- c(.legend.symbol,3)
-    
-  with(df,points(x[z == 3],y[z == 3], pch = 3, col = 'black'))
-  }
-with(df,legend('bottom',legend=.legend.label,pch=.legend.symbol,title='Conditions')) 
+#   #normal Plot.
+# 
+#   plot(main = 'PCA plot!',df$x,df$y,type = 'n',
+#        xlab = paste('1. PC',sprintf('[%.2f',100*.Var.Vec[1]),'% of variance]',sep=' '),
+#        ylab = paste('2. PC',sprintf('[%.2f',100*.Var.Vec[2]),'% of variance]',sep=' '),
+#        xlim=c(.xMin-.xAdd, .xMax + .xAdd), 
+#        ylim=c(.yMin-.yAdd, .yMax + .yAdd)
+#        )
+#   with(df,points(x[z == .Names.Vec[1]],y[z == .Names.Vec[1]], pch = 1, col = 'blue'))
+#   with(df,points(x[z == .Names.Vec[2]],y[z == .Names.Vec[2]], pch = 2, col = 'red'))
+# 
+# 
+#   #other are there
+#   if (3 %in% df$z)
+#   {
+#   .legend.label <- c(.legend.label,"other")
+#   .legend.symbol <- c(.legend.symbol,3)
+#     
+#   with(df,points(x[z == 3],y[z == 3], pch = 3, col = 'black'))
+#   }
+# with(df,legend('bottom',legend=.legend.label,pch=.legend.symbol,title='Conditions')) 
 
   
   return(df)
@@ -432,14 +433,6 @@ df2 = df2[df2$z != 0,]
   #ggplot
 do.plot.naow(df2,'BRITE fraction significant','function','fraction')
   #plot
-I.order = order(df2$z)
-df <- df2[I.order,]
-COOLCOLZ = THREE_COL_FUNCTION(max(df$z)+1)
-x11();
-par(oma = c(0, 15, 0, 0))
-barplot(height = df$x, names.arg = df$y, horiz = TRUE, cex.names = 1, space = c(0,2), xpd = FALSE, col = COOLCOLZ[df$z+1], las = 1)
-legend('bottomright',legend = rev(c(min(df$z),ceiling(mean(df$z)),max(df$z))), fill = rev(c(COOLCOLZ[min(df$z)+1],COOLCOLZ[ceiling(mean(df$z))],COOLCOLZ[max(df$z)])), title = '#Counts color code')
-par(oma = c(0, 0, 0, 0))
 return(df2)
 }
 
@@ -450,6 +443,9 @@ phancy.plot <- function(O.data.kegg,O.data.refined, O.job.config)
   I.order = order(df2$z)
   df <- df2[I.order,]
   COOLCOLZ = THREE_COL_FUNCTION(max(df$z)+1)
+  x11();
+  par(oma = c(0, 15, 0, 0))
   barplot(height = df$x, names.arg = df$y, horiz = TRUE, cex.names = 1, space = c(0,2), xpd = FALSE, col = COOLCOLZ[df$z+1], las = 1)
-  
+  legend('bottomright',legend = rev(c(min(df$z),ceiling(median(df$z)),max(df$z))), fill = rev(c(COOLCOLZ[min(df$z)+1],COOLCOLZ[ceiling(median(df$z))],COOLCOLZ[max(df$z)])), title = '#Counts color code')
+  par(oma = c(0, 0, 0, 0))
 }

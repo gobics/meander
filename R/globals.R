@@ -26,19 +26,6 @@
 DEBUG.PRINT <- TRUE
 
 
-OBJECT.ERROR.NOCLASSES <- 'no Classes.\n'
-OBJECT.ERROR.reqLENGTH <- 'required length not set.\n'
-OBJECT.ERROR.LENGTH.CLASSES.reqLENGTH <- "length differ.\n"
-OBJECT.ERROR <- "length ClassNames & ClassVec differ.\n"
-
-
-
-OBJECT.ERROR.NORESUME <- 'death\n'
-OBJECT.ERROR.RESUME <- 'half death\n'
-OBJECT.WARNING <- 'all "fine"\n'
-
-
-
 FILETYPE.DNA <- "DNA"
 FILETYPE.DNAwoRNA <- "RNAfilteredDNA"
 FILETYPE.UproC <- "UproC"
@@ -99,24 +86,6 @@ METHOD.CALLS <- setClass (
 
 
 METHOD.LIST <- new("METHOD.CALLS")
-
-
-
-
-
-MESSAGES <- list(
-OBJECT.OK = TRUE,
-OBJECT.ERROR = FALSE,
-OBJECT.ERROR.NOFASTAHEADER = 'For a FASTA file, first expected symbol is ">".\n',
-OBJECT.WARNING.FASTA = 'Short on nucleotides?\n',
-OBJECT.ERROR.RDS = 'File is not in RDS format!\n',
-OBJECT.ERROR.UPROCVERSION = 'UProC version is wrong.\n',
-OBJECT.ERROR.UNKNOWN = 'not in list for checks.\n'
-)
-
-
-
-
 
 
 .ok.fun <- function()

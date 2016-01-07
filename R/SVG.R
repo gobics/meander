@@ -39,7 +39,7 @@ df <- data.frame(x = NULL, y = NULL, z = NULL)
   XXX.SVG <- readRDS('./data/SVG_positions.rds') 
   XXX.PNG <- readRDS('./data/path_png.rds') 
   
-  for (i in XXX.KEGGmapnames[1:10])
+  for (i in XXX.KEGGmapnames)
   {
     #get png alpha [1] & normal [2] & dimensions [x = 3, y = 4]
   .PNG <- XXX.PNG[[i]]
@@ -72,9 +72,9 @@ df <- data.frame(x = NULL, y = NULL, z = NULL)
         .String = c(.String,.X)
       }
       #write to file
-    cat(c(.String,'</svg>') , file = paste(i,'.svg',sep=''), sep = "\n", fill = FALSE, labels = NULL, append = FALSE)      
+          
     }
-
+  cat(c(.String,'</svg>') , file = paste(i,'.svg',sep=''), sep = "\n", fill = FALSE, labels = NULL, append = FALSE)
   
   
   }
