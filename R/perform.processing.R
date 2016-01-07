@@ -631,7 +631,7 @@ prepare.svgvectors.colour <- function(O.data.refined, O.data.kegg, O.job.config)
   
   Vec.ratio <- vector(mode = 'numeric', length = nMax.dim) + 1
   Vec.Col = vector(mode = 'character', length = nMax.dim)
-  
+  Vec.Flag = vector(mode = 'integer', length = nMax.dim);
   #find rows with min counts
   .Mat.I <- rowSums(.Mat) > 0
   
@@ -651,31 +651,26 @@ prepare.svgvectors.colour <- function(O.data.refined, O.data.kegg, O.job.config)
   
   Vec.ratio[which(.Mat.I)] = .Counts.A / .Counts.B
   
-  #All my KO
-  KO.hit.all <- which(rowSums(.Mat) > 0)
-  KO.hit.tax <- KO.hit.all[KO.hit.all %in% .AllowedKO]
-  KO.hit.extra <- KO.hit.all[(KO.hit.all %in% .AllowedKO) == FALSE]
-  KO.miss <- .AllowedKO[(.AllowedKO %in% KO.hit.all) == FALSE]
-  
-  KO.hit.sig <- which(.Sig.Ko)
-  KO.hit.usig <- KO.hit.tax[(KO.hit.tax %in% KO.hit.sig) == FALSE]
-  
-  KO.greater <- which(Vec.ratio > 1)
-  KO.smaller <- which(Vec.ratio < 1)
-  
-  cat(length(KO.hit.all),length(KO.hit.tax),length(KO.hit.extra),length(KO.miss),length(KO.hit.sig),length(KO.hit.usig),length(KO.greater),length(KO.smaller),'\n')
 
   
-  Vec.Col[1:nMax.dim] <- NOT_MAPPED_AND_SHOULD_NOT_DEFAULT_COLOR
-  Vec.Col[KO.hit.sig[KO.hit.sig %in% KO.smaller]] <- SIGNIFICANT_DOWN_REGULATED_DEFAULT_COLOR
-  Vec.Col[KO.hit.sig[KO.hit.sig %in% KO.greater]] <- SIGNIFICANT_UP_REGULATED_DEFAULT_COLOR
-  Vec.Col[KO.hit.usig[KO.hit.usig %in% KO.smaller]] <- INSIGNIFICANT_DOWN_REGULATED_DEFAULT_COLOR
-  Vec.Col[KO.hit.usig[KO.hit.usig %in% KO.greater]] <- INSIGNIFICANT_UP_REGULATED_DEFAULT_COLOR
-  Vec.Col[KO.hit.extra] <- MAPPED_AND_SHOULD_NOT_DEFAULT_COLOR
-  Vec.Col[KO.miss] <- NOT_MAPPED_AND_SHOULD_DEFAULT_COLOR
+  #should map
+  Vec.Flag[.AllowedKO] <- set.Flag(Vec.Flag[.AllowedKO],SHOULD_MAP_FLAG)
+  #maps
+  KO.hit.all <- which(rowSums(.Mat) > 0)
+  Vec.Flag[KO.hit.all] <- set.Flag(Vec.Flag[KO.hit.all],MAPPED_FLAG)
+  #up
+  Vec.Flag[Vec.ratio > 1] <- set.Flag(Vec.Flag[Vec.ratio > 1],UP_REGULATED_FLAG)
+  #sig
+  Vec.Flag[.Sig.Ko] <- set.Flag(Vec.Flag[.Sig.Ko],SIGNIFICANT_FLAG)
+  
+  
+  #set colors
+  Vec.Col <- ORTHOLOG_COLORS[Vec.Flag+1];
+  
   
   
   O.data.refined <- setInputdata(O.data.refined,'ColorVec',Vec.Col)
+  O.data.refined <- setInputdata(O.data.refined,'FlagVec',Vec.Flag)
   return(O.data.refined)
 }
 
@@ -684,4 +679,5 @@ perform.pvalcalc <- function(O.data.refined)
 {
 .pMat <- slot(O.data.refined,'ConsensusMat')
 .p.Val <- sapply(1:dim(.pMat)[1], function(x) median(.pMat[x,]))
+return(.p.Val)
 }
