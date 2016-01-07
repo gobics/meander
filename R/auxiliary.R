@@ -16,3 +16,28 @@ set.RunningMode <- function(mode)
 {
     assign('RUNNING_MODE', mode, pos = globalenv())
 }
+
+# ************************************************************************************************** 
+#   BIT FLAG OPERATIONS
+# ************************************************************************************************** 
+
+set.Flag = function (byte, ...)
+{
+    flag = Reduce(bitwOr, ...)
+
+    bitwOr(byte, flag)
+}
+
+unset.Flag = function (byte, ...)
+{
+    flag = Reduce(bitwOr, ...)
+
+    bitwAnd(byte, bitwNot(flag))
+}
+
+toggle.Flag = function (byte, ...)
+{
+    flag = Reduce(bitwOr, ...)
+    
+    bitwXor(byte, flag)
+}
