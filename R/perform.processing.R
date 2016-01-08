@@ -665,7 +665,7 @@ prepare.svgvectors.colour <- function(O.data.refined, O.data.kegg, O.job.config)
   
   
   #set colors
-  Vec.Col <- ORTHOLOG_COLORS[Vec.Flag+1];
+  Vec.Col <- ORTHOLOG_COLORS[Vec.Flag+COLOR_OFFSET];
   
   
   
