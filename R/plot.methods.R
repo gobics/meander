@@ -96,8 +96,7 @@ plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,mi
   Kcount.matrix <-XMat[I.K,]
   Matrix.FULL <- matrix(0,ncol=.matDims[2],nrow=.matDims[1])
   res <- sapply(c(1:DimVec[2]), function(x) rank(XMat[I.K,x]))
-  print(res[1:10])
-  print(sum(XMat))
+
   res <- res + sapply(1:DimVec[2],function(x) sample(1000,DimVec[1],replace=T)/1000000)
   Matrix.FULL[I.K,] <- res
   X2 <- prcomp(t(res),center = TRUE)
@@ -128,6 +127,9 @@ plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,mi
   .yMin = min(df$y)
   .yMax = max(df$y)  
   
+  
+  #print(c(.xMin,.xMax,.yMin,.yMax))
+  
   .xAdd = (.xMax - .xMin)*0.1
   .yAdd = (.yMax - .yMin)*0.1
   
@@ -141,7 +143,6 @@ plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,mi
     labs(title = "PCA ggplot2", 
          x = paste('1. PC',sprintf('[%.2f',100*.Var.Vec[1]),'% of variance]',sep=' '),
          y = paste('2. PC',sprintf('[%.2f',100*.Var.Vec[2]),'% of variance]',sep=' ')) + geom_text(alpha = 1, hjust=-1, vjust=0, show_guide = FALSE) +
-     +
     xlim(.xMin-.xAdd, .xMax + .xAdd) +
     ylim(.yMin-.yAdd, .yMax + .yAdd)
 

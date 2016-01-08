@@ -28,10 +28,13 @@ NAME.SVG.includepic <- function(xPos,yPos,xDim,yDim,base64pic)
 }
 
 
-perform.SVGcreation <- function(O.data.refined)
+perform.SVGcreation <- function(O.data.refined,O.job.paths)
 {
   #get the color vector
   ColVec <- slot(O.data.refined,'ColorVec')
+  
+  .path = file.path(slot(O.job.paths,'DirOut'),'HTML')
+  
   
 df <- data.frame(x = NULL, y = NULL, z = NULL)
   #in object later
@@ -74,7 +77,7 @@ df <- data.frame(x = NULL, y = NULL, z = NULL)
       #write to file
           
     }
-  cat(c(.String,'</svg>') , file = paste(i,'.svg',sep=''), sep = "\n", fill = FALSE, labels = NULL, append = FALSE)
+  cat(c(.String,'</svg>') , file = file.path(.path,paste(i,'.svg',sep='')), sep = "\n", fill = FALSE, labels = NULL, append = FALSE)
   
   
   }
