@@ -223,7 +223,8 @@
     ALLKOabove = "vector",        #KO above threshold counts in a row
 #SVG relevant
     ConsensusVec = "vector",      #significant differences detected by x method[s]    
-    ColorVec = 'vector'           #HEX color code
+    ColorVec = 'vector',          #HEX color code
+    FlagVec = 'vector'            #FLAG
     
   ),
   prototype = list(
@@ -233,7 +234,8 @@
     ConsensusVec = vector(),
     Matrix = matrix(),
     ALLKOabove = vector(),
-    ColorVec = vector()
+    ColorVec = vector(),
+    FlagVec = vector()
   )
 )
 

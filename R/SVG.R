@@ -28,10 +28,13 @@ NAME.SVG.includepic <- function(xPos,yPos,xDim,yDim,base64pic)
 }
 
 
-perform.SVGcreation <- function(O.data.refined)
+perform.SVGcreation <- function(O.data.refined,O.job.paths)
 {
   #get the color vector
   ColVec <- slot(O.data.refined,'ColorVec')
+  
+  .path = file.path(slot(O.job.paths,'DirOut'),'HTML')
+  
   
 df <- data.frame(x = NULL, y = NULL, z = NULL)
   #in object later
@@ -39,7 +42,7 @@ df <- data.frame(x = NULL, y = NULL, z = NULL)
   XXX.SVG <- readRDS('./data/SVG_positions.rds') 
   XXX.PNG <- readRDS('./data/path_png.rds') 
   
-  for (i in XXX.KEGGmapnames[1:10])
+  for (i in XXX.KEGGmapnames)
   {
     #get png alpha [1] & normal [2] & dimensions [x = 3, y = 4]
   .PNG <- XXX.PNG[[i]]
@@ -72,9 +75,9 @@ df <- data.frame(x = NULL, y = NULL, z = NULL)
         .String = c(.String,.X)
       }
       #write to file
-    cat(c(.String,'</svg>') , file = paste(i,'.svg',sep=''), sep = "\n", fill = FALSE, labels = NULL, append = FALSE)      
+          
     }
-
+  cat(c(.String,'</svg>') , file = file.path(.path,paste(i,'.svg',sep='')), sep = "\n", fill = FALSE, labels = NULL, append = FALSE)
   
   
   }
