@@ -1,0 +1,25 @@
+
+// ============================================================================
+	<!--> DATA FROM R ENDS HERE </!-->
+// ============================================================================
+
+var COLUMN_NOF		= TABLE_HEADER.length+ SUB_CAPTION.length;
+
+</script> 
+
+<script type="text/javascript" src="../supply/table_sort.js"></script>
+
+<title></title>
+
+</head>
+<body onLoad="init();">
+<div>
+	<h1></h1> 
+	<noscript> <p>This site needs JavaScript to be installed and activated for proper display!</p> </noscript>
+</div>
+<div> 
+	<table></table>
+	<table style="position:relative; top:30px"></table>
+</div> 
+</body>  
+</html>

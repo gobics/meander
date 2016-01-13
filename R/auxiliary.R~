@@ -42,12 +42,6 @@ toggle.Flag = function (byte, ...)
     bitwXor(byte, flag)
 }
 
-has.Flag = function(byte, ...)
-{
-    flag = Reduce(bitwOr, ...)
-
-    bitwAnd(byte, flag) == flag
-}
 
 # ************************************************************************************************** 
 #   CONFIG FILE OPERATIONS

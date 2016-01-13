@@ -678,7 +678,6 @@ prepare.svgvectors.colour <- function(O.data.refined, O.data.kegg, O.job.config)
   KO.hit.all <- which(rowSums(.Mat) > 0)
   KO.hit.tax <- KO.hit.all[KO.hit.all %in% .AllowedKO]
   KO.hit.extra <- KO.hit.all[(KO.hit.all %in% .AllowedKO) == FALSE]
-
   KO.miss <- .AllowedKO[(.AllowedKO %in% KO.hit.all) == FALSE]
   
   KO.hit.sig <- which(.Sig.Ko)

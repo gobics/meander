@@ -1,0 +1,1 @@
+<tr><td width="40px">%d.</td><td class="ortholog"><a href="../pathways/%s.html" target="TABLE_FRAME">%s</a></td><td bgcolor="%s" width="10px"></td><td class="pval">%.2E</td></tr>
