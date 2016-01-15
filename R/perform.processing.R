@@ -472,7 +472,7 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   
   #select all possible KO for the species
   KO.Hits <- which(slot(O.Data.Refined,'ConsensusVec'))
-  ALLKO.Hits <- slot(O.Data.Refined,'ALLKOabove')
+  ALLKO.Hits <- which(rowSums(slot(O.Data.Refined,'Matrix')) > 5)
     #NAME.getData(Object = Object, LEVEL1 = 'Results', LEVEL2 = 'Consensus',LEVEL3 = 'KOwithHits')
   
   PossibleKO = slot(O.Data.Kegg,'KOinTax')[[TaxID]]
@@ -544,11 +544,16 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   .AllPaths <- colSums(KEGG2Path[ALLKO.Hits[ALLKO.Hits <= nKO],]);
   .AllPathsTax <- colSums(PathMat[ALLKO.Hits[ALLKO.Hits <= nKO],]);
   
+  #cat(ALLKO.Hits,'\n')
   
-  cat(.SigPaths,'\n')
-  cat(.padjVals,'\n')
-  
-  return(list(.SigPaths,.padjVals,SigKOCountVec,PossibleKOCountVec))
+  #cat(.SigPaths,'\n')
+  #cat(.padjVals,'\n')
+  .Vec <- sapply(1:nPath, function(x) which(KEGG2Path[,x] == 1))
+  .A <- sapply(1:nPath, function(x) length(.Vec[[x]]))
+  .Vec <- sapply(1:nPath, function(x) which(PathMat[,x] == 1))
+  .B <- sapply(1:nPath, function(x) length(.Vec[[x]]))
+   
+  return(list(.SigPaths,.padjVals,SigKOCountVec,.AllPathsTax,.A,.B))
 }
 
 

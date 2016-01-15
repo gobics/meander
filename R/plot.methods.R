@@ -411,7 +411,7 @@ do.plot.naow <- function(df,title,x,y)
     #scale_fill_manual( values = colfunc(8) )
     #scale_fill_gradient2(low = "black",  high = "lightblue", midpoint = mean(range(df$x)))
     scale_fill_gradient2(midpoint = ceiling(mean(range(df$z))), space = 'Lab',
-                         low = 'pink', mid = 'purple', high = 'darkblue'
+                         low = THREE_COL_FUNCTION[1], mid = THREE_COL_FUNCTION[2], high = THREE_COL_FUNCTION[3]
     )
   print(p)
 }
@@ -439,7 +439,7 @@ return(df2)
 
 
 
-phancy.plot <- function(O.data.kegg,O.data.refined, O.job.config)
+phancy.plot <- function(df2,O.data.kegg,O.data.refined, O.job.config)
 {
   I.order = order(df2$z)
   df <- df2[I.order,]

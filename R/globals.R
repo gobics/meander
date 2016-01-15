@@ -12,7 +12,7 @@
     
     
 ############
-    THREE_COL_FUNCTION <- colorRampPalette(c("pink", "purple","darkblue"))    
+    THREE_COL_FUNCTION <- (c("pink", "purple","darkblue"))    
     
     
     

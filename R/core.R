@@ -263,7 +263,7 @@ meander.start <- function(
 
   Object.data.refined <- prepare.svgvectors.colour(Object.data.refined,Object.data.kegg,Object.job.config)
   
-
+  
   #output
   .df <- perform.SVGcreation(Object.data.refined,Object.job.path)
   
