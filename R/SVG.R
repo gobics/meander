@@ -6,7 +6,7 @@ NAME.SVG.rect <- function(xPos,yPos,xDim,yDim,col,opac)
 NAME.SVG.link <- function(ID,xPos,yPos,xDim,yDim)
 {
   .String = paste('<g id="',ID,'">\n',sep='')
-  .String = paste(.String,'<a xlink:href= "../html/K',sprintf('%05d',ID),'.html" target="sebi">\n',sep='')
+  .String = paste(.String,'<a xlink:href= "../html/K',sprintf('%05d',ID),'.html" target="',LEFT_FRAME,'">\n',sep='')
   .String = paste(.String,NAME.SVG.rect(xPos,yPos,xDim,yDim,'#000000',0),sep='')
   .String = paste(.String,'</a>\n','</g>\n',sep='')
   return(.String)
@@ -33,7 +33,7 @@ perform.SVGcreation <- function(O.data.refined,O.job.paths)
   #get the color vector
   ColVec <- slot(O.data.refined,'ColorVec')
   
-  .path = file.path(slot(O.job.paths,'DirOut'),'HTML')
+  .path = file.path(slot(O.job.paths,'DirOut'),'HTML','svg')
   
   
 df <- data.frame(x = NULL, y = NULL, z = NULL)
