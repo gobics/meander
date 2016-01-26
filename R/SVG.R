@@ -6,7 +6,7 @@ NAME.SVG.rect <- function(xPos,yPos,xDim,yDim,col,opac)
 NAME.SVG.link <- function(ID,xPos,yPos,xDim,yDim)
 {
   .String = paste('<g id="',ID,'">\n',sep='')
-  .String = paste(.String,'<a xlink:href= "../html/K',sprintf('%05d',ID),'.html" target="',LEFT_FRAME,'">\n',sep='')
+  .String = paste(.String,'<a xlink:href= "../html/pathways/K',sprintf('%05d',ID),'.html" target="',LEFT_FRAME,'">\n',sep='')
   .String = paste(.String,NAME.SVG.rect(xPos,yPos,xDim,yDim,'#000000',0),sep='')
   .String = paste(.String,'</a>\n','</g>\n',sep='')
   return(.String)
