@@ -268,7 +268,7 @@ obtain.Size = function(tree)
 
 obtain.Names = function(forest)
 {
-    readRDS(get.RdsFileDescriptor('pathway.names'))[forest$id]  
+    readRDS(get.RdsFileDescriptor('tax.names'))[forest$id]  
 }
 
 obtain.Colors = function(forest)
@@ -306,6 +306,8 @@ extract.SubTree = function(tree, vertex)
 
 create.Canvas = function(forest)
 {
+    require(tcltk)
+
     min.Node.X = forest[x == min(x), id][1]
     max.Node.X = forest[x == max(x), id][1]
 
