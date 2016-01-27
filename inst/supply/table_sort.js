@@ -1,9 +1,14 @@
 function init()
 {
 	document.title = TITLE;
-	document.getElementsByTagName("h1")[0].innerHTML = TITLE;
 	if (document.getElementsByTagName("h3").length > 0)
-		document.getElementsByTagName("h3")[0].innerHTML = P_VALUE;
+    {
+	    document.getElementsByTagName("h1")[0].innerHTML = KEGG_LINK;
+        document.getElementsByTagName("h3")[0].innerHTML = P_VALUE;
+    }	
+    else
+	    document.getElementsByTagName("h1")[0].innerHTML = TITLE;
+        
 	
 	build_table(0, false);
 }

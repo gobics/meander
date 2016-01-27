@@ -3,6 +3,7 @@ TABLE_COLUMN_OFFSET = 2
 write.html.files = function(Object)
 {
     # TODO Sebastian: wrapper for create.Output
+
 }
 
 create.HTML.Output = function(Pathways.Table, Orthologs.Table, Pathways.Orthologs.Map, output.Dir)
@@ -66,9 +67,6 @@ create.Output.Pathways = function(Pathways.Table, Orthologs.Table, Pathways.Orth
 
 create.Output.Orthologs = function(Pathways.Table, Orthologs.Table, Pathways.Orthologs.Map, output.Dir)
 {
-
-    Orthologs.Table = Orthologs.Table[order(Orthologs.Table[, 3]), ]
-
     for (pathway in rownames(Pathways.Table))
     {
         Orthologs.Subset = Orthologs.Table[Pathways.Orthologs.Map[pathway,],]
@@ -130,7 +128,7 @@ get.PathwayLinks = function(pathways.ID)
 
 build.Pathways.HTML.Data = function(names, links, values, id)
 {
-    sort.Idx = order(names)
+    #values = format.Values(values)
 
     data = apply(
         cbind(names, links, values),
@@ -140,7 +138,7 @@ build.Pathways.HTML.Data = function(names, links, values, id)
 
     names(data) = id
 
-    data[sort.Idx]
+    data
 }
 
 write.Pathway.HTML = function(title, p.value, pathway.idx, caption, data, dir, column.nof)
@@ -162,7 +160,15 @@ write.Pathway.HTML = function(title, p.value, pathway.idx, caption, data, dir, c
             readLines(file.path(HTML_TEMPLATE_PATH, 'tail.temp')),
         collapse = '\n'
         )
-    
+
+
+    keggLink = bindStrings(
+        '\"<a href=\\\"http://www.genome.jp/dbget-bin/www_bget?ko+',
+        title,
+        '\\" target=\\\"_blank\\\">',
+        title,
+        '</a>\"'
+        )
 
     cat(
         head,
@@ -179,6 +185,10 @@ write.Pathway.HTML = function(title, p.value, pathway.idx, caption, data, dir, c
 		'var TITLE = ',
 		sprintf('\"%s\"', chartr('_', ' ', title)),
 		';\n\n',
+
+        'var KEGG_LINK = ',
+        keggLink,
+        ';\n\n',
 
         'var COLUMN_NOF = ',
         column.nof,
@@ -203,10 +213,10 @@ UNIT_TEST_create.HTML.Output = function()
 
     no=50    
 
-    Pathways.Table = data.frame(names = sample(LETTERS, np, replace = TRUE), coverage = sample(100, np, replace = TRUE)/100, abundance = sample(10000, np))
+    Pathways.Table = data.frame(names = sample(LETTERS, np, replace = TRUE), coverage = sample(100, np, replace = TRUE)/100, abundance = sample(10000, np), stringsAsFactors = FALSE)
     rownames(Pathways.Table) = sprintf('%05d', sample(10000, np))
 
-    Orthologs.Table = data.frame(names = sample(LETTERS, no, replace = TRUE), flag = sample(15, no, replace = TRUE), p.value = sample(100, no, replace = TRUE)/10000)
+    Orthologs.Table = data.frame(names = sample(LETTERS, no, replace = TRUE), flag = sample(15, no, replace = TRUE), p.value = sample(100, no, replace = TRUE)/10000, stringsAsFactors = FALSE)
     rownames(Orthologs.Table) = sprintf('K%05d', sample(10000, no))
 
     Pathways.Orthologs.Map = matrix(sample(c(TRUE, FALSE), no*np, replace = TRUE), nrow = np)
@@ -223,11 +233,14 @@ write.Ortholog.HTML = function(pathway, pathway.name, Orthologs.Table, output.Di
 
     diffExp.Idx = has.Flag(Orthologs.Table[, 2], SHOULD_MAP_FLAG, MAPPED_FLAG)
 
-    diffExp.Table = build.Table.Rows(Orthologs.Table[diffExp.Idx, ])
-    misMap.Table = build.Table.Rows(Orthologs.Table[!diffExp.Idx, ])
+    diffExp.Table = Orthologs.Table[diffExp.Idx, ]
+    misMap.Table = Orthologs.Table[!diffExp.Idx, ]
+
+    diffExp.Table.Rows = build.Table.Rows(diffExp.Table[order(as.numeric(diffExp.Table[,3])), ])
+    misMap.Table.Rows = build.Table.Rows(misMap.Table[order(misMap.Table[,2], decreasing = TRUE), ])
 
     cat(
-        sprintf(table.FormatString, pathway.name, pathway.name, diffExp.Table, misMap.Table),
+        sprintf(table.FormatString, pathway.name, pathway.name, diffExp.Table.Rows, misMap.Table.Rows),
         file = output.File
         )
 }
