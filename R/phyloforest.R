@@ -1,7 +1,7 @@
 
 FULL_CIRCLE_ANGLE = 2 * pi
 
-#make editiable
+#START PARAMETERS
 MIN_RATIO_EXPAND = 0.01
 
 RIGID_CUTOFF_MODE = TRUE
@@ -19,6 +19,8 @@ COLORING_THRESHOLD_RATIO = 0
 COLORING_THRESHOLD_SHELL = 5 
 
 COLORING_THRESHOLD_RADIUS = MAX_SIZE/5
+
+#END PARAMETERS
 
 TOTAL_PADDING = 20
 BRANCH_PADDING = 5
@@ -98,9 +100,11 @@ obtain.Y_Coordinates = function (forest)
 {
     max.Radius = forest[shell > 0, max(radius), by = shell]$V1
 
-    temp.Matrix = matrix(0, nrow = MAX_RANK, ncol = MAX_RANK)
+    max.rank = max(forest$shell)
 
-    temp.Matrix[lower.tri(temp.Matrix)] = rep(max.Radius, times = (MAX_RANK - 1):0) * 2
+    temp.Matrix = matrix(0, nrow = max.rank, ncol = max.rank)
+
+    temp.Matrix[lower.tri(temp.Matrix)] = rep(max.Radius, times = (max.rank - 1):0) * 2
 
     temp.Matrix = temp.Matrix + lower.tri(temp.Matrix) * SHELL_PADDING
 
