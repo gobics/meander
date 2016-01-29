@@ -96,7 +96,7 @@ process.storeRDS <- function(Object.data.big, Object.job.path, Object.job.statis
 {
   .uproc.filein <- slot(Object.job.path,FILETYPE.UproC)[Sample]
   .RDS.fileout <- slot(Object.job.path,FILETYPE.RDS)[Sample]
-  cat('shit:',.uproc.filein,'\n')
+  
   options(warn=-1)
   .Return <- fread(.uproc.filein, nrows=-1, select = c(1,3,8,9,10,11))
   options(warn=1)
