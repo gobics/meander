@@ -1,9 +1,54 @@
 TABLE_COLUMN_OFFSET = 2
 
-write.html.files = function(Object)
+# @PARAMS
+# data.frame : pathways.table             [ _df.rds ]
+# data.frame : pathways.table.header      
+#   - contains the variables: string, type for each column of pathway.table indicating
+#    - string : the name of the column as it appears in the html table
+#    - type   : the type of the column data, either (i) integer, (r) ratio, (f) double
+# character  : kegg.pathways.IDs          [ data/keggmapnames.rds ]
+# character  : kegg.pathways.names        [ data/pathway.names.Rds ]
+# character  : kegg.orthologs.description [ data/ko_desc.rds ]
+# integer    : orthologs.flag             [ Object@DATA@Refined@FlagVec ]
+# double     : orthologs.p_value          [ _pval.rds ]
+# matrix     : orthologs.pathways.map     [ Object@DATA@KEGG@KEGG2PATH ]
+# string     : output.Dir
+write.html.files = function(pathways.table, pathways.table.header, kegg.pathways.IDs, kegg.pathways.names, kegg.orthologs.description, orthologs.flag, orthologs.p_value, orthologs.pathways.map, output.Dir)
 {
-    # TODO Sebastian: wrapper for create.Output
+    # prepare pathways.table
+    names(pathways.table) = pathways.table.header$string  
+    for (col in 1:ncol(pathways.table))
+    {
+        if (pathways.table.header$type[col] == 'r')
+        {
+            pathways.table[is.na(pathways.table[, col]), col] = 0
+            pathways.table[, col] = sprintf('%1.2f', round(pathways.table[,col], 2))
+        }
+        if (pathways.table.header$type[col] == 'f')
+            pathways.table[, col] = sprintf('%1.2E', pathways.table[,col])
+    }
+    rownames(pathways.table) = gsub('map', '', kegg.pathways.IDs)
+    pathways.table$Name = kegg.pathways.names[rownames(pathways.table)]
+    pathways.table = pathways.table[, c(ncol(pathways.table), 2:ncol(pathways.table)- 1)]
 
+    # prepare orthologs.table
+    max.ko = nrow(orthologs.pathways.map)
+    orthologs.table = data.frame(
+        Name = kegg.orthologs.description[1:max.ko],
+        Flag = orthologs.flag[1:max.ko], 
+        P.Value = orthologs.p_value[1:max.ko],
+        stringsAsFactors = FALSE,
+        row.names = sprintf('K%05d', 1:max.ko)
+        )
+    orthologs.table$Name[orthologs.table$Name==''] = rownames(orthologs.table)[orthologs.table$Name=='']
+    orthologs.table$P.Value = sprintf('%1.2E', orthologs.table$P.Value)
+
+    # prepare map
+    pathways.orthologs.map = t(orthologs.pathways.map == 1)
+    dimnames(pathways.orthologs.map) = list(rownames(pathways.table), rownames(orthologs.table))
+
+    # call next
+    create.HTML.Output(pathways.table, orthologs.table,  pathways.orthologs.map, output.Dir)
 }
 
 create.HTML.Output = function(Pathways.Table, Orthologs.Table, Pathways.Orthologs.Map, output.Dir)
