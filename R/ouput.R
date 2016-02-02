@@ -5,7 +5,7 @@ TABLE_COLUMN_OFFSET = 2
 # data.frame : pathways.table.header      
 #   - contains the variables: string, type for each column of pathway.table indicating
 #    - string : the name of the column as it appears in the html table
-#    - type   : the type of the column data, either (i) integer, (r) ratio, (f) double
+#    - type   : the type of the column data, either (i) integer, (r) ratio, (f) float
 # character  : kegg.pathways.IDs          [ data/keggmapnames.rds ]
 # character  : kegg.pathways.names        [ data/pathway.names.Rds ]
 # character  : kegg.orthologs.description [ data/ko_desc.rds ]
