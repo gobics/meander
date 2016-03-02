@@ -63,19 +63,22 @@ check.ConfigFile = function ()
 
 create.ConfigFile = function ()
 {
-    file.create(CONFIG_FILE)
 
-    write.ConfigFile.Hash()
+
 }
 
-write.ConfigFile.Hash = function ()
+write.ConfigFile.Key = function(key, value)
 {
-    hash = bindStrings(CONFIG_FILE_COMMENT, CONFIG_FILE_HASH)
-
-    write(hash, CONFIG_FILE)
+    
 }
 
-write.ConfigFile.Key = function()
+load.ConfigFile.AllKeys = function()
 {
+    lines = readLines(CONFIG_FILE)
+    
+    # REMOVE COMMENTARY LINES
+    lines = grep(bindStrings('^[^', CONFIG_FILE_COMMENT, ']'), lines, value = TRUE)   
 
+    varNames = gsub(CONFIG_FILE_ENTRY_PATTERN, '\\1', lines)
+    varValues = gsub(CONFIG_FILE_ENTRY_PATTERN, '\\2', lines)
 }
