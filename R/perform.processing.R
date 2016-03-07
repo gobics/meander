@@ -482,8 +482,8 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   .PathMode = 'inTax'
   #.PathMode = 'all'
   
-  #.PathKOMode = 'inTax'
-  .PathKOMode = 'all'
+  .PathKOMode = 'inTax'
+  #.PathKOMode = 'all'
   ##Settings
   #.Threshold <- NAME.getData(Object = Object, LEVEL1 = 'Parameter',LEVEL2 = 'R', LEVEL3 = 'SelectedThreshold')
   .Threshold = 0.05

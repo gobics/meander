@@ -416,7 +416,7 @@ do.plot.naow <- function(df,title,x,y)
   print(p)
 }
 
-ko2br.path <- function(O.data.kegg,O.data.refined)
+ko2br.path <- function(O.data.kegg,O.data.refined,AllowedKO)
 {
 OJ <- slot(O.data.kegg,'ko2br.pathway')            # get ko2br object
 KoZ <- which(slot(O.data.refined,'ConsensusVec'))  # find significant functions
@@ -424,8 +424,10 @@ KoZ <- which(slot(O.data.refined,'ConsensusVec'))  # find significant functions
 KoZ.Ind <- KoZ <= dim(slot(OJ,'Matrix'))[1]
 KoZ.red <- KoZ[KoZ.Ind]
 
+AllowedKO <- AllowedKO[AllowedKO <= dim(slot(OJ,'Matrix'))[1]]
+
 X <- colSums(slot(OJ,'Matrix')[KoZ.red,])
-Z <- colSums(slot(OJ,'Matrix')) 
+Z <- colSums(slot(OJ,'Matrix')[AllowedKO,]) 
 
 df2 = data.frame(x = X/Z, y = unlist(slot(OJ,'Names')), z = X, stringsAsFactors = FALSE)
 
@@ -437,6 +439,47 @@ do.plot.naow(df2,'BRITE fraction significant','function','fraction')
 return(df2)
 }
 
+ko2br.path.A <- function(O.data.kegg,O.data.refined)
+{
+  OJ <- slot(O.data.kegg,'ko2br.pathway')            # get ko2br object
+  KoZ <- which(slot(O.data.refined,'FlagVec') == 15)  # find significant functions
+  
+  KoZ.Ind <- KoZ <= dim(slot(OJ,'Matrix'))[1]
+  KoZ.red <- KoZ[KoZ.Ind]
+  
+  X <- colSums(slot(OJ,'Matrix')[KoZ.red,])
+  Z <- colSums(slot(OJ,'Matrix')) 
+  
+  df2 = data.frame(x = X/Z, y = unlist(slot(OJ,'Names')), z = X, stringsAsFactors = FALSE)
+  
+  df2 = df2[df2$z != 0,]
+  
+  #ggplot
+  do.plot.naow(df2,'BRITE fraction significant UP [d1 vs d3]','function','fraction')
+  #plot
+  return(df2)
+}
+
+ko2br.path.B <- function(O.data.kegg,O.data.refined)
+{
+  OJ <- slot(O.data.kegg,'ko2br.pathway')            # get ko2br object
+  KoZ <- which(slot(O.data.refined,'FlagVec') == 11)  # find significant functions
+  
+  KoZ.Ind <- KoZ <= dim(slot(OJ,'Matrix'))[1]
+  KoZ.red <- KoZ[KoZ.Ind]
+  
+  X <- colSums(slot(OJ,'Matrix')[KoZ.red,])
+  Z <- colSums(slot(OJ,'Matrix')) 
+  
+  df2 = data.frame(x = X/Z, y = unlist(slot(OJ,'Names')), z = X, stringsAsFactors = FALSE)
+  
+  df2 = df2[df2$z != 0,]
+  
+  #ggplot
+  do.plot.naow(df2,'BRITE fraction significant DOWN [d1 vs d3]','function','fraction')
+  #plot
+  return(df2)
+}
 
 
 phancy.plot <- function(df2,O.data.kegg,O.data.refined, O.job.config)
@@ -449,4 +492,74 @@ phancy.plot <- function(df2,O.data.kegg,O.data.refined, O.job.config)
   barplot(height = df$x, names.arg = df$y, horiz = TRUE, cex.names = 1, space = c(0,2), xpd = FALSE, col = COOLCOLZ[df$z+1], las = 1)
   legend('bottomright',legend = rev(c(min(df$z),ceiling(median(df$z)),max(df$z))), fill = rev(c(COOLCOLZ[min(df$z)+1],COOLCOLZ[ceiling(median(df$z))],COOLCOLZ[max(df$z)])), title = '#Counts color code')
   par(oma = c(0, 0, 0, 0))
+}
+
+
+
+
+ko2br.path.counts <- function(O.data.kegg,O.data.refined)
+{
+  OJ <- slot(O.data.kegg,'ko2br.pathway')            # get ko2br object
+  KoZ <- which(slot(O.data.refined,'ConsensusVec'))  # find significant functions
+  
+  KoZ.Ind <- KoZ <= dim(slot(OJ,'Matrix'))[1]
+  KoZ.red <- KoZ[KoZ.Ind]
+  
+  dims <- dim(slot(OJ,'Matrix'))
+  
+  Sig.A <- slot(O.data.refined,'FlagVec')[1:dims[1]] == 15
+  Sig.B <- slot(O.data.refined,'FlagVec')[1:dims[1]] == 11
+  
+  
+  
+  X.A <- rowSums(slot(O.data.refined,'Matrix')[,1:6])
+  X.B <- rowSums(slot(O.data.refined,'Matrix')[,7:12])
+  Y.A <- sapply(1:dims[2], function(x) sum(X.A[slot(OJ,'Matrix')[1:dims[1],x]]))
+  Y.A.O <- sapply(1:dims[2], function(x) sum(X.A[slot(OJ,'Matrix')[,x] & Sig.A]))
+  Y.A.U <- sapply(1:dims[2], function(x) sum(X.A[slot(OJ,'Matrix')[,x] & Sig.B]))
+  
+  Y.B <- sapply(1:dims[2], function(x) sum(X.B[slot(OJ,'Matrix')[,x]]))
+  Y.B.O <- sapply(1:dims[2], function(x) sum(X.B[slot(OJ,'Matrix')[,x] & Sig.B]))
+  Y.B.U <- sapply(1:dims[2], function(x) sum(X.B[slot(OJ,'Matrix')[,x] & Sig.A]))
+  
+  cat(Y.A, '\n', Y.A.O, '\n', Y.A.U, '\n\n')
+  
+  
+  non.signi.A = (Y.A - (Y.A.O + Y.A.U))/sum(Y.A);
+  signi.U.A = Y.A.U / sum(Y.A)
+  signi.O.A = Y.A.O / sum(Y.A)
+  fraction.A <- c (non.signi.A,signi.O.A, signi.U.A)
+  
+  color.A <- rep(c('non signi','over','under'),each = dims[2])
+  label.A <- rep(1,length(fraction.A))
+  
+  non.signi.B = (Y.B - (Y.B.O + Y.B.U))/sum(Y.B);
+  signi.U.B = Y.B.U / sum(Y.B)
+  signi.O.B = Y.B.O / sum(Y.B)
+  fraction.B <- c (non.signi.B,signi.O.B, signi.U.B)
+  
+  color.B <- rep(c('non signi','over','under'),each = dims[2])
+  label.B <- rep(2,length(fraction.B))
+  
+  
+  cat(length(fraction.B),'\t',length(fraction.A),'\n',length(color.A),'\t',length(color.B),'\n')
+  
+  df2 = data.frame(fraction = c(fraction.A,fraction.B), color = c(color.A,color.B),names = rep(unlist(slot(OJ,'Names')),6), z = c(label.A,label.B), stringsAsFactors = FALSE)
+  
+  
+  return(df2)
+  
+  
+  X = c(Y.A/sum(Y.A),Y.B/sum(Y.B))
+  Y = c(Y.A,Y.B)
+  Z = c(rep(1,length(Y.A)),rep(2,length(Y.B)))
+  
+  df2 = data.frame(x = rep(1:dims[2],2), y = Y, fraction = X, counts = Y, names = rep(unlist(slot(OJ,'Names')),2), z = Z, stringsAsFactors = FALSE)
+  
+  df2 = df2[df2$y != 0,]
+  return(df2);
+  #ggplot
+  do.plot.naow(df2,'BRITE fraction significant','function','fraction')
+  #plot
+  return(df2)
 }
