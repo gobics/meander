@@ -186,6 +186,8 @@ ERROR.methodDefinition_obtain.callStack <- function(peak)
 # DUMMY-STUB
 FATAL_ERROR.methodDefinition_handle <- function()
 {
+    callSuper()
+
     stop(.self$get.ClassName())
 }
 
