@@ -64,7 +64,7 @@ create.ConfigFile = function ()
     {
         if (!file.exists(CONFIG_DIRECTORY))
             dir.create(CONFIG_DIRECTORY)
-
+        cat('do eet','\n')
         file.copy(CONFIG_TEMP_FILE, CONFIG_FILE)
     }
 }
