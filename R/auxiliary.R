@@ -62,7 +62,7 @@ create.ConfigFile = function ()
     }
     else
     {
-        if (!dir.exists(CONFIG_DIRECTORY))
+        if (!file.exists(CONFIG_DIRECTORY))
             dir.create(CONFIG_DIRECTORY)
 
         file.copy(CONFIG_TEMP_FILE, CONFIG_FILE)
