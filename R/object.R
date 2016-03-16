@@ -346,7 +346,8 @@ Object.Data.Pathview <- setClass(
     SelectedTax = 'numeric',
     requiredLength = 'numeric',
     Methods  = 'character',  #the (up to 3) used methods
-    pValThresh = 'numeric'
+    pValThresh = 'numeric',
+    SelectedBR = 'vector'
   ),
   # default
   prototype=list(
@@ -356,7 +357,8 @@ Object.Data.Pathview <- setClass(
     SelectedTax = -1,
     requiredLength = 0,
     Methods = character(),
-    pValThresh = 0.05
+    pValThresh = 0.05,
+    SelectedBR = vector()
   )
 )
 

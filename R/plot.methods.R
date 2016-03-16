@@ -497,7 +497,7 @@ phancy.plot <- function(df2,O.data.kegg,O.data.refined, O.job.config)
 
 
 
-ko2br.path.counts <- function(O.data.kegg,O.data.refined)
+ko2br.path.counts <- function(O.job.config,O.data.kegg,O.data.refined)
 {
   OJ <- slot(O.data.kegg,'ko2br.pathway')            # get ko2br object
   KoZ <- which(slot(O.data.refined,'ConsensusVec'))  # find significant functions
@@ -510,6 +510,9 @@ ko2br.path.counts <- function(O.data.kegg,O.data.refined)
   Sig.A <- slot(O.data.refined,'FlagVec')[1:dims[1]] == 15
   Sig.B <- slot(O.data.refined,'FlagVec')[1:dims[1]] == 11
   
+  
+  Allowed.KO <- slot(O.data.kegg,'KOinTax')[[as.character(slot(O.job.config,'SelectedTax'))]]
+  Allowed.KO.Ind <-   c(1:dims[1]) %in% Allowed.KO
   
   
   X.A <- rowSums(slot(O.data.refined,'Matrix')[,1:6])
@@ -541,10 +544,26 @@ ko2br.path.counts <- function(O.data.kegg,O.data.refined)
   color.B <- rep(c('non signi','over','under'),each = dims[2])
   label.B <- rep(2,length(fraction.B))
   
+  .Counts.A <- c(c(Y.A - (Y.A.O + Y.A.U)),Y.A.O, Y.A.U)
+  .Counts.B <- c(c(Y.B - (Y.B.O + Y.B.U)),Y.B.O, Y.B.U)
+  
+  
+  
+  
+  nosig.Y.A <- sapply(1:dims[2], function(x) sum(slot(OJ,'Matrix')[Sig.A == FALSE & Sig.B == FALSE & Allowed.KO.Ind,x] == 1))
+  sig.Y.A.O <- sapply(1:dims[2], function(x) sum(slot(OJ,'Matrix')[Sig.A & Allowed.KO.Ind,x] == 1))
+  sig.Y.A.U <- sapply(1:dims[2], function(x) sum(slot(OJ,'Matrix')[Sig.B & Allowed.KO.Ind,x] == 1))
+  
+  nosig.Y.B <- sapply(1:dims[2], function(x) sum(slot(OJ,'Matrix')[Sig.A == FALSE & Sig.B == FALSE,x] == 1))
+  sig.Y.B.O <- sapply(1:dims[2], function(x) sum(slot(OJ,'Matrix')[Sig.B,x] == 1))
+  sig.Y.B.U <- sapply(1:dims[2], function(x) sum(slot(OJ,'Matrix')[Sig.A,x] == 1))
+  
+  sigfunc.counts.A <- c(nosig.Y.A,sig.Y.A.O,sig.Y.A.U)
+  sigfunc.counts.B <- c(nosig.Y.B,sig.Y.B.O,sig.Y.B.U)
   
   cat(length(fraction.B),'\t',length(fraction.A),'\n',length(color.A),'\t',length(color.B),'\n')
   
-  df2 = data.frame(fraction = c(fraction.A,fraction.B), color = c(color.A,color.B),names = rep(unlist(slot(OJ,'Names')),6), z = c(label.A,label.B), stringsAsFactors = FALSE)
+  df2 = data.frame(fraction = c(fraction.A,fraction.B), functioncounts = c(sigfunc.counts.A,sigfunc.counts.B), counts = c(.Counts.A,.Counts.B), color = c(color.A,color.B),names = rep(unlist(slot(OJ,'Names')),6), z = c(label.A,label.B), stringsAsFactors = FALSE)
   
   
   return(df2)
