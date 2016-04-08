@@ -507,23 +507,66 @@ ko2br.path.counts <- function(O.job.config,O.data.kegg,O.data.refined)
   
   dims <- dim(slot(OJ,'Matrix'))
   
-  Sig.A <- slot(O.data.refined,'FlagVec')[1:dims[1]] == 15
-  Sig.B <- slot(O.data.refined,'FlagVec')[1:dims[1]] == 11
+
   
   
   Allowed.KO <- slot(O.data.kegg,'KOinTax')[[as.character(slot(O.job.config,'SelectedTax'))]]
+  
+
+  
   Allowed.KO.Ind <-   c(1:dims[1]) %in% Allowed.KO
+
+  #reduce allowed list
+  #PossibleBRselection <-rowSums(slot(slot(O.data.kegg,'ko2br.pathway'),'Matrix')[,slot(O.job.config,'SelectedBR')]) > 0
+  #PossibleBRselection <- PossibleBRselection[1:dims[1]]
+  
+  #Allowed.KO.Ind <- Allowed.KO.Ind & PossibleBRselection
+  
+  Forbidden.KO.Ind <- Allowed.KO.Ind == FALSE
+  
+  
+  
+  
+  
+  
+  Sig.A <- slot(O.data.refined,'FlagVec')[1:dims[1]] == 15
+  Sig.B <- slot(O.data.refined,'FlagVec')[1:dims[1]] == 11
+  
+  X.A <- rowSums(slot(O.data.refined,'Matrix')[,1:6])
+  X.B <- rowSums(slot(O.data.refined,'Matrix')[,7:12])
+  
+  
+  
+  BR.Idx <- which(slot(O.job.config,'SelectedBR'))
+  BR.Names <- unlist(slot(slot(O.data.kegg,'ko2br.pathway'),'Names'))[BR.Idx]
+  
+  nosig.Y.A <- sapply(BR.Idx, function(x) sum(slot(OJ,'Matrix')[Sig.A == FALSE & Sig.B == FALSE & Allowed.KO.Ind,x] == 1))
+  sig.Y.A.O <- sapply(BR.Idx, function(x) sum(slot(OJ,'Matrix')[Sig.A & Allowed.KO.Ind,x] == 1))
+  sig.Y.A.U <- sapply(BR.Idx, function(x) sum(slot(OJ,'Matrix')[Sig.B & Allowed.KO.Ind,x] == 1))
+  
+  #count based on all
+  #nosig.Y.B <- sapply(BR.Idx, function(x) sum(slot(OJ,'Matrix')[Sig.A == FALSE & Sig.B == FALSE,x] == 1))
+  #sig.Y.B.O <- sapply(BR.Idx, function(x) sum(slot(OJ,'Matrix')[Sig.B,x] == 1))
+  #sig.Y.B.U <- sapply(BR.Idx, function(x) sum(slot(OJ,'Matrix')[Sig.A,x] == 1))
+
+  
+  df2 <- data.frame(Name = BR.Names, NonSig = nosig.Y.A, SigOver = sig.Y.A.O, SigUnder = sig.Y.A.U, TotalCounts = nosig.Y.A+sig.Y.A.O+sig.Y.A.U, SignificantCounts = sig.Y.A.O+sig.Y.A.U)
+  #df2 <- data.frame(Name = BR.Names, NonSig = nosig.Y.B, SigOver = sig.Y.B.O, SigUnder = sig.Y.B.U, TotalCounts = nosig.Y.B+sig.Y.B.O+sig.Y.B.U, SignificantCounts = sig.Y.B.O+sig.Y.B.U)
+  return(df2)
+  
+  
+  
   
   
   X.A <- rowSums(slot(O.data.refined,'Matrix')[,1:6])
   X.B <- rowSums(slot(O.data.refined,'Matrix')[,7:12])
-  Y.A <- sapply(1:dims[2], function(x) sum(X.A[slot(OJ,'Matrix')[1:dims[1],x]]))
-  Y.A.O <- sapply(1:dims[2], function(x) sum(X.A[slot(OJ,'Matrix')[,x] & Sig.A]))
-  Y.A.U <- sapply(1:dims[2], function(x) sum(X.A[slot(OJ,'Matrix')[,x] & Sig.B]))
+  Y.A <- sapply(1:dims[2], function(x) sum(X.A[slot(OJ,'Matrix')[Allowed.KO.Ind,x]]))
+  Y.A.O <- sapply(1:dims[2], function(x) sum(X.A[slot(OJ,'Matrix')[Allowed.KO.Ind,x] & Sig.A]))
+  Y.A.U <- sapply(1:dims[2], function(x) sum(X.A[slot(OJ,'Matrix')[Allowed.KO.Ind,x] & Sig.B]))
   
-  Y.B <- sapply(1:dims[2], function(x) sum(X.B[slot(OJ,'Matrix')[,x]]))
-  Y.B.O <- sapply(1:dims[2], function(x) sum(X.B[slot(OJ,'Matrix')[,x] & Sig.B]))
-  Y.B.U <- sapply(1:dims[2], function(x) sum(X.B[slot(OJ,'Matrix')[,x] & Sig.A]))
+  Y.B <- sapply(1:dims[2], function(x) sum(X.B[slot(OJ,'Matrix')[Allowed.KO.Ind,x]]))
+  Y.B.O <- sapply(1:dims[2], function(x) sum(X.B[slot(OJ,'Matrix')[Allowed.KO.Ind,x] & Sig.B]))
+  Y.B.U <- sapply(1:dims[2], function(x) sum(X.B[slot(OJ,'Matrix')[Allowed.KO.Ind,x] & Sig.A]))
   
   cat(Y.A, '\n', Y.A.O, '\n', Y.A.U, '\n\n')
   
@@ -550,6 +593,9 @@ ko2br.path.counts <- function(O.job.config,O.data.kegg,O.data.refined)
   
   
   
+  
+  
+  
   nosig.Y.A <- sapply(1:dims[2], function(x) sum(slot(OJ,'Matrix')[Sig.A == FALSE & Sig.B == FALSE & Allowed.KO.Ind,x] == 1))
   sig.Y.A.O <- sapply(1:dims[2], function(x) sum(slot(OJ,'Matrix')[Sig.A & Allowed.KO.Ind,x] == 1))
   sig.Y.A.U <- sapply(1:dims[2], function(x) sum(slot(OJ,'Matrix')[Sig.B & Allowed.KO.Ind,x] == 1))
@@ -564,9 +610,11 @@ ko2br.path.counts <- function(O.job.config,O.data.kegg,O.data.refined)
   cat(length(fraction.B),'\t',length(fraction.A),'\n',length(color.A),'\t',length(color.B),'\n')
   
   df2 = data.frame(fraction = c(fraction.A,fraction.B), functioncounts = c(sigfunc.counts.A,sigfunc.counts.B), counts = c(.Counts.A,.Counts.B), color = c(color.A,color.B),names = rep(unlist(slot(OJ,'Names')),6), z = c(label.A,label.B), stringsAsFactors = FALSE)
+
   
   
-  return(df2)
+  
+  
   
   
   X = c(Y.A/sum(Y.A),Y.B/sum(Y.B))

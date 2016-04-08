@@ -39,7 +39,7 @@ perform.deseq2 <- function(count.matrix,DiffCond)
   colData<-data.frame(condition=factor(DiffCond),type=rep('single-read',length(DiffCond)))
   dds <- DESeqDataSetFromMatrix(countData = count.matrix, colData = colData, design = ~ condition)
   dds <- DESeq(dds)
-  res <- results(dds)
+res <- results(dds)
   
   res$padj[is.na(res$padj)] = 1
   

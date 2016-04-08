@@ -1,3 +1,6 @@
+loadNamespace('stats')
+
+
 .errorZ <- setClass("errorZ",
          representation(Error="character", Warning="character")
          )

@@ -470,6 +470,8 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   TaxID <- as.character(slot(O.Job.Config,'SelectedTax'))
   KEGG2Path <- slot(O.Data.Kegg,'KEGG2PATH')
   
+  
+  
   #select all possible KO for the species
   KO.Hits <- which(slot(O.Data.Refined,'ConsensusVec'))
   ALLKO.Hits <- which(rowSums(slot(O.Data.Refined,'Matrix')) > 5)
@@ -477,6 +479,9 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   
   PossibleKO = slot(O.Data.Kegg,'KOinTax')[[TaxID]]
   #PossibleKO = NAME.getData(Object = Object, LEVEL1 = 'Parameter', LEVEL2 = 'Output',LEVEL3 = 'KOinTax')[[TaxID]]
+  
+  
+  PossibleBRselection <- which(rowSums(slot(slot(O.Data.Kegg,'ko2br.pathway'),'Matrix')[,slot(O.Job.Config,'SelectedBR')]) > 0)
   
   ##FLAGS
   .PathMode = 'inTax'
@@ -499,6 +504,8 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   
   ReducedPossibleKO = PossibleKO[PossibleKO <= nKO]
   
+  ReducedPossibleKO = ReducedPossibleKO[ReducedPossibleKO %in% PossibleBRselection]
+  
   PathMat <- matrix(0,ncol=nPath,nrow=nKO)
   PathMat[ReducedPossibleKO,] = KEGG2Path[ReducedPossibleKO,]
   #Find allowed KO
@@ -520,10 +527,10 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   PossibleKOCountVec <- sapply(1:nPath, function(x) length(.Vec[[x]]))
   
   
-  
   if (.PathKOMode == 'inTax')
   {
     .nPossKO <- length(ReducedPossibleKO)
+    KO.Hits <- KO.Hits[KO.Hits %in% ReducedPossibleKO]
   }
   
   else if (.PathKOMode == 'all')
@@ -535,7 +542,8 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   nSig = length(KO.Hits)
   cat(nSig,.nPossKO,'\n')
   #phyper(62-1, 1998, 5260-1998, 131, lower.tail=FALSE)
-  .Vals <- unlist(lapply(c(1:nPath), function(x) phyper(SigKOCountVec[x]-1, PossibleKOCountVec[x], .nPossKO-PossibleKOCountVec[x], nSig, lower.tail = FALSE, log.p = FALSE)))
+  .Vals <- unlist(lapply(c(1:nPath), function(x) {
+    phyper(SigKOCountVec[x]-1, PossibleKOCountVec[x], .nPossKO-PossibleKOCountVec[x], nSig, lower.tail = FALSE, log.p = FALSE)}))
   
   .padjVals = p.adjust(.Vals, method = 'BH');
   .SigPaths <- which(.padjVals < .Threshold);
