@@ -224,6 +224,7 @@ function(parent)
 {
     FONT_LEAD  = tkfont.create( family = 'verdana', size = 18, weight = 'bold' )
     FONT_TEXT  = tkfont.create( family = 'verdana', size = 16 )
+    FONT_URL  = tkfont.create( family = 'verdana', size = 16, underline = 1 )
 
     frame = ttklabelframe( parent, text = 'Info')
 
@@ -237,12 +238,29 @@ function(parent)
     )
     # NCBI TaxId TEXT
     VARS$footer.TaxID = tclVar( '' )
+    footer.TaxID.Label = tklabel(
+        frame,
+        textvariable = VARS$footer.TaxID,
+        font = FONT_URL,
+        anchor = 'w',
+        foreground = '#3090F0' 
+        )
     tkgrid(
-        tklabel( frame, textvariable = VARS$footer.TaxID, font = FONT_TEXT, anchor = 'w' ),
+        footer.TaxID.Label,
         column = 1,
         row = 0,
         sticky = 'ew',
         pady = 10
+    )
+    tkbind(
+        footer.TaxID.Label,
+        '<Double-1>',
+        function()
+        {
+            uid = tclvalue( VARS$footer.TaxID ) 
+
+            if ( uid > 0 ) browseURL( bindStrings( NCBI_TAX_URL, uid ) )
+        }
     )
 
     # NCBI Rank LEAD
