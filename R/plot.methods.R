@@ -78,6 +78,21 @@ plot.uproc.scores <- function(Object.job.statistics,Object.data.dataframes,Type 
   
 }
 
+do.pca <- function(Matrix,minCount = 5)
+{
+  I.K <- which(rowSums(Matrix) > minCount);
+  DimVec <- dim(Matrix[I.K,])
+  
+  Kcount.matrix <-Matrix[I.K,]
+  
+  res <- sapply(c(1:DimVec[2]), function(x) rank(Matrix[I.K,x]))
+  
+  res <- res + sapply(1:DimVec[2],function(x) sample(1000,DimVec[1],replace=T)/1000000)
+  
+  
+  return(prcomp(t(res),center = TRUE))
+}
+
 
 plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,minCount = 5)
 {
