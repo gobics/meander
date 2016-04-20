@@ -164,6 +164,7 @@ RUNNING_MODE_BATCH = 'BATCH'
 RUNNING_MODE_INTERACTIVE = 'INTERACTIVE'
 RUNNING_MODE_FRONTEND = 'FRONTEND'
 
+NCBI_TAX_URL = 'http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id='
 
 # ******************************************************************************
 # > END     :   GENERAL       

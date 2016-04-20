@@ -250,26 +250,6 @@ write.Pathway.HTML = function(title, p.value, pathway.idx, caption, data, dir, c
     )
 }
 
-UNIT_TEST_create.HTML.Output = function()
-{
-    output.Dir = path.expand('~/9796')
-    
-    np=100
-
-    no=50    
-
-    Pathways.Table = data.frame(names = sample(LETTERS, np, replace = TRUE), coverage = sample(100, np, replace = TRUE)/100, abundance = sample(10000, np), stringsAsFactors = FALSE)
-    rownames(Pathways.Table) = sprintf('%05d', sample(10000, np))
-
-    Orthologs.Table = data.frame(names = sample(LETTERS, no, replace = TRUE), flag = sample(15, no, replace = TRUE), p.value = sample(100, no, replace = TRUE)/10000, stringsAsFactors = FALSE)
-    rownames(Orthologs.Table) = sprintf('K%05d', sample(10000, no))
-
-    Pathways.Orthologs.Map = matrix(sample(c(TRUE, FALSE), no*np, replace = TRUE), nrow = np)
-    dimnames(Pathways.Orthologs.Map) = list(rownames(Pathways.Table), rownames(Orthologs.Table))
-
-    create.HTML.Output(Pathways.Table, Orthologs.Table, Pathways.Orthologs.Map, output.Dir)
-}
-
 write.Ortholog.HTML = function(pathway, pathway.name, Orthologs.Table, output.Dir)
 {
     output.File = file.path(output.Dir, ORTHOLOG_TABLE_PATH, bindStrings(pathway, '.html'))
