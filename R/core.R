@@ -1,9 +1,4 @@
-.onLoad <- function(libname, pkgname)
-{
-    attemptExecution(create.ConfigFile())
 
-    load.ConfigFile.AllKeys()
-}
 #Q <- meander.start(Dir.in = '/gobics/home/hklingen/Vortrag/EST/',Dir.out = '/c1')
 meander.start <- function(
   #preselected files & types

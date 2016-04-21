@@ -1215,11 +1215,6 @@ function( data, refined, config)
     object
 }
 
-bindStrings <- function(...)
-{
-    paste(c(...), collapse = '')
-}
-
 taxTag.AddPrefix = 
 function( tax.id )
 {

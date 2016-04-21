@@ -1,5 +1,7 @@
 loadNamespace('stats')
 
+# prevent class def errors
+setOldClass("prcomp")
 
 .errorZ <- setClass("errorZ",
          representation(Error="character", Warning="character")

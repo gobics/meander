@@ -20,10 +20,6 @@ ERROR.REGEX_VALID_ERROR_STRING = bindStrings(
     '[[:digit:]]+$'
 )
 
-ERROR.STACK_POINTER = as.integer(0)
-
-ERROR.STACK = list()
-
 # ************************************************************************************************** 
 #   STATIC FIELDS AND METHODS
 # ************************************************************************************************** 
@@ -77,7 +73,7 @@ is.ErrorObject <- function(error)
 is.ValidError <- function(error)
 {
     
-    error %in% names(ERROR.STACK)
+    error %in% names(._ERROR$stack)
 }
 
 is.ReferenceClassObject <- function(error)
@@ -104,16 +100,40 @@ handle.ErrorObject <- function(error)
 
 restore.ErrorObject <- function(errorID)
 {
-    error = ERROR.STACK[errorID][[1]]
+    error = ._ERROR$stack[[ errorID ]]
     
-    ERROR.STACK[errorID] <<- NULL
+    ._ERROR$stack[[ errorID ]] = NULL
     
     error
 }
 
 obtain.IDString <- function(ID)
+
 {
     bindStrings(ERROR.ID_PREFIX, ID)
+}
+# ************************************************************************************************** 
+#   WRAPPER FUNCTIONS
+# ************************************************************************************************** 
+
+attemptExecution <- function(expr, nof.Attempts = 1)
+{
+    index.Attempt = 0
+    success = F
+    
+    suppressWarnings( 
+    while(!success && index.Attempt < nof.Attempts) 
+    {
+        index.Attempt = index.Attempt + 1 
+        
+        tryCatch(
+            {
+                expr
+                success = TRUE
+            },
+            error = handle.Error
+        )
+    })
 }
 
 # ************************************************************************************************** 
@@ -138,7 +158,7 @@ ERROR.methodDefinition_throw <- function()
 
 ERROR.methodDefinition_addTo.ErrorStack <- function()
 {
-    ERROR.STACK[obtain.IDString(.self$ID)] <<- .self
+    ._ERROR$stack[[ obtain.IDString(.self$ID) ]] = .self
 }
 
 ERROR.methodDefinition_obtain.formattedThrowString <- function()
@@ -170,9 +190,9 @@ ERROR.methodDefinition_initialize <- function(message = '', description = 'ERROR
 #     }
         
     # INCREASE STACK POINTER
-    ERROR.STACK_POINTER <<- as.integer(ERROR.STACK_POINTER + 1)
+    ._ERROR$stack.Pointer = as.integer(._ERROR$stack.Pointer + 1)
 
-    initFields(ID = ERROR.STACK_POINTER)
+    initFields(ID = ._ERROR$stack.Pointer)
 }
 
 ERROR.methodDefinition_obtain.callStack <- function(peak)
@@ -183,7 +203,6 @@ ERROR.methodDefinition_obtain.callStack <- function(peak)
         )
 }
 
-# DUMMY-STUB
 FATAL_ERROR.methodDefinition_handle <- function()
 {
     callSuper()
@@ -203,19 +222,6 @@ WARNING.methodDefinition_initialize <- function(message = '', description = 'WAR
     callSuper(message = message, description = description, ...)
 }
 
-MY_WARNING.methodDefinition_initialize <- function(samples, message = '', description = 'WARNING', ...)
-{
-  #message = sprintf('%s %d\n',message,number)
-  callSuper(message = sprintf(WARNING_MESSAGE_NOREPLACEMENT,message), description = description, ...)
-}
-
-MY_WARNING2.methodDefinition_initialize <- function(message = '', number = 4, description = 'WARNING', ...)
-{
-  message <<- sprintf('%s %d\n',message,number)
-#  tk_messageBox(type = "ok",
-#                message = ret, caption = "", default = "", ...)
-}
-
 WARNING.methodDefinition_issue <- function(TKFLAG = FALSE)
 {
   callSuper()
@@ -224,22 +230,6 @@ WARNING.methodDefinition_issue <- function(TKFLAG = FALSE)
       tk_messageBox(type = "ok", message = message, caption = "", default = "")
     }
 }
-
-
-WARNING_DIFFERENT_METHOD.methodDefinition_initialize <- function(rep.method, ori.method, message = '', description = 'WARNING', ...)
-{
-  #message = sprintf('%s %d\n',message,number)
-  callSuper(message = sprintf(WARNING_MESSAGE_DIFFERENTMETHOD,rep.method,ori.method), description = description, ...)
-}
-
-
-WARNING_NO_REPLACEMENT.methodDefinition_initialize <- function(message = '', description = 'WARNING', ...)
-{
-  #message = sprintf('%s %d\n',message,number)
-  callSuper(message = sprintf(WARNING_MESSAGE_NOREPLACEMENT,message), description = description, ...)
-}
-
-
 # ************************************************************************************************** 
 #   CLASS DEFINITIONS
 # ************************************************************************************************** 
@@ -310,6 +300,40 @@ WARNING = setRefClass(
         )
 )
 
+# ************************************************************************************************** 
+#   CUSTOM METHODS DEFINITIONS
+# ************************************************************************************************** 
+
+MY_WARNING.methodDefinition_initialize <- function(samples, message = '', description = 'WARNING', ...)
+{
+  #message = sprintf('%s %d\n',message,number)
+  callSuper(message = sprintf(WARNING_MESSAGE_NOREPLACEMENT,message), description = description, ...)
+}
+
+MY_WARNING2.methodDefinition_initialize <- function(message = '', number = 4, description = 'WARNING', ...)
+{
+  message <<- sprintf('%s %d\n',message,number)
+#  tk_messageBox(type = "ok",
+#                message = ret, caption = "", default = "", ...)
+}
+
+WARNING_DIFFERENT_METHOD.methodDefinition_initialize <- function(rep.method, ori.method, message = '', description = 'WARNING', ...)
+{
+  #message = sprintf('%s %d\n',message,number)
+  callSuper(message = sprintf(WARNING_MESSAGE_DIFFERENTMETHOD,rep.method,ori.method), description = description, ...)
+}
+
+WARNING_NO_REPLACEMENT.methodDefinition_initialize <- function(message = '', description = 'WARNING', ...)
+{
+  #message = sprintf('%s %d\n',message,number)
+  callSuper(message = sprintf(WARNING_MESSAGE_NOREPLACEMENT,message), description = description, ...)
+}
+
+
+# ************************************************************************************************** 
+#   CUSTOM CLASS DEFINITIONS
+# ************************************************************************************************** 
+
 MY_WARNING = setRefClass(
   'MY_WARNING',
   
@@ -350,26 +374,3 @@ WARNING_NO_REPLACEMENT = setRefClass(
   )
 )
 
-# ************************************************************************************************** 
-#   WRAPPER FUNCTIONS
-# ************************************************************************************************** 
-
-attemptExecution <- function(expr, nof.Attempts = 1)
-{
-    index.Attempt = 0
-    success = F
-    
-    suppressWarnings( 
-    while(!success && index.Attempt < nof.Attempts) 
-    {
-        index.Attempt = index.Attempt + 1 
-        
-        tryCatch(
-            {
-                expr
-                success = TRUE
-            },
-            error = handle.Error
-        )
-    })
-}
