@@ -86,6 +86,6 @@ load.ConfigFile.AllKeys = function()
 
     for (i in 1:length(varNames))
     {
-        assign(varNames[i], varValues[i], envir = .GlobalEnv)
+        assign( varNames[i], varValues[i], envir = ._CONFIG )
     }
 }

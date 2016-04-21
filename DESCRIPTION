@@ -1,12 +1,13 @@
 Package: MeandeR
 Type: Package
-Title: Sebastian verruecktmachen
-Version: 0.0.0.0.0.0.0.0.0.0.0.0.1.0.1
+Title: Metatranscriptomic Analysis of Differential Expression in R 
+Version: 1.0.0
 Date: 1015-13-32
-Author: Dein Schwarm
-Maintainer: Who to complain to <root@127.0.0.1>
-Description: it does Stuff!
-License: Pay2Win
+Author: Heiner Klingenberg, Sebastian Gross, Peter Meinicke
+Maintainer: Heiner Klingenberg <heiner@gobics.de>
+Description: TODO
+License: GPL (>= 3)
 LazyData: FALSE
 Imports:stats, data.table
-Depends: stats, data.table
+Depends: R (>= 3.0.0), stats, data.table, samr, DESeq2
+Collate: globals.R auxiliary.R init.R object.R S4.R checks.R static.R SVG.R core.R error.R export.R fileinput.R graphics.R install.R interactive.R methods.R object.modifications.R ouput.R perform.processing.R phyloforest.R plot.methods.R priorities.R set.R steps.R tax.select.R test.R
