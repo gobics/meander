@@ -463,3 +463,30 @@ setValidity ("Object.Job.Config",
               
 
 #validObject(Z, test = TRUE)
+
+
+load.ConfigFile.as.object = function()
+{
+  lines = readLines(CONFIG_FILE)
+  
+  Config.Order.Vec <- c("MODEL_DIR","UPROC_DIR","PATHWAY_MODE","PROTEIN_MODE")
+  
+  # REMOVE COMMENTARY LINES
+  lines = grep(bindStrings('^[^', CONFIG_FILE_COMMENT, ']'), lines, value = TRUE)
+  
+  varNames = gsub(CONFIG_FILE_ENTRY_PATTERN, '\\1', lines)
+  varValues = gsub(CONFIG_FILE_ENTRY_PATTERN, '\\2', lines)
+  
+  Ordered.Vec <- vector(mode = 'numeric', length = 4)
+  
+  for (i in 1:length(varNames))
+  {
+    print(varNames[i])
+    location <- which(Config.Order.Vec %in% varNames[i])
+    if (location)
+    {
+      Ordered.Vec[location] = i
+    }
+    
+  }
+}
