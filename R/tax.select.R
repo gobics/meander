@@ -33,14 +33,14 @@ PCA_COLORS = sapply( ( 1 : 2 ) / 2 , hsv, s = 0.6, v = 0.9 )
 # LAYOUT
 LAYOUT = list(
 ELEMENTS = list(
-        LAYOUT_HEADER  = list( col = 0, cspan = 5, row = 0, rspan = 1, sticky = 'new' ),
+        LAYOUT_HEADER  = list( col = 0, cspan = 5, row = 0, rspan = 1, sticky = 'new'  ),
         LAYOUT_PIE_1   = list( col = 0, cspan = 1, row = 2, rspan = 1, sticky = 'nsew' ),
         LAYOUT_PIE_2   = list( col = 2, cspan = 1, row = 2, rspan = 1, sticky = 'nsew' ),
         LAYOUT_PCA     = list( col = 4, cspan = 1, row = 2, rspan = 3, sticky = 'nsew' ),
-        LAYOUT_BAR_1   = list( col = 0, cspan = 1, row = 4, rspan = 1, sticky = 'sew' ),
-        LAYOUT_BAR_2   = list( col = 2, cspan = 1, row = 4, rspan = 1, sticky = 'sew' ),
-        LAYOUT_FOOTER  = list( col = 0, cspan = 3, row = 6, rspan = 1, sticky = 'sew' ),
-        LAYOUT_CONTROL = list( col = 4, cspan = 1, row = 5, rspan = 2, sticky = 'se' ),
+        LAYOUT_BAR_1   = list( col = 0, cspan = 1, row = 4, rspan = 1, sticky = 'sew'  ),
+        LAYOUT_BAR_2   = list( col = 2, cspan = 1, row = 4, rspan = 1, sticky = 'sew'  ),
+        LAYOUT_FOOTER  = list( col = 0, cspan = 3, row = 6, rspan = 1, sticky = 'sew'  ),
+        LAYOUT_CONTROL = list( col = 4, cspan = 1, row = 5, rspan = 2, sticky = 'se'   ),
 
         FILL_A = list( col = 0, cspan = 5, row = 1, rspan = 1, sticky = 'nsew' ),
         FILL_B = list( col = 0, cspan = 1, row = 3, rspan = 1, sticky = 'nsew' ),
@@ -937,7 +937,8 @@ function( id )
             color.Dark = '#606060'
             ))
 
-        precursor[[ cond ]][ , total := level * DATA$tree[[ cond ]][ tax.id == id, total ] ]
+        tmp.Total = DATA$tree[[ cond ]][ tax.id == id, total ]
+        precursor[[ cond ]][ , total := level * tmp.Total ]
 
         precursor[[ cond ]][ , extent := - level * 360 ]
 

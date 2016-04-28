@@ -5,7 +5,6 @@
 ._ERROR     = new.env()
 ._CONFIG    = new.env()
 
-
 .onLoad =
 function( libName, pkgName )
 {
@@ -16,7 +15,12 @@ function( libName, pkgName )
 
     # init config environment
     rm( list = ls( ._CONFIG ), envir = ._CONFIG )
-    attemptExecution( create.ConfigFile() )
-    load.ConfigFile.AllKeys()
+    attemptExecution( load.ConfigFile() )
 
+    if ( ._CONFIG$SHOW_LICENCE_TEXT )
+    {
+        licenceFile = file ( LICENCE_FILE )
+        cat( readLines( licenceFile ), sep = '\n' )
+        close( licenceFile )
+    }
 }

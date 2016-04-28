@@ -108,7 +108,6 @@ restore.ErrorObject <- function(errorID)
 }
 
 obtain.IDString <- function(ID)
-
 {
     bindStrings(ERROR.ID_PREFIX, ID)
 }
@@ -142,10 +141,13 @@ attemptExecution <- function(expr, nof.Attempts = 1)
 
 ERROR.methodDefinition_handle <- function() 
 {
-    print(.self$get.ClassName())
-    print(.self$description)
-    print(.self$message)
-#    print(.self$variables)
+    cat(
+        .self$get.ClassName(),
+        toupper( .self$description ),
+        .self$message,
+        sep = '\n'
+        )
+
     lapply(.self$callStack, print) 
 }
 

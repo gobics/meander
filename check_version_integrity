@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# check DESCRIPTION
+Ver_A=`grep '^[[:space:]]*Version[[:space:]]*:' DESCRIPTION | awk '{print $2}'`
+
+# check GLOBALS
+Ver_B=`grep '^[[:space:]]*MEANDER_VERSION[[:space:]]*=' R/globals.R | awk '{print $3}' | tr -d "'"`
+
+# check CONFIG
+Ver_C=`sed -e '2!d' inst/meander.conf | tr -d "#"`
+
+if [ $Ver_A = $Ver_B -a $Ver_A = $Ver_C ]; then
+    echo PASS
+else
+    echo FAIL
+fi
