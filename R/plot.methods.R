@@ -191,11 +191,8 @@ plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,mi
 
 plot.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), threshold = , threshold = 0.05)
 {
-<<<<<<< HEAD
+
 calculate.vennreplacement(Method.Vec = Method.Vec, Mat.pVal = Mat.pVal, threshold = threshold)
-=======
-calculate.vennreplacement <- function(Method.Vec = Method.Vec, Mat.pVal = Mat.pVal, threshold = threshold)
->>>>>>> bd477be29969b1a57960b84ab981eea41b68ac9a
   
   p <- ggplot() + geom_point(data=df,aes(x=X,y=Y, colour=factor(Z)),size=10) + theme_minimal() + theme(legend.position="none") + scale_color_manual(values = c("black","grey70")) + 
     theme(
