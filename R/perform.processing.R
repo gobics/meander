@@ -694,3 +694,63 @@ perform.pvalcalc <- function(O.data.refined)
 .p.Val <- sapply(1:dim(.pMat)[1], function(x) median(.pMat[x,]))
 return(.p.Val)
 }
+
+
+calculate.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.pVal, threshold = 0.05)
+{
+  TF.Mat <- Mat.pVal < threshold
+  
+  nFeatures = dim(TF.Mat)[1]
+  
+  nMethods = length(Method.Vec)
+  
+  Logic.T <- sapply(1:nFeatures, function(x) which(TF.Mat[x,]))
+  LetterMat <- sapply(1:nFeatures, function(x) paste(Method.Vec[Logic.T[[x]]],sep='',collapse=''))
+  
+  LetterMat <- LetterMat[nchar(LetterMat) > 0]
+  
+  
+  
+  BarPlotTable <- table(unlist(Logic.T))
+  LetterTable <- table(LetterMat)
+  
+  #sort shit via max counts
+  
+  
+  Ind.Order <- order(LetterTable,decreasing=TRUE)
+  LetterTable <- LetterTable[Ind.Order]
+  
+  #LetterTable = LetterTable[nchar(names(LetterTable)) != 0]
+  
+  TableNames <- names(LetterTable)
+  
+  Logic.Method <- sapply(1:nMethods, function(x) grepl(Method.Vec[x],TableNames))
+  Coords.T <- which(Logic.Method,arr.ind=TRUE) -1
+  Coords.F <- which(Logic.Method == FALSE,arr.ind=TRUE) -1
+  
+  
+  
+  
+  
+  smallGraph = data.frame(X= 0:(nMethods-1), Y=colSums(TF.Mat))
+  
+  
+  
+  
+  nPoss = sum(sapply(1:3, function(x) choose(3,x)))
+  #all possible
+  nLimz = nPoss + 1
+  #only used
+  nLimz = length(LetterTable)
+  
+  
+  nDim = dim(Logic.Method)[1]
+  
+  df <- data.frame(X = c(Coords.T[,1],Coords.F[,1]),Y = c(Coords.T[,2],Coords.F[,2]), Z = c(rep(1,length(Coords.T[,1])),rep(0,length(Coords.F[,1]))))
+  
+  #remove no-hit part
+  
+  
+  df2 <- data.frame(Freq = as.vector(LetterTable),LetterMat = c(0:(length(LetterTable)-1)))
+  return(list(df,df2))
+}
