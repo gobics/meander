@@ -91,7 +91,7 @@ function()
 check.ConfigFile =
 function()
 {
-    if ( ! dir.exists( CONFIG_DIRECTORY ) )
+    if ( ! file.exists( CONFIG_DIRECTORY ) )
         return( FALSE )
 
     if ( ! file.exists( CONFIG_FILE ) )

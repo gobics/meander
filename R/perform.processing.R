@@ -752,5 +752,113 @@ calculate.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'),
   
   
   df2 <- data.frame(Freq = as.vector(LetterTable),LetterMat = c(0:(length(LetterTable)-1)))
-  return(list(df,df2))
+  return(list(df,df2,nLimz,LetterTable,smallGraph))
+}
+
+
+plot.generate.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.pVal = Mat.pVal,threshold = 0.05)
+{
+  
+  ret <- calculate.vennreplacement(Method.Vec = Method.Vec, Mat.pVal = Mat.pVal, threshold = threshold)
+  df <- ret[[1]]
+  df2 <- ret[[2]]
+  nLimz <- ret[[3]]
+  LetterTable <- ret[[4]]
+  smallGraph <- ret[[5]]
+  
+  nMethods = length(Method.Vec)
+  p <- ggplot() + geom_point(data=df,aes(x=X,y=Y, colour=factor(Z)),size=10) + theme_minimal() + theme(legend.position="none") + scale_color_manual(values = c("black","grey70")) + 
+    theme(
+      plot.margin = unit(c(0,0,0,0),"inches"), 
+      panel.margin = unit(c(0,0,0,0),"inches"),
+      #axis.text = element_blank(), 
+      axis.text.x = element_blank(),
+      #axis.title = element_blank(),
+      #panel.grid = element_blank(),
+      axis.ticks = element_blank(),
+      axis.ticks.margin=unit(c(0,0),'cm'),
+      panel.border = element_rect(colour = 'black', fill = 'transparent'),
+      panel.margin = unit(0, 'mm')) +
+    scale_x_continuous(limits=c(-1, nLimz))+
+    labs(x=NULL, y=NULL) +
+    scale_y_continuous(breaks=c(1:nMethods), labels=Method.Vec)
+  #scale_x_continuous(	breaks=c(0:31), 	labels=TableNames,	limits=c(-1, 33))
+  
+  
+  p <- ggplot() +geom_raster(data=df,aes(x=X,y=Y, fill=factor(Z)), alpha = 1) + theme(legend.position="none") + scale_fill_manual(values = c("white","black")) + 
+    theme(
+      plot.margin = unit(c(0,0,0,0),"inches"), 
+      panel.margin = unit(c(0,0,0,0),"inches"),
+      #axis.text = element_blank(), 
+      axis.text.x = element_blank(),
+      #axis.title = element_blank(),
+      #panel.grid = element_blank(),
+      axis.ticks = element_blank(),
+      axis.ticks.margin=unit(c(0,0),'cm'),
+      panel.border = element_rect(colour = 'black', fill = 'transparent'),
+      panel.margin = unit(0, 'mm')) +
+    scale_x_continuous(limits=c(-1, nLimz))+
+    labs(x=NULL, y=NULL) +
+    scale_y_continuous(breaks=c(0:(nMethods-1)), labels=Method.Vec)
+  #scale_x_continuous(	breaks=c(0:31), 	labels=TableNames,	limits=c(-1, 33))
+  
+  
+  
+  
+  p2 <- ggplot() + theme_minimal() +
+    geom_bar(data=df2,aes(x=LetterMat,y=Freq),stat="identity") +
+    theme(
+      plot.margin = unit(c(0,0,0,0),"inches"), 
+      panel.margin = unit(c(0,0,0,0),"inches"),
+      axis.text.x = element_blank(), 
+      #axis.title = element_blank(),
+      #panel.grid = element_blank(),
+      axis.ticks = element_blank(),
+      axis.ticks.margin=unit(c(0,0),'cm'),
+      panel.border = element_rect(colour = 'black', fill = 'transparent'),
+      panel.margin = unit(0, 'mm')) +
+    #scale_x_continuous( breaks=c(10,20,30)) +
+    labs(x=NULL,y='method agreement') +
+    geom_text(data=df2,aes(x=LetterMat,y=Freq,label=Freq), vjust=-1) + 
+    scale_x_continuous(limits=c(-1, nLimz)) +
+    scale_y_continuous(limits=c(0,max(LetterTable)+(max(LetterTable)*0.1)))
+  
+  
+  e <- ggplot(data=df2,aes(x=LetterMat,y=Freq)) + theme_minimal() + geom_blank() +
+    theme(
+      plot.margin = unit(c(0,0,0,0),"inches"), 
+      panel.margin = unit(c(0,0,0,0),"inches"),
+      axis.text = element_blank(), 
+      axis.title = element_blank(),
+      panel.grid = element_blank(),
+      axis.ticks = element_blank(),
+      axis.ticks.margin=unit(c(0,0),'cm'),
+      panel.margin = unit(0, 'mm'))
+  
+  f <- ggplot() + geom_bar(data=smallGraph, aes(x=X, y=Y),stat="identity",width = 0.2) + coord_flip()+
+    theme(
+      plot.margin = unit(c(0,0,0,0),"inches"), 
+      panel.margin = unit(c(0,0,0,0),"inches"),
+      axis.text.y = element_blank(), 
+      axis.title = element_blank(),
+      #panel.grid = element_blank(),
+      axis.ticks.y = element_blank(),
+      axis.ticks.margin=unit(c(0,0),'cm'),
+      panel.border = element_rect(colour = 'black', fill = 'transparent'),
+      panel.margin = unit(0, 'mm')) +
+    #scale_x_continuous( breaks=c(10,20,30))
+    xlim(-0.5, (nMethods-0.5))
+  gA <- ggplotGrob(p)
+  gB <- ggplotGrob(p2)
+  gC <- ggplotGrob(e)
+  gD <- ggplotGrob(f)
+  
+  maxWidth = grid::unit.pmax(gA$widths[2:5], gB$widths[2:5])
+  maxHight = grid::unit.pmax(gA$heights[2:5], gD$heights[2:5])
+  gA$widths[2:5] <- as.list(maxWidth)
+  gB$widths[2:5] <- as.list(maxWidth)
+  gD$heights[2:5] <- as.list(maxHight)
+  gA$heights[2:5] <- as.list(maxHight)
+  grid.arrange(gC,gB,gD,gA, layout_matrix=cbind(c(1,1,3),c(2,2,4),c(2,2,4),c(2,2,4)))
+  return(list(gC,gB,gD,gA, cbind(c(1,1,3),c(2,2,4),c(2,2,4),c(2,2,4))))
 }

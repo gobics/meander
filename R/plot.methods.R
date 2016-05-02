@@ -189,11 +189,17 @@ plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,mi
 }
 
 
-plot.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), threshold = 0.05)
+plot.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.pVal = Mat.pVal,threshold = 0.05)
 {
 
-calculate.vennreplacement(Method.Vec = Method.Vec, Mat.pVal = Mat.pVal, threshold = threshold)
-  
+ret <- calculate.vennreplacement(Method.Vec = Method.Vec, Mat.pVal = Mat.pVal, threshold = threshold)
+df <- ret[[1]]
+df2 <- ret[[2]]
+nLimz <- ret[[3]]
+LetterTable <- ret[[4]]
+smallGraph <- ret[[5]]
+
+nMethods = length(Method.Vec)
   p <- ggplot() + geom_point(data=df,aes(x=X,y=Y, colour=factor(Z)),size=10) + theme_minimal() + theme(legend.position="none") + scale_color_manual(values = c("black","grey70")) + 
     theme(
       plot.margin = unit(c(0,0,0,0),"inches"), 
@@ -476,7 +482,7 @@ ko2br.path.counts <- function(O.job.config,O.data.kegg,O.data.refined)
   Allowed.KO <- slot(O.data.kegg,'KOinTax')[[as.character(slot(O.job.config,'SelectedTax'))]]
   
 
-  
+  print('qq')
   Allowed.KO.Ind <-   c(1:dims[1]) %in% Allowed.KO
 
   #reduce allowed list

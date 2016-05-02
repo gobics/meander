@@ -28,19 +28,38 @@ NAME.SVG.includepic <- function(xPos,yPos,xDim,yDim,base64pic)
 }
 
 
-perform.SVGcreation <- function(O.data.refined,O.job.paths)
+perform.SVGcreation <- function(O.data.refined,O.job.paths, O.job.config = NULL)
 {
+
+basedatapath = file.path(system.file(package='MeandeR'), 'data')
+
+
+
   #get the color vector
   ColVec <- slot(O.data.refined,'ColorVec')
   
+  if (is.null(O.job.config))
+  {
   .path = file.path(slot(O.job.paths,'DirOut'),'HTML','svg')
+  }
+  
+  else
+  {
+  .path = file.path(slot(O.job.paths,'DirOut'),'HTML',slot(O.job.config, 'SelectedTax'),'svg')
+  }
   
   
 df <- data.frame(x = NULL, y = NULL, z = NULL)
   #in object later
-  XXX.KEGGmapnames <- readRDS('./data/keggmapnames.rds')
-  XXX.SVG <- readRDS('./data/SVG_positions.rds') 
-  XXX.PNG <- readRDS('./data/path_png.rds') 
+  
+  
+  XXX.KEGGmapnames <- readRDS(file.path(basedatapath,'keggmapnames.rds'))
+  XXX.SVG <- readRDS(file.path(basedatapath,'SVG_positions.rds'))
+  XXX.PNG <- readRDS(file.path(basedatapath,'path_png.rds'))
+  
+  #XXX.KEGGmapnames <- readRDS('./data/keggmapnames.rds')
+  #XXX.SVG <- readRDS('./data/SVG_positions.rds') 
+  #XXX.PNG <- readRDS('./data/path_png.rds') 
   
   for (i in XXX.KEGGmapnames)
   {
