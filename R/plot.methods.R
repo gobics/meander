@@ -133,7 +133,7 @@ plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,mi
   if (sum(.I) != 0)
   {
     print(.I)
-    df = rbind(df,data.frame(x = .PCA.Mat[.I,1], y = .PCA.Mat[.I,2], z = rep(other,sum(.I)), label = .which(.I), stringsAsFactors = FALSE))
+    df = rbind(df,data.frame(x = .PCA.Mat[.I,1], y = .PCA.Mat[.I,2], z = rep('other',sum(.I)), label = which(.I), stringsAsFactors = FALSE))
   }
   
   

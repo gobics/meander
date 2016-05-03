@@ -48,6 +48,7 @@ basedatapath = file.path(system.file(package='MeandeR'), 'data')
   .path = file.path(slot(O.job.paths,'DirOut'),'HTML',slot(O.job.config, 'SelectedTax'),'svg')
   }
   
+  create.directory(file.path(slot(O.job.paths,'DirOut'),'HTML',slot(O.job.config, 'SelectedTax')),'svg')
   
 df <- data.frame(x = NULL, y = NULL, z = NULL)
   #in object later
