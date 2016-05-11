@@ -67,14 +67,14 @@ plot.uproc.scores <- function(Object.job.statistics,Object.data.dataframes,Type 
     {
     p <- p + geom_vline(xintercept = .setThresh, colour = 'red')
     }
-  print(p + 
+  p <- p + 
           geom_line(aes(colour =factor( x)))+ 
           stat_summary(fun.x = mean, geom="line") + 
           xlab("UProC Score") + 
           ylab("Fraction of Counts") +
           scale_colour_grey(name = "Samples")
-        ) 
-  
+  print(p) 
+return(p)  
   
 }
 

@@ -37,31 +37,33 @@ basedatapath = file.path(system.file(package='MeandeR'), 'data')
 
   #get the color vector
   ColVec <- slot(O.data.refined,'ColorVec')
-  
+
   if (is.null(O.job.config))
   {
-  .path = file.path(slot(O.job.paths,'DirOut'),'HTML','svg')
+  .path = file.path(slot(O.job.paths,'DirOut'),'HTML')
   }
-  
+
   else
   {
-  .path = file.path(slot(O.job.paths,'DirOut'),'HTML',slot(O.job.config, 'SelectedTax'),'svg')
+  .path = file.path(slot(O.job.paths,'DirOut'),'HTML',slot(O.job.config, 'SelectedTax'))
   }
-  
-  create.directory(file.path(slot(O.job.paths,'DirOut'),'HTML',slot(O.job.config, 'SelectedTax')),'svg')
-  
+
+  create.directory(.path,'svg')
+
+  .path <- file.path(.path,'svg')
+
 df <- data.frame(x = NULL, y = NULL, z = NULL)
   #in object later
-  
-  
+
+
   XXX.KEGGmapnames <- readRDS(file.path(basedatapath,'keggmapnames.rds'))
   XXX.SVG <- readRDS(file.path(basedatapath,'SVG_positions.rds'))
   XXX.PNG <- readRDS(file.path(basedatapath,'path_png.rds'))
-  
+
   #XXX.KEGGmapnames <- readRDS('./data/keggmapnames.rds')
-  #XXX.SVG <- readRDS('./data/SVG_positions.rds') 
-  #XXX.PNG <- readRDS('./data/path_png.rds') 
-  
+  #XXX.SVG <- readRDS('./data/SVG_positions.rds')
+  #XXX.PNG <- readRDS('./data/path_png.rds')
+
   for (i in XXX.KEGGmapnames)
   {
     #get png alpha [1] & normal [2] & dimensions [x = 3, y = 4]
@@ -70,36 +72,36 @@ df <- data.frame(x = NULL, y = NULL, z = NULL)
   .X <- NAME.SVG.includepic(0,0,.PNG[3],.PNG[4],.PNG[2])
   .String = c(.String,.X)
   .Tmp.svg <- XXX.SVG[MAP == paste0(i,'.conf')]
-  
+
     if (dim(.Tmp.svg)[1] != 0)
     {
     .KOz <- as.numeric(substr(.Tmp.svg[,KO],2,10))
-    
+
     df = rbind(df,data.frame(x = unique(.KOz), y = rep(i,length(unique(.KOz))), z = rep(666,length(unique(.KOz)))))
-    
+
     .xPos <- .Tmp.svg[,xPos]
     .yPos <- .Tmp.svg[,yPos]
     .width <- .Tmp.svg[,width]
         for (j in 1:length(.KOz))
         {
           .X <- NAME.SVG.rect(.xPos[j],.yPos[j],.width[j],18,ColVec[.KOz[j]],1)
-          .String = c(.String,.X)        
+          .String = c(.String,.X)
         }
-    
+
     .X <- NAME.SVG.includepic(0,0,.PNG[3],.PNG[4],.PNG[1])
     .String = c(.String,.X)
-    
+
       for (j in 1:length(.KOz))
       {
         .X <- NAME.SVG.link(.KOz[j],.xPos[j],.yPos[j],.width[j],18)
         .String = c(.String,.X)
       }
       #write to file
-          
+
     }
   cat(c(.String,'</svg>') , file = file.path(.path,paste(i,'.svg',sep='')), sep = "\n", fill = FALSE, labels = NULL, append = FALSE)
-  
-  
+
+
   }
 return(df)
 }
