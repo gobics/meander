@@ -23,4 +23,15 @@ function( libName, pkgName )
         cat( readLines( licenceFile ), sep = '\n' )
         close( licenceFile )
     }
+
+    if ( ._CONFIG$SHOW_VERSION )
+    {
+        cat(
+            "Welcome to ",
+            APPLICATION_TITLE,
+            " Version: ",
+            MEANDER_VERSION,
+            '\n'
+            )
+    }
 }

@@ -988,7 +988,6 @@ function(canvas, x, y, type, i)
 
 draw.PCA =
 function( id )
-
 {
     tkdelete( ELES$pca.Canvas, 'all' )
 

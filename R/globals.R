@@ -6,7 +6,7 @@
 # BEGIN     :   GENERAL       
 # ******************************************************************************
 
-APPLICATION_TITLE = 'meandeR'
+APPLICATION_TITLE = 'MeandeR'
 MEANDER_VERSION = '1.0.0'
 LICENCE_FILE = file.path( system.file( package = getPackageName() ) , 'LICENCE' )
 NCBI_TAX_URL = 'http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id='
