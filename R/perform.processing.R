@@ -552,12 +552,18 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   .AllPaths <- colSums(KEGG2Path[ALLKO.Hits[ALLKO.Hits <= nKO],]);
   .AllPathsTax <- colSums(PathMat[ALLKO.Hits[ALLKO.Hits <= nKO],]);
   
+  print(which())
+  
   #cat(ALLKO.Hits,'\n')
   
   #cat(.SigPaths,'\n')
   #cat(.padjVals,'\n')
   .Vec <- sapply(1:nPath, function(x) which(KEGG2Path[,x] == 1))
   .A <- sapply(1:nPath, function(x) length(.Vec[[x]]))
+  
+  print(.Vec[[1]])
+  
+  
   .Vec <- sapply(1:nPath, function(x) which(PathMat[,x] == 1))
   .B <- sapply(1:nPath, function(x) length(.Vec[[x]]))
    
