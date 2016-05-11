@@ -262,7 +262,10 @@ Object.Data.Pathview <- setClass(
     TaxMat = "data.frame",
     KEGG2PATH = "matrix",
     KOinTax = "list",
-    ko2br.pathway = "Object.Data.Pathview"
+    ko2br.pathway = "Object.Data.Pathview",
+    keggmapnames = "vector",
+    pathway.names = "vector",
+    ko_desc = "vector"
   )
 )
 

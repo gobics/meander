@@ -493,10 +493,6 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   #.Threshold <- NAME.getData(Object = Object, LEVEL1 = 'Parameter',LEVEL2 = 'R', LEVEL3 = 'SelectedThreshold')
   .Threshold = 0.05
   
-  
-  
-  
-  
   nKO = dim(KEGG2Path)[1]
   nPath <- dim(KEGG2Path)[2]
   
@@ -552,7 +548,6 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   .AllPaths <- colSums(KEGG2Path[ALLKO.Hits[ALLKO.Hits <= nKO],]);
   .AllPathsTax <- colSums(PathMat[ALLKO.Hits[ALLKO.Hits <= nKO],]);
   
-  print(which())
   
   #cat(ALLKO.Hits,'\n')
   
