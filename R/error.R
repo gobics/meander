@@ -13,6 +13,7 @@ ERROR.NAME_ID_DELIMITER = ':'
 ERROR.ID_PREFIX = 'ID_'
 
 ERROR.CALLING_FRAME_OFFSET = 11
+._ERROR$SKIP_FRAMES = 3:8
 
 ERROR.REGEX_VALID_ERROR_STRING = bindStrings(
     '^[[:alpha:]\\.]+[[:alnum:]_\\.]*', ERROR.NAME_ID_DELIMITER,
@@ -27,7 +28,6 @@ ERROR.REGEX_VALID_ERROR_STRING = bindStrings(
 handle.Error <- function(errorString)
 {
     error = extract.ErrorFeatures(errorString$message)
-
     
     if (is.ErrorObject(error$Name) && is.ValidError(error$ID))
         handle.ErrorObject(error$ID)
@@ -118,7 +118,7 @@ obtain.IDString <- function(ID)
 attemptExecution <- function(expr, nof.Attempts = 1)
 {
     index.Attempt = 0
-    success = F
+    success = FALSE
     
     suppressWarnings( 
     while(!success && index.Attempt < nof.Attempts) 
@@ -142,13 +142,17 @@ attemptExecution <- function(expr, nof.Attempts = 1)
 ERROR.methodDefinition_handle <- function() 
 {
     cat(
+        ' ',
+        '### MEANDER EXCEPTION CAUGHT ###',
         .self$get.ClassName(),
-        toupper( .self$description ),
+        .self$description,
         .self$message,
+        '###         CALLSTACK        ###',
+        .self$callStack,
+        '### END OF EXCEPTION MESSAGE ###',
+        ' ',
         sep = '\n'
         )
-
-    lapply(.self$callStack, print) 
 }
 
 ERROR.methodDefinition_throw <- function()
@@ -177,19 +181,7 @@ ERROR.methodDefinition_initialize <- function(message = '', description = 'ERROR
 {
     callSuper(message, description, ...)
 
-    #print(sys.nframe())
-    
-#     if (sys.nframe() > ERROR.CALLING_FRAME_OFFSET + 1)
-#     {
-#       callingFrame = sys.frame(- ERROR.CALLING_FRAME_OFFSET - 1)
-#       
-#       varNames = ls(envir = callingFrame)
-#       
-#       variables <<- lapply(varNames, get, envir = callingFrame)
-#       names(variables) <<- varNames
-#       
-#       callStack <<- obtain.callStack(sys.nframe() - ERROR.CALLING_FRAME_OFFSET)
-#     }
+    callStack <<- obtain.callStack()
         
     # INCREASE STACK POINTER
     ._ERROR$stack.Pointer = as.integer(._ERROR$stack.Pointer + 1)
@@ -197,12 +189,39 @@ ERROR.methodDefinition_initialize <- function(message = '', description = 'ERROR
     initFields(ID = ._ERROR$stack.Pointer)
 }
 
-ERROR.methodDefinition_obtain.callStack <- function(peak)
+ERROR.methodDefinition_obtain.callStack <- function()
 {
-    lapply(
+    stack = as.character(sapply(
+        1 : sys.nframe(),
+        sys.call
+        ))
+    
+    peak = grep('attemptExecution', stack )
+
+    stack = as.character(sapply(
         1 : peak,
         sys.call
-        )
+        ))
+
+    stack
+}
+
+FILE_WRITE_ERROR.methodDefinition_initialize =
+function( file, isCritical )
+{
+    msg = bindStrings( 'Could not write file: ', file )
+    
+    descr = arrange.Text( 'MeandeR was not able to write file to disk. Either due to file permission restrictions or due to disk space limitations. Other reasons might also apply but are unlikely. Please contact your system administrator if this problem keeps occuring.', maxCol = 80, lead = '  #' )
+
+    callSuper( descr, msg, isCritical = isCritical )
+}
+
+FILE_WRITE_ERROR.methodDefinition_handle <- function()
+{
+    callSuper()
+
+    if ( .self$isCritical )
+        stop(.self$get.ClassName())
 }
 
 FATAL_ERROR.methodDefinition_handle <- function()
@@ -258,7 +277,7 @@ ERROR = setRefClass(
     fields = list(
         ID = 'integer',
         variables = 'list',
-        callStack = 'list'
+        callStack = 'character'
         ),
     
     methods = list(
@@ -268,6 +287,21 @@ ERROR = setRefClass(
        initialize = ERROR.methodDefinition_initialize,
        addTo.ErrorStack = ERROR.methodDefinition_addTo.ErrorStack,
        obtain.callStack = ERROR.methodDefinition_obtain.callStack
+       )
+)
+
+FILE_WRITE_ERROR = setRefClass(
+    'FILE_WRITE_ERROR',
+    
+    contains = ERROR_CLASS.NAME_STRING,
+    
+    fields = list(
+        isCritical = 'logical'
+    ),
+
+    methods = list(
+       initialize = FILE_WRITE_ERROR.methodDefinition_initialize,
+       handle = FILE_WRITE_ERROR.methodDefinition_handle
        )
 )
 
@@ -337,13 +371,13 @@ WARNING_NO_REPLACEMENT.methodDefinition_initialize <- function(message = '', des
 # ************************************************************************************************** 
 
 MY_WARNING = setRefClass(
-  'MY_WARNING',
+    'MY_WARNING',
   
-  contains = 'WARNING',
+     contains = 'WARNING',
   
-  methods = list(
+    methods = list(
     initialize = MY_WARNING.methodDefinition_initialize
-  )
+    )
 )
 
 MY_WARNING2 = setRefClass(

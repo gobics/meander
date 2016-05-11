@@ -147,7 +147,9 @@ function( ... )
     keys = c( pair[ keepIdx, 1], keys )
     values = c( pair[ keepIdx, 2], ... )
 
-    configFile = file( CONFIG_FILE, open = 'at' )
+    configFile = file( CONFIG_FILE, open = 't' )
+    tryCatch
+
     tryCatch(
         writeLines( sprintf(CONFIG_FILE_ENTRY_FORMATTER, keys, values), configFile ),
         error = function(e)
