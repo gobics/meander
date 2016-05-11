@@ -67,14 +67,14 @@ plot.uproc.scores <- function(Object.job.statistics,Object.data.dataframes,Type 
     {
     p <- p + geom_vline(xintercept = .setThresh, colour = 'red')
     }
-  print(p + 
+  p <- p + 
           geom_line(aes(colour =factor( x)))+ 
           stat_summary(fun.x = mean, geom="line") + 
           xlab("UProC Score") + 
           ylab("Fraction of Counts") +
           scale_colour_grey(name = "Samples")
-        ) 
-  
+  print(p) 
+return(p)  
   
 }
 
@@ -133,7 +133,7 @@ plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,mi
   if (sum(.I) != 0)
   {
     print(.I)
-    df = rbind(df,data.frame(x = .PCA.Mat[.I,1], y = .PCA.Mat[.I,2], z = rep(other,sum(.I)), label = .which(.I), stringsAsFactors = FALSE))
+    df = rbind(df,data.frame(x = .PCA.Mat[.I,1], y = .PCA.Mat[.I,2], z = rep('other',sum(.I)), label = which(.I), stringsAsFactors = FALSE))
   }
   
   
@@ -189,63 +189,17 @@ plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,mi
 }
 
 
-plot.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.pVal, threshold = 0.05)
+plot.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.pVal = Mat.pVal,threshold = 0.05)
 {
-  TF.Mat <- Mat.pVal < threshold
-  
-  nFeatures = dim(TF.Mat)[1]
-  
-  nMethods = length(Method.Vec)
-  
-  Logic.T <- sapply(1:nFeatures, function(x) which(TF.Mat[x,]))
-  LetterMat <- sapply(1:nFeatures, function(x) paste(Method.Vec[Logic.T[[x]]],sep='',collapse=''))
-  
-  LetterMat <- LetterMat[nchar(LetterMat) > 0]
-  
-  
-  
-  BarPlotTable <- table(unlist(Logic.T))
-  LetterTable <- table(LetterMat)
-  
-  #sort shit via max counts
-  
-  
-  Ind.Order <- order(LetterTable,decreasing=TRUE)
-  LetterTable <- LetterTable[Ind.Order]
-  
-  #LetterTable = LetterTable[nchar(names(LetterTable)) != 0]
-  
-  TableNames <- names(LetterTable)
-  
-  Logic.Method <- sapply(1:nMethods, function(x) grepl(Method.Vec[x],TableNames))
-  Coords.T <- which(Logic.Method,arr.ind=TRUE) -1
-  Coords.F <- which(Logic.Method == FALSE,arr.ind=TRUE) -1
-  
-  
-  
-  
-  
-  smallGraph = data.frame(X= 0:(nMethods-1), Y=colSums(TF.Mat))
-  
-  
-  
-  
-  nPoss = sum(sapply(1:3, function(x) choose(3,x)))
-  #all possible
-  nLimz = nPoss + 1
-  #only used
-  nLimz = length(LetterTable)
-  
-  
-  nDim = dim(Logic.Method)[1]
-  
-  df <- data.frame(X = c(Coords.T[,1],Coords.F[,1]),Y = c(Coords.T[,2],Coords.F[,2]), Z = c(rep(1,length(Coords.T[,1])),rep(0,length(Coords.F[,1]))))
-  
-  #remove no-hit part
-  
-  
-  df2 <- data.frame(Freq = as.vector(LetterTable),LetterMat = c(0:(length(LetterTable)-1)))
-  
+
+ret <- calculate.vennreplacement(Method.Vec = Method.Vec, Mat.pVal = Mat.pVal, threshold = threshold)
+df <- ret[[1]]
+df2 <- ret[[2]]
+nLimz <- ret[[3]]
+LetterTable <- ret[[4]]
+smallGraph <- ret[[5]]
+
+nMethods = length(Method.Vec)
   p <- ggplot() + geom_point(data=df,aes(x=X,y=Y, colour=factor(Z)),size=10) + theme_minimal() + theme(legend.position="none") + scale_color_manual(values = c("black","grey70")) + 
     theme(
       plot.margin = unit(c(0,0,0,0),"inches"), 
@@ -528,7 +482,7 @@ ko2br.path.counts <- function(O.job.config,O.data.kegg,O.data.refined)
   Allowed.KO <- slot(O.data.kegg,'KOinTax')[[as.character(slot(O.job.config,'SelectedTax'))]]
   
 
-  
+  print('qq')
   Allowed.KO.Ind <-   c(1:dims[1]) %in% Allowed.KO
 
   #reduce allowed list

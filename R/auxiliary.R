@@ -91,7 +91,7 @@ function()
 check.ConfigFile =
 function()
 {
-    if ( ! dir.exists( CONFIG_DIRECTORY ) )
+    if ( ! file.exists( CONFIG_DIRECTORY ) )
         return( FALSE )
 
     if ( ! file.exists( CONFIG_FILE ) )
@@ -148,8 +148,6 @@ function( ... )
     values = c( pair[ keepIdx, 2], ... )
 
     configFile = file( CONFIG_FILE, open = 't' )
-    tryCatch
-
     tryCatch(
         writeLines( sprintf(CONFIG_FILE_ENTRY_FORMATTER, keys, values), configFile ),
         error = function(e)

@@ -58,7 +58,7 @@ start.DNAnoRNA <- function(Object.job.path, object.save.FLAG)
   {
     
     #get basename, put a .uproc behind and put the dirout path to it...
-    .file.out = file.path(slot(Object.job.path,'DirOut'),'UPROC',paste0(basename(.Allfiles[i]),'.upoc'))
+    .file.out = file.path(slot(Object.job.path,'DirOut'),'UPROC',paste0(basename(.Allfiles[i]),'.uproc'))
     #.file.out.RDS = file.path(slot(Object.job.path,'DirOut'),'RDS',paste0(basename(.Allfiles[i]),'.rds'))
     .systemcommand = paste0(.UPROCbin, .UPROCmode, .file.out, .UProCDB, .UProCmodel, .Allfiles[i],  ' 2>&1' )
 
