@@ -232,7 +232,11 @@ input.uproc.dummy <- function()
     if (length(slot(NEW$Object.job.path,FILETYPE.UproC)) == 0)
     {
     Ret <- select.multiple.files('UProC')
-    slot(NEW$Object.job.path,FILETYPE.UproC) <- Ret
+      if (length(Ret) > 0 & Ret[1] != -1)
+      {
+      slot(NEW$Object.job.path,FILETYPE.UproC) <- Ret  
+      }
+    
     }
 
   .ret <- start.UProC(NEW$Object.job.path,NEW$Object.job.statistics,NEW$Object.data.big,NEW$Object.data.dataframes)
@@ -573,304 +577,6 @@ B <- slot(slot(Object,'DATA'),'BIG')
 C <- slot(slot(Object,'DATA'),'KEGG')
 D <- slot(slot(Object,'Job'),'Paths')
 return(list(A,B,C,D))
-}
-
-
-
-Name.Global.Object <- function()
-{
-
-  Obj.Bad.Practice <<- .BadPractice()
-  QQ2 <- .BadPractice()
-  return(QQ2)
-}
-
-
-
-NAME.interactive.Output <- function()
-{
-  #select output folder
-  .Val <- tkchooseDirectory(initialdir = './')
-  return(tclvalue(.Val))
-}
-
-
-NAME.interactive.PCA <- function()
-{
-
-}
-
-
-NAME.interactive.Taxa <- function(Object,Window)
-{
-  .generate.mat <- function(DataTable,Tax)
-  {
-    .DT2 <- DataTable[Previous == Tax]
-    .u.Tax <- unique(.DT2[,TaxID])
-
-    .Mat = matrix(0,ncol = length(AllowedSamples), nrow = length(.u.Tax))
-
-    for (i in(1:length(AllowedSamples)))
-    {
-
-      for(j in 1:length(.u.Tax))
-      {
-        .tmp = .DT2[(TaxID %in% .u.Tax[j]) & Sample == AllowedSamples[i]][,Counts]
-        if(length(.tmp) > 0)
-        {
-          .Mat[j,i] = .tmp
-        }
-      }
-    }
-    rownames(.Mat) <- c(.u.Tax)
-    return(.Mat)
-  }
-
-
-  AllowedSamples = which(Object@Results@SelectedSamples)
-  #use only Samples in selected Samples
-  .DT <- Object@Results@QuickDataTable[Sample %in% AllowedSamples]
-  #reduce vector to olny used samples
-  .ClassVec <- Object@Input@ClassVec[AllowedSamples]
-  #create 2 Classes
-  .uClassVec <- unique(.ClassVec)
-  .CondA.I <- .ClassVec %in% .uClassVec[1]
-  .CondB.I <- .ClassVec %in% .uClassVec[2]
-
-  .lowestTaxa = unique(.DT[Rank == 1,TaxID])
-
-  #set TaqxID to Root
-  .Curr.Tax = -1
-
-  #get assigned Counts at top level
-  .XVec.ROOT <- colSums(.generate.mat(.DT, .Curr.Tax))# in .Xmat.Root[1,] max possible counts
-
-
-  .done = 0
-  x11()
-  while(.done == 0)
-  {
-
-
-    .Xmat <- .generate.mat(.DT, .Curr.Tax)
-    .Total = colSums(.Xmat)/.XVec.ROOT
-
-    .nTax = dim(.Xmat)[1]
-
-    print(.Xmat)
-
-    .nTotalA = c(mean(.Total[.CondA.I]),rep(0,.nTax-1))
-    .nTotalB = c(mean(.Total[.CondB.I]),rep(0,.nTax-1))
-    .nClassA = sapply(1:.nTax, function(x) mean(.Xmat[x,.CondA.I]))
-    .nClassB = sapply(1:.nTax, function(x) mean(.Xmat[x,.CondB.I]))
-
-    #myDF <- data.frame(FractionA = .nTotalA, ClassA = .nClassA/sum(.nClassA), FractionB = .nTotalB, ClassB = .nClassB/sum(.nClassB))
-
-    myMat = cbind(.nTotalA,.nClassA/sum(.nClassA),.nTotalB,.nClassB/sum(.nClassB))
-    rownames(myMat) <- rownames(.Xmat)
-    colnames(myMat) <- c('FractionA','CondA','FractionB','CondB')
-    barplot(myMat)
-    print(.Curr.Tax)
-
-    .Ret <- dostuff(Window,as.list(rownames(myMat)),as.list(1:length(rownames(myMat))),as.list(myMat[,2]),'select TaxID')
-
-    if (.Ret[1] == 'OK')
-    {
-      slot(Obj.Bad.Practice,'selectedTax') = as.numeric(rownames(myMat)[.Ret[[2]]])
-      .done = 1
-    }
-
-    else if (.Ret[1] == 'Next')
-    {
-      if (as.numeric(rownames(myMat)[.Ret[[2]]]) %in% .lowestTaxa)
-      {
-
-      }
-      else
-      {
-        .Curr.Tax = as.numeric(rownames(myMat)[.Ret[[2]]])
-      }
-
-    }
-
-    else if (.Ret[1] == 'Prev')
-    {
-      if (.Curr.Tax != -1)
-      {
-        .Curr.Tax = .DT[TaxID == .Curr.Tax,Previous][1]
-      }
-    }
-  }
-
-  Obj2 <- NAME.addData(Object = Object, LEVEL1 = 'Parameter', LEVEL2 = 'R', LEVEL3 = 'SelectedTaxa', value = slot(Obj.Bad.Practice,'selectedTax'))
-
-  return(Obj2)
-}
-
-NAME.interactive.MainWindow <- function()
-{
-
-}
-
-
-NAME.Button.set <- function(ButtonList,ButtonNameList)
-{
-  nLength = length(ButtonList)
-  if (nLength != length(ButtonNameList))
-  {
-    return(FALSE)
-  }
-
-  else
-  {
-    for (i in 1:nLength)
-    {
-      if (slot(Obj.Bad.Practice,ButtonNameList[[i]]))
-      {
-        tkconfigure(widget = ButtonList[[i]], state = 'normal')
-      }
-
-      else
-      {
-        tkconfigure(widget = ButtonList[[i]], state = 'disabled')
-      }
-    }
-  }
-
-}
-
-makepresser=function(ButtonWid,ButtonName)
-{
-  force(ButtonWid);
-  force(ButtonName);
-  function()
-  {
-    NAME.Button.set(ButtonWid,ButtonName)
-  }
-
-
-}
-
-
-
-NAME.interactive.tcltk2 <- function(Object)
-{
-  MY.SCOPE = environment()
-
-List.Object.Parts <- split.object(Object)
-
-#A <- slot(slot(Object,'DATA'),'Refined')
-#B <- slot(slot(Object,'DATA'),'BIG')
-#C <- slot(slot(Object,'DATA'),'KEGG')
-#D <- slot(slot(Object,'Job'),'Paths')
-
-
-
-  But.func <- function()
-  {
-    .Ret <- NAME.interactive.Output()
-    if (.Ret != '')
-    {
-      print(.Ret)
-      #MY.SCOPE$Object <- NAME.addData(Object = Object, LEVEL1 = 'Results', LEVEL2 = 'HTML', value = .Ret)
-      slot(List.Object.Parts[[4]],'DirOut') <- .Ret
-      slot(Obj.Bad.Practice,'Button1') <<- TRUE
-      #set big Object
-    }
-
-    else
-    {
-      slot(Obj.Bad.Practice,'Button1') <<- FALSE
-    }
-
-    NAME.Button.set(ButtonList.Widget,ButtonList.Names)
-  }
-
-  But.func2 <- function()
-  {
-    MY.SCOPE$Object <- NAME.interactive.Taxa(Object,ttMain)
-    slot(Obj.Bad.Practice,'Button2') <<- TRUE
-    NAME.Button.set(ButtonList.Widget,ButtonList.Names)
-  }
-
-  But.func3 <- function()
-  {
-
-    MY.SCOPE$Object <- NAME.make.pca2(Object)
-    slot(Obj.Bad.Practice,'Button3') <<- TRUE
-    NAME.Button.set(ButtonList.Widget,ButtonList.Names)
-    plot(Object@Results@PCA$x[,1],Object@Results@PCA$x[,2])
-  }
-
-
-  But.func4 <- function()
-  {
-    MY.SCOPE$Object <- NAME.perform.multianalysis(Object)
-    MY.SCOPE$Object <- NAME.select.Consensus(Object, 'Consensus')
-    MY.SCOPE$Object <- NAME.perform.pathwaydetection(Object)
-    slot(Obj.Bad.Practice,'Button4') <<- TRUE
-    NAME.Button.set(ButtonList.Widget,ButtonList.Names)
-  }
-
-  But.func5 <- function()
-  {
-    print(NAME.getData(Object = Object, LEVEL1 = 'Results', LEVEL2 = 'HTML'))
-    NAME.perform.HTMLcreation(Object)
-    NAME.perform.SVGcreation(Object)
-  }
-
-  But.Restart <- function()
-  {
-    Name.Global.Object()
-    NAME.Button.set(ButtonList.Widget,ButtonList.Names)
-  }
-
-  But.Quit <- function()
-  {
-    Obj <<- Object
-    tkdestroy(ttMain)
-  }
-
-
-
-
-  ttMain <- tktoplevel()
-  tktitle(ttMain) <- "ttMain"
-  #get info of window pos
-  tkwm.geometry(ttMain)
-  #change window pos
-  tkwm.geometry(ttMain, "500x500+1000+500")
-
-
-  A.button <- tkbutton(ttMain, height = 2, width = 20, text = "Set Output Dir", command = But.func)
-  B.button <- tkbutton(ttMain, height = 2, width = 20, text = "Select Taxonomy", command = But.func2)
-  C.button <- tkbutton(ttMain, height = 2, width = 20, text = "Perform PCA", command = But.func3)
-  D.button <- tkbutton(ttMain, height = 2, width = 20, text = "run methods", command = But.func4)
-  E.button <- tkbutton(ttMain, height = 2, width = 20, text = "create output", command = But.func5)
-
-
-  ButtonList.Widget <- list(B.button,C.button,D.button,E.button)
-  ButtonList.Names <- list('Button1','Button2','Button3','Button4')
-
-
-  Restart.button <- tkbutton(ttMain, height = 2, text = "Restart", command = But.Restart)
-  Quit.button <- tkbutton(ttMain, height = 2, text = "Quit", command = But.Quit)
-
-
-
-  tkconfigure(widget = B.button, state = 'disabled')
-  tkconfigure(widget = C.button, state = 'disabled')
-  tkconfigure(widget = D.button, state = 'disabled')
-  tkconfigure(widget = E.button, state = 'disabled')
-
-
-
-
-
-  tkgrid(A.button,B.button)
-  tkgrid(C.button,D.button)
-  tkgrid(E.button)
-  tkgrid(Restart.button,Quit.button)
 }
 
 #functions
@@ -1643,10 +1349,6 @@ BUTTONS.ON.OFF <- function(Object.Part, Environment, x, y)
 
            tcltk.variable = tclVar(-1)
 
-
-
-
-
            ret <- button.execute(Object.Part, Environment, Environment$ttMain, tcltk.variable)
 
            #apply changes to following buttons
@@ -1845,7 +1547,12 @@ setMethod ("button.execute", "class.button.input.fasta",
            #lock all buttons
 	   child.window <- tktoplevel(x);
 	   ret <- Message.waiting(child.window,input.fasta.dummy,"Please press 'run' and wait for process to end.",Environment)
-	   print(ret)
+	    if (ret == 'Cancel')
+	    {
+	    return('BAD')
+	    }
+	    
+	   return('OK')
 	   #unlock new buttons
            })
 
@@ -1855,7 +1562,10 @@ setMethod ("button.execute", "class.button.input.fastanorrna",
 
 	   child.window <- tktoplevel(x);
 	   ret <- Message.waiting(child.window,input.fastanorrna.dummy,"Please press 'run' and wait for process to end.",Environment)
-	   print(ret)
+	    if (ret == 'Cancel')
+	    {
+	    return('BAD')
+	    }
 	   print('done waiting...')
 	   return('OK')
            })
@@ -1871,7 +1581,13 @@ setMethod ("button.execute", "class.button.input.uproc",
 	   child.window <- tktoplevel(x);
 
 	   ret <- Message.waiting(child.window,input.uproc.dummy,"Please press 'run' and wait for process to end.",Environment)
+	   
 	   print(ret)
+	   
+	    if (ret == 'Cancel')
+	    {
+	    return('BAD')
+	    }
 
 	   #transform uproc to RDS
 
@@ -1964,7 +1680,10 @@ setMethod ("button.execute", "class.button.process.score",
 	   child.window <- tktoplevel(x);
 
 	   ret <- Message.waiting(child.window,process.score.dummy,"Please press 'run' and wait for process to end.",Environment)
-	   print(ret)
+	    if (ret == 'Cancel')
+	    {
+	    return('BAD')
+	    }
 
 
 	   print('done waiting...')
@@ -1977,7 +1696,11 @@ setMethod ("button.execute", "class.button.process.taxonomy",
 	   child.window <- tktoplevel(x);
 
 	   ret <- Message.waiting(child.window,process.taxonomy.dummy,"Please press 'run' and wait for process to end.",Environment)
-	   print(ret)
+
+	    if (ret == 'Cancel')
+	    {
+	    return('BAD')
+	    }
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 	   print('done waiting...')
@@ -1993,7 +1716,10 @@ setMethod ("button.execute", "class.button.analyse.methods",
 
 	   child.window <- tktoplevel(x);
 	   ret <- Message.waiting(child.window,analyse.methods.dummy,"Please press 'run' and wait for process to end.",Environment)
-	   print(ret)
+	    if (ret == 'Cancel')
+	    {
+	    return('BAD')
+	    }
 
 	   print('done waiting...')
 	   return('OK')
@@ -2006,7 +1732,10 @@ setMethod ("button.execute", "class.button.analyse.pca",
 
 	   child.window <- tktoplevel(x);
 	   ret <- Message.waiting(child.window,analyse.pca.dummy,"Please press 'run' and wait for process to end.",Environment)
-	   print(ret)
+	    if (ret == 'Cancel')
+	    {
+	    return('BAD')
+	    }
 
 
 
@@ -2023,7 +1752,10 @@ setMethod ("button.execute", "class.button.analyse.br",
 	   child.window <- tktoplevel(x);
 	   ret <- Message.waiting(child.window,analyse.br.dummy,"Please press 'run' and wait for process to end.",Environment)
 
-
+	    if (ret == 'Cancel')
+	    {
+	    return('BAD')
+	    }
 	   print('done waiting...')
 	   return('OK')
            })
@@ -2034,7 +1766,10 @@ setMethod ("button.execute", "class.button.analyse.venn",
 
 	   child.window <- tktoplevel(x);
 	   ret <- Message.waiting(child.window,analyse.venn.dummy,"Please press 'run' and wait for process to end.",Environment)
-	   print(ret)
+	    if (ret == 'Cancel')
+	    {
+	    return('BAD')
+	    }
 
 
 	   #Environment$Container.Object.Button
@@ -2051,7 +1786,10 @@ setMethod ("button.execute", "class.button.analyse.pathway",
 
 	   child.window <- tktoplevel(x);
 	   ret <- Message.waiting(child.window,analyse.pathway.dummy,"Please press 'run' and wait for process to end.",Environment)
-	   print(ret)
+	    if (ret == 'Cancel')
+	    {
+	    return('BAD')
+	    }
 
 
 	   print('done waiting...')
@@ -2067,7 +1805,10 @@ setMethod ("button.execute", "class.button.output.svghtml",
 
 	   child.window <- tktoplevel(x);
 	   ret <- Message.waiting(child.window,output.svghtml.dummy,"Please press 'run' and wait for process to end.",Environment)
-	   print(ret)
+	    if (ret == 'Cancel')
+	    {
+	    return('BAD')
+	    }
 
 	   print('done waiting...')
 	   return(y)
@@ -2316,8 +2057,22 @@ setMethod ("set.interaction.on", "class.button.input.object",
 
 setMethod ("set.interaction.on", "class.button.process.output",
            function(Part.Object, Object,x,y){
-	    slot(slot(Object,x),'interaction.on') <- ALL.BUTTON.NAMES[c(1:5)]
-	    slot(slot(Object,x),'interaction.off') <- ALL.BUTTON.NAMES[c(6:17)]
+		  #check if UProC is even availible...
+		  if (!is.null(._CONFIG$UPROC_DIR) & !is.null(._CONFIG$MODEL_DIR))
+		  {
+		  slot(slot(Object,x),'interaction.on') <- ALL.BUTTON.NAMES[c(1:5)]
+		  slot(slot(Object,x),'interaction.off') <- ALL.BUTTON.NAMES[c(6:17)]
+		  }
+		  
+		  else
+		  {
+		  slot(slot(Object,x),'interaction.on') <- ALL.BUTTON.NAMES[c(4:5)]
+		  slot(slot(Object,x),'interaction.off') <- ALL.BUTTON.NAMES[c(1:3,6:17)]		    
+		  }
+		  
+		  
+	    
+	    
 	   return(Object)
            })
 
