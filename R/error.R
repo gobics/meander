@@ -198,12 +198,23 @@ ERROR.methodDefinition_obtain.callStack <- function()
     
     peak = grep('attemptExecution', stack )
 
+    if (length(peak > 0))
+    {
     stack = as.character(sapply(
         1 : peak,
         sys.call
         ))
 
-    stack
+          
+    }
+    else
+    {
+      stack = as.character(sapply(
+        1,
+        sys.call
+      ))
+    }
+stack
 }
 
 FILE_WRITE_ERROR.methodDefinition_initialize =
