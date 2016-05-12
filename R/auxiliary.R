@@ -149,11 +149,11 @@ function( ... )
 
     headerLines = c(
         bindStrings( CONFIG_FILE_COMMENT, CONFIG_FILE_HASH ),
-        bindStrings( CONFIG_FILE_COMMENT, MEANDER_VERSION ),
+        bindStrings( CONFIG_FILE_COMMENT, MEANDER_VERSION )
     )
     contentLines = sprintf( CONFIG_FILE_ENTRY_FORMATTER, keys, values )
 
-    configFile = file( CONFIG_FILE, open = 't' )
+    configFile = file( CONFIG_FILE, open = 'wt' )
     tryCatch(
         writeLines( c(headerLines, contentLines), configFile ),
         error = function(e)
