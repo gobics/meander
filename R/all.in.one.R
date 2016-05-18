@@ -2591,7 +2591,7 @@ tclvar.main.okcancel <- tclVar('empty')
   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'keggmapnames', value = readRDS(file.path(DATA_PATH,'keggmapnames.rds')))
   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'pathway.names', value = readRDS(file.path(DATA_PATH,'pathway.names.Rds')))
   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'ko_desc', value = readRDS(file.path(DATA_PATH,'ko_desc.rds')))
-
+  NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'br2pathway', value = readRDS(file.path(DATA_PATH,'br2pathway.rds')))
   
   
 #Keggmapnames

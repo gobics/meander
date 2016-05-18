@@ -265,7 +265,8 @@ Object.Data.Pathview <- setClass(
     ko2br.pathway = "Object.Data.Pathview",
     keggmapnames = "vector",
     pathway.names = "vector",
-    ko_desc = "vector"
+    ko_desc = "vector",
+    br2pathway = "matrix"
   )
 )
 
