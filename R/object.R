@@ -303,7 +303,8 @@ Object.Data.Pathview <- setClass(
     filtered.score = 'numeric',
     ScoreCutoff = 'numeric',
     FilteringScore = 'numeric',
-    PCA = 'prcomp'
+    #PCA = 'prcomp'
+    PCA = 'list'
   ),
   prototype = list(
     UProCHits = numeric(),
