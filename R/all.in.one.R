@@ -1,49 +1,6 @@
 #ADDITIONS
 
-load.kegg.object.parts <- function()
-{
 
-  #prepare basepath
-
-  #load X
-
-  #load y
-
-return(Object.Part.Kegg)
-}
-
-resume.object <- function(object.location)
-{
-
-  Complete.Object <- NULL
-  #load object
-
-  #set buttons according
-
-return(Complete.Object)
-}
-
-resume.object.buttonsetup <- function(Button.Settings,Full.Object)
-{
-#MeandR object will always start after the Score Selection step.
-
-  #check if entries are availible
-  ret <- check.states.object(Full.Object)
-    if (!is.null(ret))
-    {
-      Button.Settings <- ret
-    }
-  #set button to desired states
-
-
-  #return Object in parts
-  return(list(Button.Settings,Full.Object))
-}
-
-check.states.object <- function()
-{
-
-}
 
 #Find out if RNA is something...
 #Vec.List <- our 16 and 28 rrna
@@ -129,6 +86,38 @@ detect.RNA <- function(Ret,Vec.List,fraglength = 300,nStepsize = 100, repetition
   return(list(AllScores.List,AllRNA,QQQQ))
 }
 
+find.unselected.functions <- function()
+{
+KEGG2PATH.zero = slot(NEW$Object.data.kegg,'KEGG2PATH')  
+X1 = rowSums(KEGG2PATH.zero[,Ind]) > 0
+X2 = rowSums(KEGG2PATH.zero[,!Ind]) > 0
+
+X3 = X1 - X2  
+
+important.values <- c(
+  SHOULD_MAP_FLAG + MAPPED_FLAG+SIGNIFICANT_FLAG, #sign. mapped, should map
+  SHOULD_MAP_FLAG + MAPPED_FLAG+SIGNIFICANT_FLAG + UP_REGULATED_FLAG #sign. mapped, should map, up regulated
+  )
+
+Idx <- which(X3 == -1)
+Idx <- Idx[(1:length(Idx)) < length(NEW$Object.data.refined@FlagVec)]
+
+YY <- NEW$Object.data.refined@FlagVec[Idx] %in% important.values
+
+A <- slot(NEW$Object.job.config,'SelectedBR')
+B <- slot(NEW$Object.data.kegg,'br2pathway')
+
+xpathways = sum(rowSums(B[,A]) == 0)
+xfunctions = sum(NEW$Object.data.refined@FlagVec[Idx] != 0)
+xsignificant = sum(YY)
+
+
+info.message = paste0('Your category restriction hides #',xpathways,' pathways which include #',xfunctions, ' unique functions, #',xsignificant,' of them are signifiant')
+
+ret <- tkmessageBox(message = info.message, type = 'ok', icon = 'info')
+}
+
+
 
 
 rRNA.object <- setClass(
@@ -148,11 +137,6 @@ rRNA.object <- setClass(
     length = vector()
   )
 )
-#initialize and do random stuff
-Obj <- rRNA.object()
-Obj@r16s <- list(sample(1000,100), sample(1000,100), sample(1000,100))
-Obj@r23s <- list(sample(1000,50), sample(1000,50), sample(1000,50))
-Obj@length <- c(100,500,1000)
 
 detect.RNA.multi <- function(Sequence.Object,rRNA.object, repetitions = 1)
 {
@@ -189,6 +173,7 @@ return(A)
 process.taxonomy.dummy <- function()
 {
 slot(NEW$Object.job.config,'SelectedTax') <- as.numeric(tax.Select(obj.data= NEW$Object.data.big, obj.refined= NEW$Object.data.refined, obj.config= NEW$Object.job.config))
+return(NULL)
 }
 
 input.fasta.dummy <- function()
@@ -206,7 +191,7 @@ input.fastanorrna.dummy()
 input.uproc.dummy()
 #mark this rRNA
 
-
+return(NULL)
 }
 
 
@@ -225,6 +210,7 @@ input.fastanorrna.dummy <- function()
   NEW$Object.job.path <- .ret[[1]]
   print(.ret[[2]])
   input.uproc.dummy()
+  return(NULL)
 }
 
 input.uproc.dummy <- function()
@@ -241,6 +227,7 @@ input.uproc.dummy <- function()
 
   .ret <- start.UProC(NEW$Object.job.path,NEW$Object.job.statistics,NEW$Object.data.big,NEW$Object.data.dataframes)
   NEW$Object.job.path = .ret[[1]];    NEW$Object.job.statistics = .ret[[2]];    NEW$Object.data.big = .ret[[3]];    NEW$Object.data.dataframes = .ret[[4]]
+  return(NULL)
 }
 
 process.score.dummy <-function()
@@ -250,6 +237,7 @@ process.score.dummy <-function()
 
   .ret <- start.RDS(Object.data.big = NEW$Object.data.big, Object.job.path = NEW$Object.job.path, Object.data.kegg = NEW$Object.data.kegg, Object.job.statistics = NEW$Object.job.statistics, Object.data.refined =  NEW$Object.data.refined, object.save.FLAG = FALSE)
   NEW$Object.data.big <- .ret[[2]];  NEW$Object.job.statistics <- .ret[[1]];  NEW$Object.data.refined <- .ret[[3]]
+  return(NULL)
 }
 
 
@@ -268,11 +256,13 @@ analyse.methods.dummy <- function()
   .ret <- perform.consensusselecion(Type = 'Consensus', O.Job.Config = NEW$Object.job.config, O.DATA.Refined = NEW$Object.data.refined)
   NEW$Object.data.refined <- .ret
   NEW$Object.data.refined <- prepare.svgvectors.colour(NEW$Object.data.refined,NEW$Object.data.kegg,NEW$Object.job.config)
+  return(NULL)
 }
 
 analyse.venn.dummy <- function()
 {
 xxx <- plot.generate.vennreplacement(Method.Vec = slot(NEW$Object.job.config,'Methods'), Mat.pVal = NEW$Object.data.refined@ConsensusMat, threshold = 0.05)
+return(NULL)
 }
 
 analyse.br.dummy <- function()
@@ -283,13 +273,14 @@ positions <- df[order((df$SignificantCounts/df$TotalCounts) * df$SignificantCoun
 print(ggplot(df2, aes(x = x, y = y, color = factor(z), group = factor(z), fill = Counts)) + scale_x_discrete(limits = positions) + geom_bar(position = "dodge",stat="identity") + coord_flip() + scale_fill_gradient(low = "lightblue", high = "darkblue") +
 ylab('fraction significant') +
 xlab('kegg br categories'))
-
+return(NULL)
 }
 
 
 analyse.pca.dummy <- function()
 {
 df <- plot.pca(NEW$Object.job.config, NEW$Object.job.statistics,NEW$Object.data.big, minCount = 5)
+return(NULL)
 }
 
 
@@ -297,9 +288,12 @@ df <- plot.pca(NEW$Object.job.config, NEW$Object.job.statistics,NEW$Object.data.
 analyse.pathway.dummy <- function()
 {
 #create svg
+  cat('works up to','perform.pathwaydetection','\n', sep = ' ')
   NEW$REEEEED <- perform.pathwaydetection(NEW$Object.job.config,NEW$Object.data.kegg,NEW$Object.data.refined)
-
+  cat('works up to','prepare.svgvectors.colour','\n', sep = ' ')
   NEW$Object.data.refined <- prepare.svgvectors.colour(NEW$Object.data.refined,NEW$Object.data.kegg,NEW$Object.job.config)
+  
+  cat('works up to','perform.SVGcreation','\n', sep = ' ')
   NEW$.df <- perform.SVGcreation(NEW$Object.data.refined,NEW$Object.job.path,NEW$Object.job.config)
 
   .path = file.path(slot(NEW$Object.job.path,'DirOut'),'HTML',slot(NEW$Object.job.config, 'SelectedTax'))
@@ -310,20 +304,29 @@ analyse.pathway.dummy <- function()
   colnames(sebastian.rekt.df) <- sebastian.rekt.names
   PWTH=data.frame(string=sebastian.rekt.names, type=c('i','i','r','i','f'), stringsAsFactors=FALSE)
 
-
-
-  write.html.files(sebastian.rekt.df,PWTH,readRDS('/home/hklingen/projects/meander/data/keggmapnames.rds'),readRDS('/home/hklingen/projects/meander/data/pathway.names.Rds'),readRDS('/home/hklingen/projects/meander/data/ko_desc.rds'),slot(NEW$Object.data.refined,'FlagVec'),perform.pvalcalc(NEW$Object.data.refined),slot(NEW$Object.data.kegg,'KEGG2PATH'),.path)
-
+  #reduce to only display selected pathways.
+  A <- NEW$Object.job.config@SelectedBR
+  B <- NEW$Object.data.kegg@br2pathway
+  
+  
+  Ind <- rowSums(B[,A]) > 0
+  
+  keggmapnames.mod = slot(NEW$Object.data.kegg,'keggmapnames')[Ind]
+  KEGG2PATH.mod = slot(NEW$Object.data.kegg,'KEGG2PATH')[,Ind]
+  sebastian.rekt.df.mod = sebastian.rekt.df[Ind,]
+  cat('works up to','write.html.files','\n', sep = ' ')
+  write.html.files(sebastian.rekt.df.mod,PWTH,keggmapnames.mod,slot(NEW$Object.data.kegg,'pathway.names'),slot(NEW$Object.data.kegg,'ko_desc'),slot(NEW$Object.data.refined,'FlagVec'),perform.pvalcalc(NEW$Object.data.refined),KEGG2PATH.mod,.path)
 #create HTML
-
+  return(NULL)
 }
 
 output.svghtml.dummy <- function()
 {
-  .path = file.path(slot(NEW$Object.job.path,'DirOut'),'HTML',slot(NEW$Object.job.config, 'SelectedTax'),'RESULTS.html')
+.path = file.path(slot(NEW$Object.job.path,'DirOut'),'HTML',slot(NEW$Object.job.config, 'SelectedTax'),'RESULTS.html')
 
 
 browseURL(.path, browser = getOption("browser"),encodeIfNeeded = FALSE)
+return(NULL)
 }
 
 button.dummy <- function()
@@ -470,8 +473,17 @@ E.part <- environment()
   encapsulate.function <- function()
   {
   tkconfigure(button.message.run, state = 'disabled')
-  function.to.execute()
-  tkconfigure(button.message.ok, state = 'enabled')
+  ret <- function.to.execute()
+    if (is.null(ret))
+    {
+    tkconfigure(button.message.ok, state = 'enabled')
+    }
+  
+    else
+    {
+    tkmessageBox(message = 'ERROR', type = 'ok', icon = 'error')
+    }
+  
   }
 
   button.ok <- function()
@@ -931,7 +943,6 @@ Vector2 <- tcltk.select.category(Class.names.Vec)
 return(list(Class.names.Vec,Vector,Vector2));
 }
 
-
 select.multiple.files <- function(type = 'ALL')
 {
 keep.running = TRUE
@@ -1108,8 +1119,8 @@ ALL.BUTTON.NAMES <- c(
 set.objectinput.object <- function(Object)
 {
   print('wot?')
-  slot(slot(Object,"button.input.object"),'interaction.on') <- ALL.BUTTON.NAMES[c(4,5)]
-  slot(slot(Object,"button.input.object"),'interaction.off') <- ALL.BUTTON.NAMES[c(1:3,6:14)]
+  slot(slot(Object,"button.input.object"),'interaction.on') <- ALL.BUTTON.NAMES[c(5,6)]
+  slot(slot(Object,"button.input.object"),'interaction.off') <- ALL.BUTTON.NAMES[c(1:4,7:14)]
   return(Object)
 }
 
@@ -1388,138 +1399,30 @@ initialize.Button.Object <- function()
   for (curr.Name in Button.Names)
   {
   slot(slot(Object,curr.Name),'name') <- curr.Name
-    if (curr.Name == "button.input.fasta")
+
+print(curr.Name)
+
+    if (curr.Name == "button.main.saveobject")
     {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
+
+    }
+  
+    else if (curr.Name %in% c('button.process.output', 'class.button.main.ok','class.button.main.reset','class.button.main.quit'))
+    {
+      slot(slot(Object,curr.Name),'state') <- TRUE
     }
 
-    else if (curr.Name == "button.input.fastanorrna")
+  #do nothing
+    else if (curr.Name %in% c('button.main.ok',"button.main.reset","button.main.quit"))
     {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
+      
     }
-
-    else if (curr.Name == "button.input.uproc")
+  
+    else
     {
-    #set buttons on/off
     Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
     }
-
-    else if (curr.Name == "button.input.object")
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-
-    else if (curr.Name == 'button.process.output')
-    {
-    #set buttons on/off
-    slot(slot(Object,curr.Name),'state') <- TRUE
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-
-
-    }
-
-    else if (curr.Name == 'button.process.category')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-
-    }
-
-    else if (curr.Name == 'button.process.conditions')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-
-    else if (curr.Name == 'button.process.score')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-
-    else if (curr.Name == 'button.process.taxonomy')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-    else if (curr.Name == 'button.analyse.methods')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-    else if (curr.Name == 'button.analyse.pca')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-    else if (curr.Name == 'button.analyse.br')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-    else if (curr.Name == 'button.analyse.venn')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-
-    else if (curr.Name == 'button.analyse.pathway')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-    else if (curr.Name == 'button.output.svghtml')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-    else if (curr.Name == 'button.output.csv')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-    else if (curr.Name == 'button.output.figures')
-    {
-    #set buttons on/off
-   Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
-    }
-
-
-    else if (curr.Name == "button.main.saveobject")
-    {
-
-    }
-
-    else if (curr.Name == "class.button.main.ok")
-    {
-    slot(slot(Object,curr.Name),'state') <- TRUE
-    }
-
-    else if (curr.Name == "class.button.main.reset")
-    {
-    slot(slot(Object,curr.Name),'state') <- TRUE
-    }
-
-    else if (curr.Name == "class.button.main.quit")
-    {
-    slot(slot(Object,curr.Name),'state') <- TRUE
-    }
-
-
+print(curr.Name)
   }
 return(Object)
 }
@@ -1537,7 +1440,7 @@ return(Object)
 
 setGeneric("button.execute",
            function(Object, Environment,x,y)
-           {Eprint('NO SUCH METHOD')}
+           {Eprint('NO SUCH METHOD in button.execute')}
 )
 
 setMethod ("button.execute", "class.button.input.fasta",
@@ -1602,11 +1505,20 @@ setMethod ("button.execute", "class.button.input.object",
            function(Object, Environment, x, y){
 	   print('fastanorrna!')
 
-	   #Environment$Container.Object.Button
-	   #tclvalue(Environment$tcltk.variable) = 'QQ';
-	   print('done waiting...')
-	   return('FALSE')
+	   
+	   child.window <- tktoplevel(x);
+
+	   ret <- Message.waiting(child.window,input.object.dummy,"Please press 'run' and wait for process to end.",Environment)
+	   
+	   if (ret == 'Cancel')
+	   {
+	     return('BAD')
+	   }
+	   
+	   return('OK')
            })
+
+
 setMethod ("button.execute", "class.button.process.output",
            function(Object, Environment, x, y){
 	   print('fastanorrna!')
@@ -1630,11 +1542,14 @@ setMethod ("button.execute", "class.button.process.output",
 	   print('done waiting...')
 	   return('OK')
            })
+
+
+
 setMethod ("button.execute", "class.button.process.category",
            function(Object, Environment, x, y){
 	   print('fastanorrna!')
 
-	   xx <- br.selection(unlist(Environment$ko2br@Names),Environment)
+	   xx <- br.selection(unlist(slot(slot(Environment$Object.data.kegg, 'ko2br.pathway'),'Names')),Environment)
 	   slot(Environment$Object.job.config,'SelectedBR') <- xx
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
@@ -1646,8 +1561,6 @@ setMethod ("button.execute", "class.button.process.conditions",
 	   print('class.button.process.conditions!')
 
 	   #HACK##############
-
-
 
 #ClassNames
 Class.names.Vec <- tcltk.multiple.input.boxes()
@@ -1671,6 +1584,7 @@ slot(Environment$Object.job.config,'SelectedClasses') <- Vector2
 	   print('done waiting...')
 	   return('OK')
            })
+
 setMethod ("button.execute", "class.button.process.score",
            function(Object, Environment, x, y){
 	   print('fastanorrna!')
@@ -1689,6 +1603,7 @@ setMethod ("button.execute", "class.button.process.score",
 	   print('done waiting...')
 	   return('OK')
            })
+
 setMethod ("button.execute", "class.button.process.taxonomy",
            function(Object, Environment, x, y){
 	   print('class.button.process.taxonomy!')
@@ -1837,7 +1752,7 @@ setMethod ("button.execute", "class.button.output.figures",
 
 setGeneric("button.set.states",
            function(Part.Object, Object,x,y)
-           {ERROR$new('NO SUCH METHOD')$throw()}
+           {ERROR$new('NO SUCH METHOD in button.set.states')$throw()}
 )
 
 setMethod ("button.set.states", "class.button.input.fasta",
@@ -2023,7 +1938,10 @@ setMethod ("button.set.states", "class.button.output.figures",
 
 setGeneric("set.interaction.on",
            function(Part.Object, Object,x,y)
-           {ERROR$new('NO SUCH METHOD')$throw()}
+             
+           {
+           print(Part.Object)
+           ERROR$new('NO SUCH METHOD in set.interaction.on')$throw()}
 )
 
 setMethod ("set.interaction.on", "class.button.input.fasta",
@@ -2556,11 +2474,8 @@ save.object.all <- function(Env)
 
 main.interface <- function()
 {
+#Q <- readRDS('~/projects/meander/new_method.rds')
 
-Q <- readRDS('~/projects/meander/new_method.rds')
-
-ONE <<- 'QQQQQQQQQQQQQQQ'
-ko2br <- readRDS('~/projects/meander/data/ko2br_pathway.rds')
 NEW <<- environment();
 tclvar.main.okcancel <- tclVar('empty')
 
@@ -2577,23 +2492,27 @@ tclvar.main.okcancel <- tclVar('empty')
   NEW$Object.data.refined <- .Object.DATA.Refined()
   NEW$Object.data.dataframes <- .Object.DATA.dataframes()
   ##load fixed data
-  #tax Mat
-
-  #Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS('./data/TaxMat.rds'))
-  NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS(file.path(DATA_PATH,'TaxMat.rds')))
-  #ko2path
-  NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KEGG2PATH', value = as.matrix(readRDS(file.path(DATA_PATH,'KEGG2PATH.rds'))))
-  #kointax
-  NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KOinTax', value = readRDS(file.path(DATA_PATH,'KOlist.rds')))
-  #...
-  NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'ko2br.pathway', value = readRDS(file.path(DATA_PATH,'ko2br_pathway.rds')))
-
-  NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'keggmapnames', value = readRDS(file.path(DATA_PATH,'keggmapnames.rds')))
-  NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'pathway.names', value = readRDS(file.path(DATA_PATH,'pathway.names.Rds')))
-  NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'ko_desc', value = readRDS(file.path(DATA_PATH,'ko_desc.rds')))
-  NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'br2pathway', value = readRDS(file.path(DATA_PATH,'br2pathway.rds')))
   
+  load.kegg.object.parts()
   
+#   #tax Mat
+# 
+
+#   #Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS('./data/TaxMat.rds'))
+#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS(file.path(DATA_PATH,'TaxMat.rds')))
+#   #ko2path
+#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KEGG2PATH', value = as.matrix(readRDS(file.path(DATA_PATH,'KEGG2PATH.rds'))))
+#   #kointax
+#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KOinTax', value = readRDS(file.path(DATA_PATH,'KOlist.rds')))
+#   #...
+#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'ko2br.pathway', value = readRDS(file.path(DATA_PATH,'ko2br_pathway.rds')))
+# 
+#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'keggmapnames', value = readRDS(file.path(DATA_PATH,'keggmapnames.rds')))
+#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'pathway.names', value = readRDS(file.path(DATA_PATH,'pathway.names.Rds')))
+#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'ko_desc', value = readRDS(file.path(DATA_PATH,'ko_desc.rds')))
+#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'br2pathway', value = readRDS(file.path(DATA_PATH,'br2pathway.rds')))
+#   
+#   
 #Keggmapnames
 #pathway.names
 #ko_descr
@@ -2624,14 +2543,13 @@ window.center(ttMain)
 #load general settings
 
 
-Container.Object.Button <- spawn.buttons(NEW$ttMain)
+NEW$Container.Object.Button <- spawn.buttons(NEW$ttMain)
 
 #set buttons to initial setting
 Container.Object.Button <- check.state(Container.Object.Button,slotNames(Container.Object.Button))
 #tclServiceMode(TRUE)
 #wait for final buttonpress
 print('main waiting...')
-
 
 
 tkwait.variable(NEW$tclvar.main.okcancel)

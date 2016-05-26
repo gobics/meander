@@ -64,6 +64,11 @@ df <- data.frame(x = NULL, y = NULL, z = NULL)
   #XXX.SVG <- readRDS('./data/SVG_positions.rds')
   #XXX.PNG <- readRDS('./data/path_png.rds')
 
+  A <- slot(NEW$Object.job.config,'SelectedBR')
+  B <- slot(NEW$Object.data.kegg,'br2pathway')
+  
+  XXX.KEGGmapnames <- XXX.KEGGmapnames[rowSums(B[,A]) > 0]
+  
   for (i in XXX.KEGGmapnames)
   {
     #get png alpha [1] & normal [2] & dimensions [x = 3, y = 4]

@@ -79,7 +79,9 @@ ClassList <- list("Class.DESeq2","Class.DESeq","Class.edgeR","Class.limma","Clas
 
 setGeneric("executeMethod",
            function(z,x,y)
-           {ERROR$new('NO SUCH METHOD')$throw()}
+           {
+             print(z)
+             ERROR$new('NO SUCH METHOD')$throw()}
 )
 
 setMethod ("executeMethod", "Class.DESeq2",
