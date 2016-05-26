@@ -8,7 +8,7 @@
 
 APPLICATION_TITLE = 'MeandeR'
 MEANDER_VERSION = '1.0.0'
-LICENCE_FILE = file.path( system.file( package = getPackageName() ) , 'LICENCE' )
+LICENCE_FILE = file.path( system.file( package = getPackageName() ), 'licence.txt' )
 NCBI_TAX_URL = 'http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id='
 
 # ******************************************************************************
@@ -64,6 +64,7 @@ NEW_FRAME = '_blank'
 
 OVERVIEW_TITLE = 'ALL_PATHWAYS'
 
+TAX_SELECT_HELP_FILE = file.path( system.file( package = getPackageName() ), 'tax_select_help.txt' )
 # ******************************************************************************
 # > END     :   FILE CONSTANTS
 # ******************************************************************************
