@@ -62,17 +62,11 @@ create.HTML.Output = function(Pathways.Table, Orthologs.Table, Pathways.Ortholog
 
 prepare.Output.Dir = function (output.Dir)
 {
-    dir.create(
-        file.path(output.Dir, PATHWAY_TABLE_PATH),
-        showWarnings = FALSE,
-        recursive = TRUE
-    )
+    pathway.Dir = file.path(output.Dir, PATHWAY_TABLE_PATH)
+    ortholog.Dir = file.path(output.Dir, ORTHOLOG_TABLE_PATH)
 
-    dir.create(
-        file.path(output.Dir, ORTHOLOG_TABLE_PATH),
-        showWarnings = FALSE,
-        recursive = TRUE
-    )
+    init.Dir( pathway.Dir )
+    init.Dir( ortholog.Dir )
 
     file.copy(
         from = HTML_SUPPLY_PATH,
@@ -86,6 +80,24 @@ prepare.Output.Dir = function (output.Dir)
     )
 
     write.ColorKey.HTML(output.Dir)
+}
+
+init.Dir = 
+function( dir.Name )
+{
+    if ( file.exists( dir.Name) )
+    {
+        sapply( 
+            list.files( dir.Name, full.names = TRUE ),
+            file.remove
+        )
+    }
+    else
+        dir.create(
+            dir.Name,
+            showWarnings = FALSE,
+            recursive = TRUE
+        )
 }
 
 create.Output.Pathways = function(Pathways.Table, Orthologs.Table, Pathways.Orthologs.Map, output.Dir)
