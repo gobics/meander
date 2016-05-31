@@ -45,11 +45,18 @@ start.DNAnoRNA <- function(Object.job.path, object.save.FLAG)
   cat("start uproC","\n")
   .Allfiles <- slot(Object.job.path,FILETYPE.DNAwoRNA)
   .nAllFiles <- length(.Allfiles)
-  
+  ._CONFIG$UPROC_DIR
+  ._CONFIG$MODEL_DIR
+  ._CONFIG$UPROC_DB
   .UPROCbin = '/home/hklingen/workspace/uproc-1.1.2_sl/uproc-dna '
   .UPROCmode = '-f -O 0 -p -o '
   .UProCmodel = '/home/hklingen/DB/PFAM/Comet/model/model '
   .UProCDB = ' /scratch/KEGG_2014-08_full_uproc_2 '
+  
+  
+  .UPROCbin = paste0(' ',._CONFIG$UPROC_DIR,' ', sep ='')
+  .UProCmodel = paste0(' ',._CONFIG$MODEL_DIR,' ', sep ='')
+  .UProCDB = paste0(' ',._CONFIG$UPROC_DB,' ', sep ='')
   
   #data.frame to store plot
   .Z <- data.frame(Sample = numeric(), length = numeric(), values= numeric(), type = character(), stringsAsFactors = FALSE)
