@@ -2,11 +2,11 @@ Package: MeandeR
 Type: Package
 Title: Metatranscriptomic Analysis of Differential Expression in R 
 Version: 1.0.0
-Date: 1015-13-32
+Date: 2016/05/16
 Author: Heiner Klingenberg, Sebastian Gross, Peter Meinicke
 Maintainer: Heiner Klingenberg <heiner@gobics.de>
-Description: TODO
-License: GPL (>= 3)
+Description: TODO:
+License: AGPL (>= 3) | file LICENCE
 LazyData: FALSE
 Imports:stats, data.table
 Depends: R (>= 3.0.0), stats, data.table, samr, DESeq2, ggplot2, grid, gridExtra, tcltk

@@ -1,0 +1,25 @@
+The tax selection view is intended to help you with the selection of a proper rank for the next step
+of the analysis. Except for the title on top there are four major fields that provide information for you.
+The most important are the pie charts and the vertical bars for each of the selected conditions.
+The pie charts show the taxonomic composition on the current rank in the taxonomic tree. However as
+you traverse down the tree you will recognize that only ratios are shown in the pie chart and no
+absolute values. 
+As an example image you are on the phylum level and see a almost red colored chart. This would only
+mean that on this rank all counts belong to one class, but you will not know how many counts or how
+many counts relatve to the total amount of counts were assigned to this category.
+To see this the count ratio bars below each of the pie charts are provided.
+The black bar indicates how many percent the current taxonomy - as stated in the title - has and the
+colored bars show how many percent the selected taxonomy - the one that you hovered or clicked -
+has.
+In the info field on the lower left you will see additional information of the selected taxonomy.
+You can also double click on the tax id to open a link to the ncbi tax page in a web browser to get
+more information about the selected taxonomy.
+Once you selected a taxonomy by clicking on it in the pie chart the principal component analysis on
+the right side updates. It is used to give you a hint about the quality of your conditions. It is
+good if each samples that belong to one condition are clearly seperable from samples belonging to
+another category.
+Last you will find a control field on the lower right. This is where you found the help button to
+see this text.
+You will find also buttons to traverse the tree downwards once you selected a taxonomy or upwards.
+The proceed button will take you to the next step of the analysis performed on the taxonomy you
+selected if any or the current taxonomy as stated in the title.

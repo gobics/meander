@@ -27,7 +27,7 @@ BRANCH_PADDING = 5
 LEAF_PADDING = 5
 SHELL_PADDING = 10
 
-draw.Overview = function (Object, radial.Flag = FALSE)
+draw.Overview = function (Object)
 {
     samples.cond.A = which(Object@Job@Config@ClassVec == Object@Job@Config@SelectedClasses[1])
 
@@ -37,7 +37,7 @@ draw.Overview = function (Object, radial.Flag = FALSE)
 
     forest = obtain.Forest(table, samples.cond.A, samples.cond.B)
 
-    forest = obtain.Coordinates(forest, radial.Flag)
+    forest = obtain.Coordinates(forest, FALSE )
 
     forest$color = obtain.Colors(forest)
 

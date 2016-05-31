@@ -394,7 +394,7 @@ function(parent)
     # Help
     help.ButtonHandler = function()
     {
-        #TODO: replace Dummy function
+        display.Help( TAX_SELECT_HELP_FILE )
     }
     tkgrid(
         tkbutton( frame, text = 'Help', width = BUTTON_WIDTH, font = FONT_BUTTON, command = help.ButtonHandler ),
