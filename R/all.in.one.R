@@ -1038,6 +1038,8 @@ Ret <- checkboxlist.builder(tcl.Var.Vec,br.names,frame.process)
 tcl.Var.Vec[[nButtons+1]] = tclVar(0)
 
 
+override.TclVarBlock(tt.ko2br,tcl.Var.Vec[[nButtons+1]],'CANCEL')
+
   for (i in 1:length(Ret))
   {
   tkgrid(Ret[[i]], row = i, column = 0, columnspan = 2, sticky = 'nsew')
