@@ -1523,18 +1523,17 @@ setMethod ("button.execute", "class.button.process.output",
            function(Object, Environment, x, y){
 	   print('fastanorrna!')
 
-
 	   AAA <- tk_choose.dir()
 
-	    if (!is.na(AAA))
-	    {
-	    slot(NEW$Object.job.path,"DirOut") <- AAA
-	    create.directory(AAA,c('UPROC','RDS','HTML','OBJECT'))
-	    }
+	   if (!is.na(AAA))
+	   {
+	   slot(NEW$Object.job.path,"DirOut") <- AAA
+	   create.directory(AAA,c('UPROC','RDS','HTML','OBJECT'))
+	   }
 
 	   else
 	   {
-	   return('fark!')
+    	   return('fark!')
 	   }
 
 	   #Environment$Container.Object.Button
