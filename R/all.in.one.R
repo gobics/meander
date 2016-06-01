@@ -1120,7 +1120,6 @@ ALL.BUTTON.NAMES <- c(
 
 set.objectinput.object <- function(Object)
 {
-  print('wot?')
   slot(slot(Object,"button.input.object"),'interaction.on') <- ALL.BUTTON.NAMES[c(5,6)]
   slot(slot(Object,"button.input.object"),'interaction.off') <- ALL.BUTTON.NAMES[c(1:4,7:14)]
   return(Object)
@@ -1128,7 +1127,6 @@ set.objectinput.object <- function(Object)
 
   set.objectinput.conditions <- function(Object)
 {
-  print('wot?')
   slot(slot(Object,"button.process.conditions"),'interaction.on') <- ALL.BUTTON.NAMES[c(7,9)]
   slot(slot(Object,"button.process.conditions"),'interaction.off') <- ALL.BUTTON.NAMES[c(8,10:14)]
   return(Object)
@@ -1401,9 +1399,7 @@ initialize.Button.Object <- function()
   for (curr.Name in Button.Names)
   {
   slot(slot(Object,curr.Name),'name') <- curr.Name
-
-print(curr.Name)
-
+  
     if (curr.Name == "button.main.saveobject")
     {
 
