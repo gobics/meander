@@ -89,6 +89,7 @@ detect.RNA <- function(Ret,Vec.List,fraglength = 300,nStepsize = 100, repetition
 find.unselected.functions <- function()
 {
 KEGG2PATH.zero = slot(NEW$Object.data.kegg,'KEGG2PATH')  
+Ind <- rowSums(slot(NEW$Object.data.kegg,'br2pathway')[,slot(NEW$Object.job.config,'SelectedBR')]) > 0
 X1 = rowSums(KEGG2PATH.zero[,Ind]) > 0
 X2 = rowSums(KEGG2PATH.zero[,!Ind]) > 0
 
@@ -235,6 +236,8 @@ process.score.dummy <-function()
   .ret <- change.uprocscorethreshold(NEW$Object.job.statistics,NEW$Object.data.dataframes)
   NEW$Object.job.statistics <- .ret[[1]]
 
+  interactive.score()
+  
   .ret <- start.RDS(Object.data.big = NEW$Object.data.big, Object.job.path = NEW$Object.job.path, Object.data.kegg = NEW$Object.data.kegg, Object.job.statistics = NEW$Object.job.statistics, Object.data.refined =  NEW$Object.data.refined, object.save.FLAG = FALSE)
   NEW$Object.data.big <- .ret[[2]];  NEW$Object.job.statistics <- .ret[[1]];  NEW$Object.data.refined <- .ret[[3]]
   return(NULL)
@@ -288,12 +291,12 @@ return(NULL)
 analyse.pathway.dummy <- function()
 {
 #create svg
-  cat('works up to','perform.pathwaydetection','\n', sep = ' ')
+  #find enriched pathways
   NEW$REEEEED <- perform.pathwaydetection(NEW$Object.job.config,NEW$Object.data.kegg,NEW$Object.data.refined)
-  cat('works up to','prepare.svgvectors.colour','\n', sep = ' ')
+  #prepare colors for the function vectors
   NEW$Object.data.refined <- prepare.svgvectors.colour(NEW$Object.data.refined,NEW$Object.data.kegg,NEW$Object.job.config)
   
-  cat('works up to','perform.SVGcreation','\n', sep = ' ')
+  #create SVG pathway map files
   NEW$.df <- perform.SVGcreation(NEW$Object.data.refined,NEW$Object.job.path,NEW$Object.job.config)
 
   .path = file.path(slot(NEW$Object.job.path,'DirOut'),'HTML',slot(NEW$Object.job.config, 'SelectedTax'))
@@ -314,7 +317,9 @@ analyse.pathway.dummy <- function()
   keggmapnames.mod = slot(NEW$Object.data.kegg,'keggmapnames')[Ind]
   KEGG2PATH.mod = slot(NEW$Object.data.kegg,'KEGG2PATH')[,Ind]
   sebastian.rekt.df.mod = sebastian.rekt.df[Ind,]
-  cat('works up to','write.html.files','\n', sep = ' ')
+  
+  find.unselected.functions()
+  
   write.html.files(sebastian.rekt.df.mod,PWTH,keggmapnames.mod,slot(NEW$Object.data.kegg,'pathway.names'),slot(NEW$Object.data.kegg,'ko_desc'),slot(NEW$Object.data.refined,'FlagVec'),perform.pvalcalc(NEW$Object.data.refined),KEGG2PATH.mod,.path)
 #create HTML
   return(NULL)
@@ -1008,10 +1013,7 @@ tcl.Var.Vec <- buttonbuilder.bytemplate(nButtons,template)
 
   rand.dis.shit <- function()
   {
-    for (i in 1:nButtons)
-    {
-    tclvalue(tcl.Var.Vec[[i]]) = sample(0:1,1)
-    }
+    tcl.Var.Vec <- buttonbuilder.bytemplate(nButtons,template)
   }
 
   sub.ok.function <- function()
@@ -1523,17 +1525,18 @@ setMethod ("button.execute", "class.button.process.output",
            function(Object, Environment, x, y){
 	   print('fastanorrna!')
 
+
 	   AAA <- tk_choose.dir()
 
-	   if (!is.na(AAA))
-	   {
-	   slot(NEW$Object.job.path,"DirOut") <- AAA
-	   create.directory(AAA,c('UPROC','RDS','HTML','OBJECT'))
-	   }
+	    if (!is.na(AAA))
+	    {
+	    slot(NEW$Object.job.path,"DirOut") <- AAA
+	    create.directory(AAA,c('UPROC','RDS','HTML','OBJECT'))
+	    }
 
 	   else
 	   {
-    	   return('fark!')
+	   return('fark!')
 	   }
 
 	   #Environment$Container.Object.Button
@@ -1975,7 +1978,7 @@ setMethod ("set.interaction.on", "class.button.input.object",
 setMethod ("set.interaction.on", "class.button.process.output",
            function(Part.Object, Object,x,y){
 		  #check if UProC is even availible...
-		  if (!is.null(._CONFIG$UPROC_DIR) & !is.null(._CONFIG$MODEL_DIR))
+		  if (!is.null(._CONFIG$UPROC_DIR) & !is.null(._CONFIG$MODEL_DIR) & !is.null(._CONFIG$UPROC_DB))
 		  {
 		  slot(slot(Object,x),'interaction.on') <- ALL.BUTTON.NAMES[c(1:5)]
 		  slot(slot(Object,x),'interaction.off') <- ALL.BUTTON.NAMES[c(6:17)]

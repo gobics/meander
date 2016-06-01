@@ -496,7 +496,6 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   nKO = dim(KEGG2Path)[1]
   nPath <- dim(KEGG2Path)[2]
   
-  cat(nKO,nPath,'\n')
   
   ReducedPossibleKO = PossibleKO[PossibleKO <= nKO]
   
@@ -536,7 +535,7 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   
   
   nSig = length(KO.Hits)
-  cat(nSig,.nPossKO,'\n')
+
   #phyper(62-1, 1998, 5260-1998, 131, lower.tail=FALSE)
   .Vals <- unlist(lapply(c(1:nPath), function(x) {
     phyper(SigKOCountVec[x]-1, PossibleKOCountVec[x], .nPossKO-PossibleKOCountVec[x], nSig, lower.tail = FALSE, log.p = FALSE)}))
@@ -555,9 +554,6 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   #cat(.padjVals,'\n')
   .Vec <- sapply(1:nPath, function(x) which(KEGG2Path[,x] == 1))
   .A <- sapply(1:nPath, function(x) length(.Vec[[x]]))
-  
-  print(.Vec[[1]])
-  
   
   .Vec <- sapply(1:nPath, function(x) which(PathMat[,x] == 1))
   .B <- sapply(1:nPath, function(x) length(.Vec[[x]]))
