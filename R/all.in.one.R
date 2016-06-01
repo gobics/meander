@@ -467,10 +467,7 @@ xMove = dim.vec.two[4]
 #calculate child, only require window size so the first two.
 tmp.String <- tclvalue(tkwm.geometry(window.child))
 dim.vec.child <- as.numeric(unlist(regmatches(tmp.String,gregexpr('[0-9]+', tmp.String))))
-  if (inherits())
-  {
-    
-  }
+
 tkwm.geometry(window.child, paste0(dim.vec.child[1],'x',dim.vec.child[2],'+',yMove,'+',xMove))
 }
 
@@ -1123,7 +1120,6 @@ ALL.BUTTON.NAMES <- c(
 
 set.objectinput.object <- function(Object)
 {
-  print('wot?')
   slot(slot(Object,"button.input.object"),'interaction.on') <- ALL.BUTTON.NAMES[c(5,6)]
   slot(slot(Object,"button.input.object"),'interaction.off') <- ALL.BUTTON.NAMES[c(1:4,7:14)]
   return(Object)
@@ -1131,7 +1127,6 @@ set.objectinput.object <- function(Object)
 
   set.objectinput.conditions <- function(Object)
 {
-  print('wot?')
   slot(slot(Object,"button.process.conditions"),'interaction.on') <- ALL.BUTTON.NAMES[c(7,9)]
   slot(slot(Object,"button.process.conditions"),'interaction.off') <- ALL.BUTTON.NAMES[c(8,10:14)]
   return(Object)
@@ -1404,9 +1399,7 @@ initialize.Button.Object <- function()
   for (curr.Name in Button.Names)
   {
   slot(slot(Object,curr.Name),'name') <- curr.Name
-
-print(curr.Name)
-
+  
     if (curr.Name == "button.main.saveobject")
     {
 
@@ -2289,7 +2282,7 @@ name = ttkentry(frame.input)
 
 
 slot(slot(Container.Object.Button,'button.process.output'),'tcldata') = ttkbutton(frame.first, text = '1Output Folder', command = button.dummy.process.output)
-tkgrid(slot(slot(Container.Object.Button,'button.process.output'),'tcldata'), row = 2, column = 0, columnspan = 2, sticky = 'nsew')
+tkgrid(slot(slot(Container.Object.Button,'button.process.output'),'tcldata'), row = 0, column = 0, columnspan = 2, sticky = 'nsew')
 
 
 
@@ -2453,11 +2446,11 @@ tkgrid.rowconfigure( frame.output, 0, weight = 1)
 #	Second Part####################
 
 tkgrid(frame.first, row = 0, column = 0, columnspan = 1, sticky = 'nsew')
-tkgrid(frame.input, row = 0, column = 0, columnspan = 1, sticky = 'nsew')
-tkgrid(frame.process, row = 1, column = 0, columnspan = 1, sticky = 'nsew')
-tkgrid(frame.analyse, row = 2, column = 0, columnspan = 1, sticky = 'nsew')
-tkgrid(frame.output, row = 3, column = 0, columnspan = 1, sticky = 'nsew')
-tkgrid(frame.save, row = 4, column = 0, columnspan = 1, sticky = 'nsew')
+tkgrid(frame.input, row = 1, column = 0, columnspan = 1, sticky = 'nsew')
+tkgrid(frame.process, row = 2, column = 0, columnspan = 1, sticky = 'nsew')
+tkgrid(frame.analyse, row = 3, column = 0, columnspan = 1, sticky = 'nsew')
+tkgrid(frame.output, row = 4, column = 0, columnspan = 1, sticky = 'nsew')
+tkgrid(frame.save, row = 5, column = 0, columnspan = 1, sticky = 'nsew')
 print('do not pack');
 #tkpack(frame.first,frame.input,frame.process,frame.analyse,frame.output,frame.save, expand = 1, fill = 'both')
 return(Container.Object.Button)
