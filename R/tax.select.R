@@ -100,6 +100,8 @@ function( obj.data, obj.refined, obj.config )
 
     set.Content( DATA$tax.Current )
 
+    override.TclVarBlock( main.Window, VARS$tax.Final, TAX_ROOT )
+
     tcl( 'vwait', VARS$tax.Final )
 
     result = tclvalue( VARS$tax.Final )
