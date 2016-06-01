@@ -467,7 +467,10 @@ xMove = dim.vec.two[4]
 #calculate child, only require window size so the first two.
 tmp.String <- tclvalue(tkwm.geometry(window.child))
 dim.vec.child <- as.numeric(unlist(regmatches(tmp.String,gregexpr('[0-9]+', tmp.String))))
-
+  if (inherits())
+  {
+    
+  }
 tkwm.geometry(window.child, paste0(dim.vec.child[1],'x',dim.vec.child[2],'+',yMove,'+',xMove))
 }
 
@@ -2455,8 +2458,8 @@ tkgrid(frame.process, row = 1, column = 0, columnspan = 1, sticky = 'nsew')
 tkgrid(frame.analyse, row = 2, column = 0, columnspan = 1, sticky = 'nsew')
 tkgrid(frame.output, row = 3, column = 0, columnspan = 1, sticky = 'nsew')
 tkgrid(frame.save, row = 4, column = 0, columnspan = 1, sticky = 'nsew')
-
-tkpack(frame.first,frame.input,frame.process,frame.analyse,frame.output,frame.save, expand = 1, fill = 'both')
+print('do not pack');
+#tkpack(frame.first,frame.input,frame.process,frame.analyse,frame.output,frame.save, expand = 1, fill = 'both')
 return(Container.Object.Button)
 }
 
