@@ -37,6 +37,17 @@ get.RdsFileDescriptor <- function(file.name)
     file.path(RDS_PATH, paste(c(file.name, RDS_FILE_EXTENSION), collapse = EXTENSION_SEPERATOR))
 }
 
+override.TclVarBlock =
+function( window, variable, value )
+{
+    tkwm.protocol( 
+        window, 
+        'WM_DELETE_WINDOW',
+        function()
+            tcl( 'set', variable, value )
+        )
+}
+
 # ************************************************************************************************** 
 #   BIT FLAG OPERATIONS
 # ************************************************************************************************** 
