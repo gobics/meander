@@ -38,13 +38,15 @@ get.RdsFileDescriptor <- function(file.name)
 }
 
 override.TclVarBlock =
-function( window, variable, value )
+function( window, variable, value, exitOnClose = FALSE )
 {
     tkwm.protocol( 
         window, 
         'WM_DELETE_WINDOW',
         function()
             tcl( 'set', variable, value )
+            if ( exitOnClose )
+                tkdestroy( window )
         )
 }
 
