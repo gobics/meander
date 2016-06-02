@@ -44,9 +44,11 @@ function( window, variable, value, exitOnClose = FALSE )
         window, 
         'WM_DELETE_WINDOW',
         function()
+        {
             tcl( 'set', variable, value )
             if ( exitOnClose )
                 tkdestroy( window )
+        }
         )
 }
 
