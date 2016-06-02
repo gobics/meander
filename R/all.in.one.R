@@ -503,14 +503,14 @@ E.part <- environment()
 
   button.func.ok <- function()
   {
-  tcltk.variable <- button.ok()
   tkdestroy(frame.window)
+  tcltk.variable <- button.ok()
   }
 
   button.func.cancel <- function()
   {
-  tcltk.variable <- button.cancel()
   tkdestroy(frame.window)
+  tcltk.variable <- button.cancel()
   }
 
 tcltk.variable = tclVar(-1)
@@ -533,7 +533,7 @@ tkgrid(button.message.ok, row = 2, column = 1, columnspan = 1, sticky = 'nsew')
 tkgrid(button.message.cancel, row = 2, column = 2, columnspan = 1, sticky = 'nsew')
 
 
-
+override.TclVarBlock(frame.window,tcltk.variable,'Cancel')
 
 
 tkpack(frame.buttons, expand = 1, fill = 'both')
@@ -542,7 +542,7 @@ tkconfigure(button.message.ok, state = 'disabled')
 
 window.next.to.parent(Environment$ttMain,frame.window)
 
-tkwait.window(frame.window)
+tkwait.variable(tcltk.variable)
 
 
   if (tclvalue(tcltk.variable) == 'OK')
