@@ -41,7 +41,7 @@ input.object.dummy <- function()
   
   if (inherits(Ret2,"numeric"))
   {
-    return(NULL);  
+    return('CANCEL');  
   }
   #set buttons
   
