@@ -233,9 +233,6 @@ input.uproc.dummy <- function()
 
 process.score.dummy <-function()
 {
-  .ret <- change.uprocscorethreshold(NEW$Object.job.statistics,NEW$Object.data.dataframes)
-  NEW$Object.job.statistics <- .ret[[1]]
-
   interactive.score()
   
   .ret <- start.RDS(Object.data.big = NEW$Object.data.big, Object.job.path = NEW$Object.job.path, Object.data.kegg = NEW$Object.data.kegg, Object.job.statistics = NEW$Object.job.statistics, Object.data.refined =  NEW$Object.data.refined, object.save.FLAG = FALSE)
@@ -1038,7 +1035,7 @@ Ret <- checkboxlist.builder(tcl.Var.Vec,br.names,frame.process)
 tcl.Var.Vec[[nButtons+1]] = tclVar(0)
 
 
-override.TclVarBlock(tt.ko2br,tcl.Var.Vec[[nButtons+1]],'CANCEL')
+override.TclVarBlock(tt.ko2br,tcl.Var.Vec[[nButtons+1]],'CANCEL',TRUE)
 
   for (i in 1:length(Ret))
   {
@@ -2472,7 +2469,7 @@ save.object.all <- function(Env)
 
 
 
-main.interface <- function()
+MeandeR.interface <- function()
 {
 #Q <- readRDS('~/projects/meander/new_method.rds')
 
