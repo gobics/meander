@@ -357,7 +357,8 @@ Object.Data.Pathview <- setClass(
     requiredLength = 'numeric',
     Methods  = 'character',  #the (up to 3) used methods
     pValThresh = 'numeric',
-    SelectedBR = 'vector'
+    SelectedBR = 'vector',
+    Version = 'character'
   ),
   # default
   prototype=list(
@@ -368,7 +369,8 @@ Object.Data.Pathview <- setClass(
     requiredLength = 0,
     Methods = character(),
     pValThresh = 0.05,
-    SelectedBR = vector()
+    SelectedBR = vector(),
+    Version = MEANDER_VERSION
   )
 )
 

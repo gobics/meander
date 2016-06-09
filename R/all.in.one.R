@@ -533,7 +533,7 @@ tkgrid(button.message.ok, row = 2, column = 1, columnspan = 1, sticky = 'nsew')
 tkgrid(button.message.cancel, row = 2, column = 2, columnspan = 1, sticky = 'nsew')
 
 
-override.TclVarBlock(frame.window,tcltk.variable,'Cancel')
+override.TclVarBlock(frame.window,tcltk.variable,'Cancel',TRUE)
 
 
 tkpack(frame.buttons, expand = 1, fill = 'both')
