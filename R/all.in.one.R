@@ -253,7 +253,7 @@ analyse.methods.dummy <- function()
   set.seed(12345)
   .X <- start.consensus(NEW$Object.data.big, NEW$Object.job.config)
   NEW$Object.data.refined <- setInputdata(NEW$Object.data.refined,'ConsensusMat',.X)
-  .ret <- perform.consensusselecion(Type = 'Consensus', O.Job.Config = NEW$Object.job.config, O.DATA.Refined = NEW$Object.data.refined)
+  .ret <- perform.consensusselecion(Type = ._CONFIG$CONSENSUS, O.Job.Config = NEW$Object.job.config, O.DATA.Refined = NEW$Object.data.refined)
   NEW$Object.data.refined <- .ret
   NEW$Object.data.refined <- prepare.svgvectors.colour(NEW$Object.data.refined,NEW$Object.data.kegg,NEW$Object.job.config)
   return(NULL)
@@ -2218,6 +2218,10 @@ window.center(NEW$ttMain)
 Obj <- spawn.buttons(NEW$ttMain)
 Obj <- check.state(Obj,slotNames(Obj))
 NEW$Container.Object.Button <- Obj
+
+tkgrid.columnconfigure(NEW$ttMain, 0, weight=1)
+tkgrid.rowconfigure(NEW$ttMain, 0, weight=1)
+
 }
 
 
@@ -2264,15 +2268,15 @@ return(as.character(tkmessageBox(message = the.message, detail = the.details, ty
 spawn.buttons <- function(parent)
 {
 Container.Object.Button <- initialize.Button.Object()
-frame.first <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10, relief = 'ridge', width = 200, height = 100)
-frame.input <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10, relief = 'ridge', width = 200, height = 100)
-frame.process <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10, relief = 'groove', width = 200, height = 100)
-frame.analyse <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10, relief = 'groove', width = 200, height = 100)
-frame.output <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10, relief = 'groove', width = 200, height = 100)
-frame.save <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10, relief = 'groove', width = 200, height = 100)
+frame.first <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10, width = 200, height = 100)
+frame.input <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10,  width = 200, height = 100)
+frame.process <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10,  width = 200, height = 100)
+frame.analyse <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10,  width = 200, height = 100)
+frame.output <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10,  width = 200, height = 100)
+frame.save <- ttkframe(parent, padding = c(1,2,4,8), borderwidth = 10, width = 200, height = 100)
 
 
-namelbl <- ttklabel(frame.input, text = 'NAAAAAAAME')
+namelbl <- ttklabel(parent, text = 'NAAAAAAAME')
 name = ttkentry(frame.input)
 
 
@@ -2280,8 +2284,10 @@ name = ttkentry(frame.input)
 #	#########################BUTTONS################################
 
 
+general.label = tklabel(frame.first, text = "General Settings" ,background ='#9080F0' ,foreground = '#0ffff0')
 slot(slot(Container.Object.Button,'button.process.output'),'tcldata') = ttkbutton(frame.first, text = '1Output Folder', command = button.dummy.process.output)
-tkgrid(slot(slot(Container.Object.Button,'button.process.output'),'tcldata'), row = 0, column = 0, columnspan = 2, sticky = 'nsew')
+tkgrid(general.label, row = 0, column = 0, columnspan = 2, sticky = 'nsew')
+tkgrid(slot(slot(Container.Object.Button,'button.process.output'),'tcldata'), row = 1, column = 0, columnspan = 1, sticky = 'nsew')
 
 
 
@@ -2419,6 +2425,17 @@ tkgrid(slot(slot(Container.Object.Button,'button.main.quit'),'tcldata'), row = 0
 
 #			BUTTONS########################################
 
+
+#	Second Part####################
+
+tkgrid(frame.first, row = 0, column = 0, columnspan = 1, sticky = 'nsew')
+tkgrid(frame.input, row = 1, column = 0, columnspan = 1, sticky = 'nsew')
+tkgrid(frame.process, row = 2, column = 0, columnspan = 1, sticky = 'nsew')
+tkgrid(frame.analyse, row = 3, column = 0, columnspan = 1, sticky = 'nsew')
+tkgrid(frame.output, row = 4, column = 0, columnspan = 1, sticky = 'nsew')
+tkgrid(frame.save, row = 5, column = 0, columnspan = 1, sticky = 'nsew')
+
+
 tkgrid.columnconfigure( frame.first, 0, weight = 1 )
 tkgrid.columnconfigure( frame.first, 1, weight = 1 )
 
@@ -2442,14 +2459,11 @@ tkgrid.rowconfigure( frame.analyse, 0, weight = 1)
 tkgrid.columnconfigure( frame.output, 0, weight = 1 )
 tkgrid.columnconfigure( frame.output, 1, weight = 1 )
 tkgrid.rowconfigure( frame.output, 0, weight = 1)
-#	Second Part####################
 
-tkgrid(frame.first, row = 0, column = 0, columnspan = 1, sticky = 'nsew')
-tkgrid(frame.input, row = 1, column = 0, columnspan = 1, sticky = 'nsew')
-tkgrid(frame.process, row = 2, column = 0, columnspan = 1, sticky = 'nsew')
-tkgrid(frame.analyse, row = 3, column = 0, columnspan = 1, sticky = 'nsew')
-tkgrid(frame.output, row = 4, column = 0, columnspan = 1, sticky = 'nsew')
-tkgrid(frame.save, row = 5, column = 0, columnspan = 1, sticky = 'nsew')
+
+tkgrid.columnconfigure( frame.save, 0, weight = 1 )
+tkgrid.rowconfigure( frame.save, 0, weight = 1)
+
 print('do not pack');
 #tkpack(frame.first,frame.input,frame.process,frame.analyse,frame.output,frame.save, expand = 1, fill = 'both')
 return(Container.Object.Button)
@@ -2541,6 +2555,9 @@ window.center(ttMain)
 
 
 NEW$Container.Object.Button <- spawn.buttons(NEW$ttMain)
+
+tkgrid.columnconfigure(NEW$ttMain, 0, weight=1)
+tkgrid.rowconfigure(NEW$ttMain, 0, weight=1)
 
 #set buttons to initial setting
 Container.Object.Button <- check.state(Container.Object.Button,slotNames(Container.Object.Button))
