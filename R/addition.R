@@ -232,6 +232,7 @@ interactive.score <- function()
     
     scale.ok.function <- function()
     {
+      val <- as.numeric(tclvalue(charalpha))
       if (scale.valid_input())
       {
         slot(NEW$Object.job.statistics,'FilteringScore') <- val
@@ -276,5 +277,6 @@ interactive.score <- function()
     tkbind(ed, "<Return>", scale.valid_input) 
     #linux for numpad enter... hope this doesn't cause trouble in windows...
     tkbind(ed, "<KP_Enter>", scale.valid_input) 
+    tkwait.window(tt)
   }
 }

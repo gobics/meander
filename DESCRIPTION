@@ -10,4 +10,4 @@ License: AGPL (>= 3) | file LICENCE
 LazyData: FALSE
 Imports:stats, data.table
 Depends: R (>= 3.0.0), stats, data.table, samr, DESeq2, ggplot2, grid, gridExtra, tcltk
-Collate: globals.R auxiliary.R init.R object.R S4.R checks.R static.R SVG.R core.R error.R export.R fileinput.R graphics.R install.R interactive.R methods.R object.modifications.R ouput.R perform.processing.R phyloforest.R plot.methods.R priorities.R set.R steps.R tax.select.R test.R all.in.one.R addition.R
+Collate: globals.R auxiliary.R init.R object.R S4.R checks.R static.R SVG.R core.R error.R export.R fileinput.R graphics.R install.R interactive.R methods.R object.modifications.R ouput.R perform.processing.R phyloforest.R plot.methods.R priorities.R set.R steps.R tax.select.R all.in.one.R addition.R interactive.general.settings.R
