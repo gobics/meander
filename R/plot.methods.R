@@ -476,10 +476,17 @@ ko2br.path.counts <- function(O.job.config,O.data.kegg,O.data.refined)
   
   dims <- dim(slot(OJ,'Matrix'))
   
-
+    if (slot(O.job.config,'SelectedTax') != -1)
+    {
+      Allowed.KO <- slot(O.data.kegg,'KOinTax')[[as.character(slot(O.job.config,'SelectedTax'))]]
+    }
+    
+    else
+    {
+      Allowed.KO <- 1:dim(slot(O.data.kegg,'KEGG2PATH'))[1]
+    }
   
   
-  Allowed.KO <- slot(O.data.kegg,'KOinTax')[[as.character(slot(O.job.config,'SelectedTax'))]]
   
 
   print('qq')

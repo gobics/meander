@@ -68,16 +68,16 @@ check_RLSQ <- function()
 }
 
 # check.uprocversion('/home/hklingen/Tool/uproc-1.1.2_sl/uproc-dna -v')
-check.uprocversion <- function(Command,ObjectPart)
+check.uprocversion <- function(Command)
 {
   #checks if the version of UProc is the correct one
   #works on linux and windows
   .Q <- system(Command,intern=TRUE)
   if (.Q[2] == "uproc tax")
   {
-    return(OK())
+    return(TRUE)
   }
-  return(BAD())
+  return(FALSE)
 }
 
 check.input <- function(SelectedType,PartObject,filepaths)
@@ -185,6 +185,25 @@ check.testforpackage <- function(test.package,LOAD.FLAG)
     
   }
   return(FALSE)
+}
+
+uproc.working.check <- function(uproc)
+{
+  Result = c ("1,X1,199,66,1,1,66,K00099,8.749,980,0",      "2,X2,199,66,3,3,66,K00099,9.927,1032,5",
+              "3,X3,199,66,2,2,66,K00099,10.055,980,6",     "4,X4,199,66,1,1,66,K00099,9.551,980,8",     
+              "5,X5,199,65,3,3,65,K00099,9.798,1032,4",     "6,X6,199,66,2,2,66,K00099,10.394,980,6",    
+              "7,X7,237,78,1,1,78,K00099,11.023,980,4",     "8,y1,199,66,1,1,66,K00991,7.072,2197,0",    
+              "9,y2,199,65,3,3,65,K00991,9.355,980,2",      "10,y3,199,66,2,2,66,K00991,9.142,509,2",    
+              "11,y4,312,103,1,1,103,K00991,15.376,2197,2")
+  .Q <- system('/home/hklingen/uproc-tx/uproc-dna -f -s -p /scratch/KEGG_2014-08_full_uproc_2/ /home/hklingen/DB/PFAM/Comet/model/model /scratch/transcriptome/small/reduced_100.fa',intern=TRUE)
+  
+  if (sum(.Q[3:13] == Result) == length(Result))
+  {
+    return(TRUE)
+  }
+#reset config to NULL
+return(FALSE)
+  
 }
 
 

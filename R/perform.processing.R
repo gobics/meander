@@ -477,7 +477,17 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   ALLKO.Hits <- which(rowSums(slot(O.Data.Refined,'Matrix')) > 5)
     #NAME.getData(Object = Object, LEVEL1 = 'Results', LEVEL2 = 'Consensus',LEVEL3 = 'KOwithHits')
   
-  PossibleKO = slot(O.Data.Kegg,'KOinTax')[[TaxID]]
+  if (slot(O.Job.Config,'SelectedTax') != -1)
+  {
+    PossibleKO = slot(O.Data.Kegg,'KOinTax')[[TaxID]]
+  }
+  
+  else
+  {
+    PossibleKO = 1:length(slot(O.Data.Kegg,'ko_desc'))
+  }
+  
+  
   #PossibleKO = NAME.getData(Object = Object, LEVEL1 = 'Parameter', LEVEL2 = 'Output',LEVEL3 = 'KOinTax')[[TaxID]]
   
   
@@ -631,7 +641,16 @@ prepare.svgvectors.colour <- function(O.data.refined, O.data.kegg, O.job.config)
 {
   .Tax <- slot(O.job.config,'SelectedTax')
   .Sig.Ko <- slot(O.data.refined,'ConsensusVec')
-  .AllowedKO <- slot(O.data.kegg,'KOinTax')[[as.character(.Tax)]]
+    if (.Tax != -1)
+    {
+      .AllowedKO <- slot(O.data.kegg,'KOinTax')[[as.character(.Tax)]]
+    }
+  
+    else
+    {
+      .AllowedKO <- 1:length(slot(O.data.kegg,'ko_desc'))
+    }
+  
   
   
   
@@ -687,8 +706,22 @@ prepare.svgvectors.colour <- function(O.data.refined, O.data.kegg, O.job.config)
 
 perform.pvalcalc <- function(O.data.refined)
 {
-.pMat <- slot(O.data.refined,'ConsensusMat')
-.p.Val <- sapply(1:dim(.pMat)[1], function(x) median(.pMat[x,]))
+.pMat <- slot(O.data.refined,'ConsensusMat')  
+  if (._CONFIG$CONSENSUS == 'all')
+  {
+    .p.Val <- sapply(1:dim(.pMat)[1], function(x) max(.pMat[x,]))
+  }
+  
+  else if (._CONFIG$CONSENSUS == 'Consensus')
+  {
+  .p.Val <- sapply(1:dim(.pMat)[1], function(x) median(.pMat[x,]))
+  }
+  
+  else
+  {
+    .p.Val <- .pMat[,which(slot(NEW$Object.job.config,'Methods') == "samr")]
+  }
+
 return(.p.Val)
 }
 

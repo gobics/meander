@@ -2,88 +2,56 @@
 
 
 
-#Find out if RNA is something...
-#Vec.List <- our 16 and 28 rrna
-detect.RNA <- function(Ret,Vec.List,fraglength = 300,nStepsize = 100, repetitions = 1,MinVec = c(2,2), MaxVec = c(5,7))
+
+rlsq_get.Scores <- function(Ret,rRNA.List)
 {
-
-  QQQQ <- c()
-
-    nRet.seqlength = width(Ret)
-    nRet.length = length(Ret)
-
-  minMax.LengthVec <- seq(min(nRet.seqlength),max(nRet.seqlength)+nStepsize,100)
-  IOrder <- order(nRet.seqlength)
-
-  reordered.Seqlength <- nRet.seqlength[IOrder]
-
   TransLateVec = c();
   TransLateVec[as.integer(charToRaw('aAcCtTgGuU'))] = c(0,0,1,1,2,2,3,3,2,2);
+  V <- TransLateVec[as.integer(charToRaw(paste0(as.character(Ret),collapse='')))]
+  
+  tmp.SeqLength = nchar(Ret)
+  test.start = c(1,cumsum(tmp.SeqLength)+1)
+  test.start <- test.start[1:(length(test.start)-1)]
+  test.end <- cumsum(tmp.SeqLength)
+  #16S
+  Scores <- .Call("rlsq_classify", as.integer(V), test.start-1, test.end-1, as.integer(tmp.SeqLength), rRNA.List[[1]][1:(length(rRNA.List[[1]])-1)], rRNA.List[[1]][length(rRNA.List[[1]])], 2, 7)
+  #23S
+  Scores2 <- .Call("rlsq_classify", as.integer(V), test.start-1, test.end-1, as.integer(tmp.SeqLength), rRNA.List[[2]][1:(length(rRNA.List[[2]])-1)], rRNA.List[[2]][length(rRNA.List[[2]])], 2, 7)
+  
+  
+  Ix <- Scores > 0 | Scores2 > 0
+  
+  return(Ix)
+}
 
-  AllRNA <- vector(mode = 'numeric', length = nRet.length)
-  AllScores.List <- list();
 
-  for (k in 1:length(MinVec))
-  {
-
-    AllScores <- c()
-
-      for (i in 1:(length(minMax.LengthVec)-1))
-      {
-
-    if (is.null(fraglength))
+#Find out if RNA is something...
+#Vec.List <- our 16 and 28 rrna
+detect.RNA <- function(myFASTA)
+{
+  require('Biostrings')
+  rRNA.List <- readRDS(file.path(DATA_PATH,'rRNA.Rds'))
+  nSeq = 100000;
+  myFASTA = '/home/hklingen/arb/SSU_16S.fasta'
+  
+  nSkip = 0
+  
+  AllRNA <- c()
+  
+  Ret <- readBStringSet(myFASTA, format="fasta", nrec=nSeq, skip=nSkip, use.names=FALSE);
+  X <- rlsq_get.Scores(Ret,rRNA.List)
+  RNA <- which(X)-1
+  AllRNA <- c(AllRNA,RNA)
+    while(length(Ret) == nSeq)
     {
-      V <- TransLateVec[as.integer(charToRaw(paste0(as.character(Ret),collapse='')))]
-
-      tmp.SeqLength = nRet.seqlength
-      test.start = c(1,cumsum(tmp.SeqLength)+1)
-      test.start <- test.start[1:(length(test.start)-1)]
-      test.end <- cumsum(tmp.SeqLength)
-
-      Scores <- .Call("rlsq_classify", PACKAGE = 'RLSQ', as.integer(V), test.start-1, test.end-1, as.integer(tmp.SeqLength), Vec.List[[k]][1:(length(Vec.List[[k]])-1)], Vec.List[[k]][length(Vec.List[[k]])], MinVec[k], MaxVec[k])
-      AllScores <- c(AllScores,Scores)
-      AllRNA = AllRNA + (Scores > 0)
+      nSkip = nSkip + nSeq
+      Ret <- readBStringSet(myFASTA, format="fasta", nrec=nSeq, skip=nSkip, use.names=FALSE);
+      X <- rlsq_get.Scores(Ret,rRNA.List)
+      RNA <- nSkip+which(X)
+      RNA <- RNA - 1
+      AllRNA <- c(AllRNA,RNA)
     }
-
-    else
-    {
-
-        if (fraglength > minMax.LengthVec[i])
-        {
-          fraglength = minMax.LengthVec[i]-1
-        }
-
-        Ind <- reordered.Seqlength >= minMax.LengthVec[i] & reordered.Seqlength < minMax.LengthVec[i+1]
-        Ord.Ind <- IOrder[Ind]
-        RNA.Vec <- vector(mode = 'numeric', length = sum(Ind))
-  if (sum(Ind) > 0)
-  {
-        for (j in 1:repetitions)
-        {
-          y = sample(minMax.LengthVec[i]-fraglength,1)
-          cat(fraglength,'\t',y,'\n')
-          Ret.Part <- subseq(Ret[Ord.Ind],y,y+fraglength-1)
-          V <- TransLateVec[as.integer(charToRaw(paste0(as.character(Ret.Part),collapse='')))]
-
-                    nFrags = sum(Ind);
-          tmp.SeqLength = rep(fraglength,nFrags)
-          test.start = c(1,cumsum(tmp.SeqLength)+1)
-          test.start <- test.start[1:(length(test.start)-1)]
-          test.end <- cumsum(tmp.SeqLength)
-          Scores <- .Call("rlsq_classify", PACKAGE = 'RLSQ', as.integer(V), test.start-1, test.end-1, as.integer(tmp.SeqLength), Vec.List[[k]][1:(length(Vec.List[[k]])-1)], Vec.List[[k]][length(Vec.List[[k]])], MinVec[k], MaxVec[k])
-          AllScores <- c(AllScores,Scores)
-          IX <- which(Scores > 0)
-          AllRNA[Ord.Ind[IX]] = AllRNA[Ord.Ind[IX]] + 1
-          QQQQ <- c(QQQQ,Ord.Ind)
-        }
-  }
-
-    }
-    }
-
-    AllScores.List[[k]] <-  AllScores
-  }
-  return(list(AllScores.List,AllRNA,QQQQ))
+return(AllRNA)
 }
 
 find.unselected.functions <- function()
@@ -171,9 +139,18 @@ return(A)
 }
 
 #Button function\
+
+save.object.dummy <- function()
+{
+  save.object.all(NEW)
+}
+
+
 process.taxonomy.dummy <- function()
 {
 slot(NEW$Object.job.config,'SelectedTax') <- as.numeric(tax.Select(obj.data= NEW$Object.data.big, obj.refined= NEW$Object.data.refined, obj.config= NEW$Object.job.config))
+tkconfigure(widget = slot(slot(NEW$Container.Object.Button,'button.main.saveobject'),'tcldata'), state = 'enabled')
+slot(slot(NEW$Container.Object.Button,'button.main.saveobject'), 'state') <- TRUE
 return(NULL)
 }
 
@@ -1141,12 +1118,12 @@ swtich.function <- function(Object,Part.Object)
 #turn on
       if (curr.Name %in% Switch.on.Vec)
       {
-      slot(slot(Object,curr.Name), 'state') <- TRUE
+        slot(slot(Object,curr.Name), 'state') <- TRUE
       }
 	  #turn off
       else if (curr.Name %in% Switch.off.Vec)
       {
-      slot(slot(Object,curr.Name), 'state') <- FALSE
+        slot(slot(Object,curr.Name), 'state') <- FALSE
       }
     }
 return(Object)
@@ -1344,35 +1321,45 @@ BUTTONS.ON.OFF <- function(Object.Part, Environment, x, y)
            Button.Names <- slotNames(Object.Copy)
 
 
+           All.Off <- Object.Copy
 
 	    for (curr.Name in Button.Names)
 	    {
-	    tkconfigure(widget = slot(slot(Object.Copy,curr.Name),'tcldata'), state = 'disabled')
+	    tkconfigure(widget = slot(slot(All.Off,curr.Name),'tcldata'), state = 'disabled')
 	    }
-	   tkconfigure(widget = slot(slot(Object.Copy,'button.main.quit'),'tcldata'), state = 'disabled')
+	   tkconfigure(widget = slot(slot(All.Off,'button.main.quit'),'tcldata'), state = 'disabled')
 
-           Environment$Container.Object.Button <- Object.Copy
-
-
-
+           Environment$Container.Object.Button <- All.Off
            #do something based on object class
-
            tcltk.variable = tclVar(-1)
-
            ret <- button.execute(Object.Part, Environment, Environment$ttMain, tcltk.variable)
-
+           #keep parts of the data...
+           ButtonZ <- c('button.main.saveobject', 'button.main.ok', 'button.main.reset', 'button.main.quit')
+            for (i in 1:4)
+            {
+              slot(slot(Object.Copy,ButtonZ[i]),'state') <- slot(slot(Environment$Container.Object.Button,ButtonZ[i]),'state')
+            }
+           
            #apply changes to following buttons
            #Object.Copy <- set.condition.object(Object.Copy)
 	    if (ret == 'OK')
 	    {
-	    Object.Copy <- set.interaction.on(slot(Object.Copy,slot(Object.Part,'name')),Object.Copy,slot(Object.Part,'name'),NULL)
-	    Object.Copy <- button.set.states(Object.Part,Object.Copy,NULL,NULL)
+	      Object.Copy <- set.interaction.on(slot(Object.Copy,slot(Object.Part,'name')),Object.Copy,slot(Object.Part,'name'),NULL)
+	      Object.Copy <- button.set.states(Object.Part,Object.Copy,NULL,NULL)
+	      Object.Copy <- check.state(Object.Copy,Button.Names)
+	      
+	      Environment$Container.Object.Button <- Object.Copy
 	    }
 
 	    else
 	    {
 	    print('problem123')
 	    #Object.Copy <- button.set.states(Object.Part,Object.Copy,NULL,NULL)
+  	  Object.Copy <- check.state(Object.Copy,Button.Names)
+  
+  	  tkconfigure(widget = slot(slot(Object.Copy,'button.main.quit'),'tcldata'), state = 'enabled')
+  	  tkconfigure(widget = slot(slot(Object.Copy,'button.main.reset'),'tcldata'), state = 'enabled')
+  	  Environment$Container.Object.Button <- Object.Copy	      
 	    }
 
 
@@ -1380,11 +1367,6 @@ BUTTONS.ON.OFF <- function(Object.Part, Environment, x, y)
 
            #set old values with change based on button
 
-	   Object.Copy <- check.state(Object.Copy,Button.Names)
-
-	   tkconfigure(widget = slot(slot(Object.Copy,'button.main.quit'),'tcldata'), state = 'enabled')
-	   tkconfigure(widget = slot(slot(Object.Copy,'button.main.reset'),'tcldata'), state = 'enabled')
-	   Environment$Container.Object.Button <- Object.Copy
 
 }
 
@@ -1732,6 +1714,7 @@ setMethod ("button.execute", "class.button.output.csv",
 	   print('button.output.csv!')
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
+     save.figures()
 	   print('done waiting...')
 	   return(y)
            })
@@ -2022,15 +2005,15 @@ setMethod ("set.interaction.on", "class.button.process.taxonomy",
 
 setMethod ("set.interaction.on", "class.button.analyse.methods",
            function(Part.Object, Object,x,y){
-	    slot(slot(Object,x),'interaction.on') <- ALL.BUTTON.NAMES[c(10:14)]
-	    slot(slot(Object,x),'interaction.off') <- ALL.BUTTON.NAMES[c(15:17)]
+	    slot(slot(Object,x),'interaction.on') <- ALL.BUTTON.NAMES[c(10:14,17)]
+	    slot(slot(Object,x),'interaction.off') <- ALL.BUTTON.NAMES[c(15)]
 	   return(Object)
            })
 
 setMethod ("set.interaction.on", "class.button.analyse.pca",
            function(Part.Object, Object,x,y){
 	    slot(slot(Object,x),'interaction.on') <- ALL.BUTTON.NAMES[c(17)]
-	    #slot(slot(Object,x),'interaction.off') <- ALL.BUTTON.NAMES[c(2,3,4)]
+	    slot(slot(Object,x),'interaction.off') <- ALL.BUTTON.NAMES[c(15)]
 	   return(Object)
            })
 
@@ -2038,7 +2021,7 @@ setMethod ("set.interaction.on", "class.button.analyse.pca",
 setMethod ("set.interaction.on", "class.button.analyse.br",
            function(Part.Object, Object,x,y){
 	    slot(slot(Object,x),'interaction.on') <- ALL.BUTTON.NAMES[c(17)]
-	    #slot(slot(Object,x),'interaction.off') <- ALL.BUTTON.NAMES[c(2,3,4)]
+	    slot(slot(Object,x),'interaction.off') <- ALL.BUTTON.NAMES[c(15)]
 	   return(Object)
            })
 
@@ -2390,8 +2373,8 @@ output.sep.horizontal = ttkseparator(frame.output, orient= 'horizontal')
 # buttons
 
 slot(slot(Container.Object.Button,'button.output.svghtml'),'tcldata') = ttkbutton(frame.output, text = '15SVG/HTML', command = button.dummy.output.svghtml)
-slot(slot(Container.Object.Button,'button.output.csv'),'tcldata') = ttkbutton(frame.output, text = '16CSV', command = emptyfunction)
-slot(slot(Container.Object.Button,'button.output.figures'),'tcldata') = ttkbutton(frame.output, text = '17figures', command = emptyfunction)
+slot(slot(Container.Object.Button,'button.output.csv'),'tcldata') = ttkbutton(frame.output, text = '16CSV', command = export.csv)
+slot(slot(Container.Object.Button,'button.output.figures'),'tcldata') = ttkbutton(frame.output, text = '17figures', command = save.figures)
 
 
 # layput
@@ -2409,7 +2392,7 @@ tkgrid(slot(slot(Container.Object.Button,'button.output.figures'),'tcldata'), ro
 # sep
 
 # buttons
-slot(slot(Container.Object.Button,'button.main.saveobject'),'tcldata') = ttkbutton(frame.save, text = '19save Object', command = emptyfunction)
+slot(slot(Container.Object.Button,'button.main.saveobject'),'tcldata') = ttkbutton(frame.save, text = '19save Object', command = save.object.dummy)
 slot(slot(Container.Object.Button,'button.main.reset'),'tcldata') = ttkbutton(frame.save, text = '18Reset', command = reset.function)
 slot(slot(Container.Object.Button,'button.main.ok'),'tcldata') = ttkbutton(frame.save, text = '20OK', command = ok.function)
 slot(slot(Container.Object.Button,'button.main.quit'),'tcldata') = ttkbutton(frame.save, text = '21cancel', command = cancel.function)
@@ -2471,14 +2454,18 @@ return(Container.Object.Button)
 
 save.object.all <- function(Env)
 {
-  slot(slot(Env$Object.Final,'Job'),'Paths') = Object.job.path
-  slot(slot(Env$Object.Final,'Job'),'Config') = Object.job.config
-  slot(slot(Env$Object.Final,'Job'),'Statistics') = Object.job.statistics
+  slot(slot(Env$Object.Final,'Job'),'Paths') = NEW$Object.job.path
+  slot(slot(Env$Object.Final,'Job'),'Config') = NEW$Object.job.config
+  slot(slot(Env$Object.Final,'Job'),'Statistics') = NEW$Object.job.statistics
 
-  slot(slot(Env$Object.Final,'DATA'),'BIG') = Object.data.big
-  slot(slot(Env$Object.Final,'DATA'),'KEGG') = Object.data.kegg
-  slot(slot(Env$Object.Final,'DATA'),'Refined') = Object.data.refined
-  slot(slot(Env$Object.Final,'DATA'),'DataFrames') =  Object.data.dataframes
+  slot(slot(Env$Object.Final,'DATA'),'BIG') = NEW$Object.data.big
+  slot(slot(Env$Object.Final,'DATA'),'KEGG') = NEW$Object.data.kegg
+  slot(slot(Env$Object.Final,'DATA'),'Refined') = NEW$Object.data.refined
+  slot(slot(Env$Object.Final,'DATA'),'DataFrames') =  NEW$Object.data.dataframes
+  
+  full.store.path = file.path(slot(NEW$Object.job.path,'DirOut'),'OBJECT','MeandeR_Object.MeandeR')
+  
+  saveRDS(object = Env$Object.Final, file = full.store.path)
 }
 
 

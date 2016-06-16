@@ -20,9 +20,7 @@ Object.job.path <- setInputdata(Object.job.path,FILETYPE.DNAwoRNA,.Allfiles)
   {
     #remove RNA
     cat("remove RNA","\n")
-    
-    .ret <- .dummy.RNA(.Allfiles[i])
-    print(.ret)
+    .ret <- detect.RNA(.Allfiles[i])
     cat("save Vec","\n") 
     Object.data.big <- appendInputdata(Object.data.big,'SeqRNA',list(.ret))
     Object.job.statistics <- appendInputdata(Object.job.statistics,'RNA',length(.ret))
