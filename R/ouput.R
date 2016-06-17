@@ -331,13 +331,14 @@ write.ColorKey.HTML = function (output.Dir, conditions)
     output.File = file.path(output.Dir, HTML_OUTPUT_SUBDIR, 'COLOR_KEY.html')
     table.FormatString = readLines(file.path(HTML_TEMPLATE_PATH, 'key_table.fmt'))
     row.FormatString = readLines(file.path(HTML_TEMPLATE_PATH, 'key_row.fmt'))
+    cond.FormatString = readLines(file.path(HTML_TEMPLATE_PATH, 'cond_row.fmt'))
 
     DESCRIPTION = matrix(
         c(
             ORTHOLOG_COLORS[16], 'Significant upregulated', ORTHOLOG_COLORS[3], 'Hit but should not',
             ORTHOLOG_COLORS[12], 'Significant downregulated', ORTHOLOG_COLORS[2], 'No Hit but should',
             ORTHOLOG_COLORS[8], 'Upregulated', ORTHOLOG_COLORS[1], 'No Hit and should not',
-            ORTHOLOG_COLORS[4], 'Downregulated', '', bindStrings( conditions[1], " vs ", conditions[2] )
+            ORTHOLOG_COLORS[4], 'Downregulated', '', ''
             ),
         byrow = TRUE,
         ncol = 4    
@@ -355,8 +356,11 @@ write.ColorKey.HTML = function (output.Dir, conditions)
         collapse = '\n'         
         )
 
+    cond = sprintf( cond.FormatString, conditions[1], conditions[2] )
+        
+
     cat(
-        sprintf(table.FormatString, rows),
+        sprintf(table.FormatString, rows, cond),
         file = output.File
         )
 }
