@@ -25,8 +25,6 @@ HELP.DIR = file.path(system.file(package=getPackageName()))
 
 HELP.FILE.INTERFACE = file.path(HELP.DIR,'MeandeR_help.html')
 
-
-
 DATA_DIR_NAME = 'data'
 DATA_PATH = file.path(system.file(package=getPackageName()), DATA_DIR_NAME)
 
@@ -71,7 +69,7 @@ NEW_FRAME = '_blank'
 
 OVERVIEW_TITLE = 'ALL_PATHWAYS'
 
-TAX_SELECT_HELP_FILE = file.path( system.file( package = getPackageName() ), 'tax_select_help.txt' )
+TAX_SELECT_HELP_FILE = file.path(HELP.DIR,'taxselection.html')
 # ******************************************************************************
 # > END     :   FILE CONSTANTS
 # ******************************************************************************

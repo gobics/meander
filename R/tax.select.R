@@ -396,7 +396,7 @@ function(parent)
     # Help
     help.ButtonHandler = function()
     {
-        display.Help( TAX_SELECT_HELP_FILE )
+        browseURL( TAX_SELECT_HELP_FILE )
     }
     tkgrid(
         tkbutton( frame, text = 'Help', width = BUTTON_WIDTH, font = FONT_BUTTON, command = help.ButtonHandler ),
@@ -594,60 +594,6 @@ function(parent, cond)
     ELES$pie.Canvas[[ cond ]] = tkcanvas( frame, width = DIAMETER_LARGE + 2 * HALO_WIDTH, height = DIAMETER_LARGE + 2 * HALO_WIDTH )
     
     tkpack( ELES$pie.Canvas[[ cond ]] )
-}
-
-display.Help = 
-function( fileName )
-{
-    help.Window = tktoplevel()
-
-    main.Frame = tkframe( help.Window )
-
-    text.Pane = tktext(
-        main.Frame,
-        font = 'verdana',
-        width = 50,
-        height = 20,
-        relief = 'sunken',
-        borderwidth = 3,
-        background = '#E0E0E0',
-        yscrollcommand = function( ... ) tkset( ELES$scroll.Bar, ... ) 
-        )
-
-    fileCon = file( fileName )
-    for ( line in readLines( fileCon ) )
-    {
-        tkinsert( text.Pane, 'end', line )
-        tkinsert( text.Pane, 'end', '\n' )
-    }
-    close.connection(fileCon)
-
-    tkconfigure( text.Pane, state = 'disabled' )
-
-    ELES$scroll.Bar = ttkscrollbar(
-        main.Frame, 
-        orient = 'vertical',
-        command = function( ... ) tkyview( text.Pane, ... )
-        )
-
-    tkgrid( text.Pane, sticky = 'nsew' )
-    tkgrid( ELES$scroll.Bar, row = 0, column = 1, sticky = 'nsew' )
-
-    tkgrid.rowconfigure( main.Frame, 0, weight = 1 )
-    tkgrid.columnconfigure( main.Frame, 0, weight = 1 )
-
-    ok.Button = tkbutton(
-        help.Window,
-        text = 'OK',
-        font = 'verdana',
-        command = function() tkdestroy( help.Window )
-    )
-
-    tkgrid( main.Frame, sticky = 'nsew', padx = 10, pady = 10 ) 
-    tkgrid( ok.Button, pady = 20 ) 
-
-    tkgrid.rowconfigure( help.Window, 0, weight = 1 )
-    tkgrid.columnconfigure( help.Window, 0, weight = 1 )
 }
 
 #=================================================================================================== 
