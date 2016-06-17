@@ -15,7 +15,9 @@ start.DNA <- function(Object.job.path,Object.data.big,Object.job.statistics,obje
   cat("write DNA to DNAnoRNA","\n")
   
 Object.job.path <- setInputdata(Object.job.path,FILETYPE.DNAwoRNA,.Allfiles)
-  
+Object.data.big <- setInputdata(Object.data.big,'SeqRNA',list())
+Object.job.statistics <- setInputdata(Object.job.statistics,'RNA',0)
+
   for (i in 1:.nAllFiles)
   {
     #remove RNA
@@ -51,6 +53,8 @@ start.DNAnoRNA <- function(Object.job.path, object.save.FLAG)
   .UProCmodel = '/home/hklingen/DB/PFAM/Comet/model/model '
   .UProCDB = ' /scratch/KEGG_2014-08_full_uproc_2 '
   
+  
+  Object.job.path <- setInputdata(Object.job.path,FILETYPE.UproC,vector())
   
   .UPROCbin = paste0(' ',._CONFIG$UPROC_DIR,' ', sep ='')
   .UProCmodel = paste0(' ',._CONFIG$MODEL_DIR,' ', sep ='')
@@ -172,6 +176,11 @@ start.UProC <- function(Object.job.path,Object.job.statistics,Object.data.big,Ob
   .nAllFiles <- length(.Allfiles)
   #data.frame to store plot
   .Z <- data.frame(Sample = numeric(), length = numeric(), values= numeric(), type = character(), stringsAsFactors = FALSE)
+  
+  Object.job.path <- setInputdata(Object.job.path,FILETYPE.RDS,vector())
+
+  
+  
   for (i in 1:.nAllFiles)
   {
     

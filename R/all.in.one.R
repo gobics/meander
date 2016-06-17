@@ -156,6 +156,10 @@ save.object.dummy <- function()
   save.object.all(NEW)
 }
 
+save.csv.dummy <- function()
+{
+  export.csv()
+}
 
 process.taxonomy.dummy <- function()
 {
@@ -204,15 +208,11 @@ input.fastanorrna.dummy <- function()
 
 input.uproc.dummy <- function()
 {
-    if (length(slot(NEW$Object.job.path,FILETYPE.UproC)) == 0)
-    {
     Ret <- select.multiple.files('UProC')
       if (length(Ret) > 0 & Ret[1] != -1)
       {
       slot(NEW$Object.job.path,FILETYPE.UproC) <- Ret  
       }
-    
-    }
 
   .ret <- start.UProC(NEW$Object.job.path,NEW$Object.job.statistics,NEW$Object.data.big,NEW$Object.data.dataframes)
   NEW$Object.job.path = .ret[[1]];    NEW$Object.job.statistics = .ret[[2]];    NEW$Object.data.big = .ret[[3]];    NEW$Object.data.dataframes = .ret[[4]]
@@ -2054,7 +2054,7 @@ setMethod ("set.interaction.on", "class.button.process.taxonomy",
 
 setMethod ("set.interaction.on", "class.button.analyse.methods",
            function(Part.Object, Object,x,y){
-	    slot(slot(Object,x),'interaction.on') <- ALL.BUTTON.NAMES[c(10:14,17)]
+	    slot(slot(Object,x),'interaction.on') <- ALL.BUTTON.NAMES[c(10:14,16,17)]
 	    slot(slot(Object,x),'interaction.off') <- ALL.BUTTON.NAMES[c(15)]
 	   return(Object)
            })
@@ -2319,7 +2319,7 @@ name = ttkentry(frame.input)
 general.label = tklabel(frame.first, text = "General Settings" ,background ='#9080F0' ,foreground = '#0ffff0')
 tkgrid(general.label, row = 0, column = 0, columnspan = 2, sticky = 'nsew')
 
-slot(slot(Container.Object.Button,'button.process.output'),'tcldata') = ttkbutton(frame.first, text = '1Output Folder', command = button.dummy.process.output)
+slot(slot(Container.Object.Button,'button.process.output'),'tcldata') = ttkbutton(frame.first, text = 'Output Folder', command = button.dummy.process.output)
 tkgrid(slot(slot(Container.Object.Button,'button.process.output'),'tcldata'), row = 1, column = 0, columnspan = 1, sticky = 'nsew')
 
 slot(slot(Container.Object.Button,'button.set.general'),'tcldata') = ttkbutton(frame.first, text = 'Settings', command = general.settings.dummy)
@@ -2334,10 +2334,10 @@ input.label = tklabel(frame.input, text = "Input" ,background ='#9080F0' ,foregr
 input.sep.horizontal = ttkseparator(frame.input, orient= 'horizontal')
 input.sep.horizontal2 = ttkseparator(frame.input, orient= 'horizontal')
 # Buttons
-slot(slot(Container.Object.Button,'button.input.fasta'),'tcldata') = ttkbutton(frame.input, text = '2FASTA', command = button.dummy.input.fasta)
-slot(slot(Container.Object.Button,'button.input.fastanorrna'),'tcldata') = ttkbutton(frame.input, text = '3FASTA w/o rRNA', command = button.dummy.input.fastanorrna)
-slot(slot(Container.Object.Button,'button.input.uproc'),'tcldata') = ttkbutton(frame.input, text = '4UPROC', command = button.dummy.input.uproc)
-slot(slot(Container.Object.Button,'button.input.object'),'tcldata') = ttkbutton(frame.input, text = '5Object', command = button.dummy.input.object)
+slot(slot(Container.Object.Button,'button.input.fasta'),'tcldata') = ttkbutton(frame.input, text = 'FASTA', command = button.dummy.input.fasta)
+slot(slot(Container.Object.Button,'button.input.fastanorrna'),'tcldata') = ttkbutton(frame.input, text = 'FASTA w/o rRNA', command = button.dummy.input.fastanorrna)
+slot(slot(Container.Object.Button,'button.input.uproc'),'tcldata') = ttkbutton(frame.input, text = 'UPROC', command = button.dummy.input.uproc)
+slot(slot(Container.Object.Button,'button.input.object'),'tcldata') = ttkbutton(frame.input, text = 'Object', command = button.dummy.input.object)
 
 
 # layout
@@ -2361,10 +2361,10 @@ process.sep.horizontal = ttkseparator(frame.process, orient= 'horizontal')
 # Buttons
 
 
-slot(slot(Container.Object.Button,'button.process.category'),'tcldata') = ttkbutton(frame.process, text = '6Categories', command = button.dummy.process.category)
-slot(slot(Container.Object.Button,'button.process.conditions'),'tcldata') = ttkbutton(frame.process, text = '7Conditions', command = button.dummy.process.conditions)
-slot(slot(Container.Object.Button,'button.process.score'),'tcldata') = ttkbutton(frame.process, text = '8Score', command = button.dummy.process.score)
-slot(slot(Container.Object.Button,'button.process.taxonomy'),'tcldata') = ttkbutton(frame.process, text = '9Taxonomy', command = button.dummy.process.taxonomy)
+slot(slot(Container.Object.Button,'button.process.category'),'tcldata') = ttkbutton(frame.process, text = 'Categories', command = button.dummy.process.category)
+slot(slot(Container.Object.Button,'button.process.conditions'),'tcldata') = ttkbutton(frame.process, text = 'Conditions', command = button.dummy.process.conditions)
+slot(slot(Container.Object.Button,'button.process.score'),'tcldata') = ttkbutton(frame.process, text = 'Score', command = button.dummy.process.score)
+slot(slot(Container.Object.Button,'button.process.taxonomy'),'tcldata') = ttkbutton(frame.process, text = 'Taxonomy', command = button.dummy.process.taxonomy)
 
 # layout
 
@@ -2391,11 +2391,11 @@ analyse.sep.horizontal = ttkseparator(frame.analyse, orient= 'horizontal')
 
 
 
-slot(slot(Container.Object.Button,'button.analyse.methods'),'tcldata') = ttkbutton(frame.analyse, text = '10run Methods', command = button.dummy.analyse.methods)
-slot(slot(Container.Object.Button,'button.analyse.pca'),'tcldata') = ttkbutton(frame.analyse, text = '11PCA', command = button.dummy.analyse.pca)
-slot(slot(Container.Object.Button,'button.analyse.br'),'tcldata') = ttkbutton(frame.analyse, text = '12br functions', command = button.dummy.analyse.br)
-slot(slot(Container.Object.Button,'button.analyse.venn'),'tcldata') = ttkbutton(frame.analyse, text = '13Venn', command = button.dummy.analyse.venn)
-slot(slot(Container.Object.Button,'button.analyse.pathway'),'tcldata') = ttkbutton(frame.analyse, text = '14Pathway analysis', command = button.dummy.analyse.pathway)
+slot(slot(Container.Object.Button,'button.analyse.methods'),'tcldata') = ttkbutton(frame.analyse, text = 'run Methods', command = button.dummy.analyse.methods)
+slot(slot(Container.Object.Button,'button.analyse.pca'),'tcldata') = ttkbutton(frame.analyse, text = 'PCA', command = button.dummy.analyse.pca)
+slot(slot(Container.Object.Button,'button.analyse.br'),'tcldata') = ttkbutton(frame.analyse, text = 'br functions', command = button.dummy.analyse.br)
+slot(slot(Container.Object.Button,'button.analyse.venn'),'tcldata') = ttkbutton(frame.analyse, text = 'Venn', command = button.dummy.analyse.venn)
+slot(slot(Container.Object.Button,'button.analyse.pathway'),'tcldata') = ttkbutton(frame.analyse, text = 'Pathway analysis', command = button.dummy.analyse.pathway)
 
 
 # layput
@@ -2424,9 +2424,9 @@ output.label = tklabel(frame.output, text = "Output" ,background ='#000000' ,for
 output.sep.horizontal = ttkseparator(frame.output, orient= 'horizontal')
 # buttons
 
-slot(slot(Container.Object.Button,'button.output.svghtml'),'tcldata') = ttkbutton(frame.output, text = '15SVG/HTML', command = button.dummy.output.svghtml)
-slot(slot(Container.Object.Button,'button.output.csv'),'tcldata') = ttkbutton(frame.output, text = '16CSV', command = export.csv)
-slot(slot(Container.Object.Button,'button.output.figures'),'tcldata') = ttkbutton(frame.output, text = '17figures', command = save.figures)
+slot(slot(Container.Object.Button,'button.output.svghtml'),'tcldata') = ttkbutton(frame.output, text = 'SVG/HTML', command = button.dummy.output.svghtml)
+slot(slot(Container.Object.Button,'button.output.csv'),'tcldata') = ttkbutton(frame.output, text = 'CSV', command = export.csv)
+slot(slot(Container.Object.Button,'button.output.figures'),'tcldata') = ttkbutton(frame.output, text = 'figures', command = save.figures)
 
 
 # layput
@@ -2444,8 +2444,8 @@ tkgrid(slot(slot(Container.Object.Button,'button.output.figures'),'tcldata'), ro
 # sep
 
 # buttons
-slot(slot(Container.Object.Button,'button.main.saveobject'),'tcldata') = ttkbutton(frame.save, text = '19save Object', command = save.object.dummy)
-slot(slot(Container.Object.Button,'button.main.reset'),'tcldata') = ttkbutton(frame.save, text = '18Reset', command = reset.function)
+slot(slot(Container.Object.Button,'button.main.saveobject'),'tcldata') = ttkbutton(frame.save, text = 'save Object', command = save.object.dummy)
+slot(slot(Container.Object.Button,'button.main.reset'),'tcldata') = ttkbutton(frame.save, text = 'Reset', command = reset.function)
 slot(slot(Container.Object.Button,'button.main.ok'),'tcldata') = ttkbutton(frame.save, text = 'HELP', command = help.function)
 slot(slot(Container.Object.Button,'button.main.quit'),'tcldata') = ttkbutton(frame.save, text = '21cancel', command = cancel.function)
 

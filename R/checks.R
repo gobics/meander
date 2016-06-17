@@ -197,7 +197,7 @@ uproc.working.check <- function()
               "7,X7,237,78,1,1,78,K00099,11.023,980,4",     "8,y1,199,66,1,1,66,K00991,7.072,2197,0",    
               "9,y2,199,65,3,3,65,K00991,9.355,980,2",      "10,y3,199,66,2,2,66,K00991,9.142,509,2",    
               "11,y4,312,103,1,1,103,K00991,15.376,2197,2")
-  .command <- paste0(._CONFIG$UPROC_DIR,' -p -O 0 ',._CONFIG$UPROC_DB,' ',._CONFIG$MODEL_DIR,' ',file.path(DATA_PATH,'reduced_100.fa'))
+  .command <- paste0(._CONFIG$UPROC_DIR,' -p -s ',._CONFIG$UPROC_DB,' ',._CONFIG$MODEL_DIR,' ',file.path(DATA_PATH,'reduced_100.fa'))
   print(.command)
   
   .Q <- system(.command,intern=TRUE)

@@ -2,6 +2,8 @@ export.csv <- function()
 {
 basePath = file.path(slot(NEW$Object.job.path,'DirOut'),'HTML',slot(NEW$Object.job.config,'SelectedTax'))
 
+file.create(basePath)
+
 ret.list <- save.object.datatable()
 
 file.names <- c('UProC_scores.csv','pca.csv','venn.csv','UProC_hits.csv')
@@ -78,6 +80,8 @@ save.object.datatable <- function()
 save.figures <- function()
 {
   basePath = file.path(slot(NEW$Object.job.path,'DirOut'),'HTML',slot(NEW$Object.job.config,'SelectedTax'))
+  
+  file.create(basePath)
   
   #PCA
   postscript(file.path(basePath,'PCA.eps'))
