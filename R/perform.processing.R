@@ -498,10 +498,8 @@ perform.pathwaydetection <- function(O.Job.Config,O.Data.Kegg,O.Data.Refined)
   #.PathMode = 'all'
   
   .PathKOMode = 'inTax'
-  #.PathKOMode = 'all'
-  ##Settings
-  #.Threshold <- NAME.getData(Object = Object, LEVEL1 = 'Parameter',LEVEL2 = 'R', LEVEL3 = 'SelectedThreshold')
-  .Threshold = 0.05
+
+  .Threshold = slot(NEW$Object.job.config,'pValThresh')
   
   nKO = dim(KEGG2Path)[1]
   nPath <- dim(KEGG2Path)[2]
@@ -726,7 +724,7 @@ return(.p.Val)
 }
 
 
-calculate.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.pVal, threshold = 0.05)
+calculate.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.pVal, threshold = slot(NEW$Object.job.config,'pValThresh'))
 {
   TF.Mat <- Mat.pVal < threshold
   
@@ -786,7 +784,7 @@ calculate.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'),
 }
 
 
-plot.generate.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.pVal = Mat.pVal,threshold = 0.05)
+plot.generate.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.pVal = Mat.pVal,threshold = slot(NEW$Object.job.config,'pValThresh'))
 {
   
   ret <- calculate.vennreplacement(Method.Vec = Method.Vec, Mat.pVal = Mat.pVal, threshold = threshold)

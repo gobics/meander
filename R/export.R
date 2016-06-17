@@ -1,26 +1,27 @@
 export.csv <- function()
 {
-basePath = file.path(slot(NEW$Object.job.path,'DirOut'),'HTML',slot(NEW$Object.job,'SelectedTax'))
+basePath = file.path(slot(NEW$Object.job.path,'DirOut'),'HTML',slot(NEW$Object.job.config,'SelectedTax'))
 
 ret.list <- save.object.datatable()
 
-file.names <- c('UProC_scores.csv','UProC_hits.csv')
+file.names <- c('UProC_scores.csv','pca.csv','venn.csv','UProC_hits.csv')
 
   for (i in 1:length(ret.list))
   {
     if (length(ret.list[[i]]) > 0)
     {
-      write.csv(x = ret.list[[i]], file = file.path(basePath,file.names[i]), row.names = FALSE)
+      write.csv(x = ret.list[[i]], file = file.path(basePath,file.names[i]))
     }    
   }
+write.csv(x = slot(NEW$Object.data.refined,'Matrix'), file = file.path(basePath,'counts.csv'))
 }
 
 #save.object.datatable(NEW$Object.data.dataframes,'Scores.Samples')
 
-save.object.datatable <- function(Object,slot.name)
+save.object.datatable <- function()
 {
+  List <- list()
   #collect data and store into data.tables
-  for (i in 1:length())
     #uproc-score
     curr <- data.frame()
     curr.modi <- slot(NEW$Object.data.dataframes,'Scores.Samples')
@@ -31,19 +32,46 @@ save.object.datatable <- function(Object,slot.name)
         colnames(curr.modi) <- c('Sample','Score','fraction of reads')
         curr <- curr.modi
       }
-
+    
+    List[[1]] = curr
    #PCA, Venn, BR
-    
-    
+    #PCA
+    df <- plot.pca(NEW$Object.job.config, NEW$Object.job.statistics,NEW$Object.data.big, minCount = 5)
+    names(df) <- c('PC1','PC2','condition','sample')
+    List[[2]] = df
     
     
     ##Venn
-    #plot.generate.vennreplacement
-    
+    ret <- calculate.vennreplacement(Mat.pVal = NEW$Object.data.refined@ConsensusMat)
+    List[[3]] <- ret[[4]]
     #read statistics
+
+      if (length(slot(NEW$Object.job.statistics,'RNA')) > 0 )
+      {
+        RNA = slot(NEW$Object.job.statistics,'RNA')
+      }
+      
+      else
+      {
+        RNA = rep(0,length(slot(NEW$Object.job.statistics,'reads')))
+      }
+
     
+    curr <- data.frame(
+      reads           = slot(NEW$Object.job.statistics,'reads'),
+      RNA             = RNA,
+      UProCHits       = slot(NEW$Object.job.statistics,'UProCHits'),
+      filtered.multi  = slot(NEW$Object.job.statistics,'filtered.multi'),
+      filtered.rna    = slot(NEW$Object.job.statistics,'filtered.rna'),
+      filtered.tax    = slot(NEW$Object.job.statistics,'filtered.tax'),
+      filtered.ko     = slot(NEW$Object.job.statistics,'filtered.ko'),
+      filtered.combo  = slot(NEW$Object.job.statistics,'filtered.combo'),
+      filtered.score  = slot(NEW$Object.job.statistics,'filtered.score')
+    )
     
-    return(curr)
+    List[[4]] <- curr
+    
+    return(List)
 }
 
 
@@ -68,6 +96,6 @@ save.figures <- function()
   
   #Venn
   postscript(file.path(basePath,'venn.eps'))
-  xxx <- plot.generate.vennreplacement(Method.Vec = slot(NEW$Object.job.config,'Methods'), Mat.pVal = NEW$Object.data.refined@ConsensusMat, threshold = 0.05)
+  xxx <- plot.generate.vennreplacement(Method.Vec = slot(NEW$Object.job.config,'Methods'), Mat.pVal = NEW$Object.data.refined@ConsensusMat, threshold = slot(NEW$Object.job.config,'pValThresh'))
   dev.off()
 }

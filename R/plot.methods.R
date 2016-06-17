@@ -189,7 +189,7 @@ plot.pca <- function(Object.Job.Config, Object.Job.Statistics,Object.Data.Big,mi
 }
 
 
-plot.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.pVal = Mat.pVal,threshold = 0.05)
+plot.vennreplacement <- function(Method.Vec = c('SAMseq','DESeq2','edgeR'), Mat.pVal = Mat.pVal,threshold = slot(NEW$Object.job.config,'pValThresh'))
 {
 
 ret <- calculate.vennreplacement(Method.Vec = Method.Vec, Mat.pVal = Mat.pVal, threshold = threshold)

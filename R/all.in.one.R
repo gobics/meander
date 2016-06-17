@@ -1,6 +1,10 @@
 #ADDITIONS
 
-
+help.function <- function()
+{
+  .path = file.path(DATA_PATH, 'MeandeR_help.html')
+  browseURL(.path, browser = getOption("browser"),encodeIfNeeded = FALSE)
+}
 
 
 rlsq_get.Scores <- function(Ret,rRNA.List)
@@ -140,6 +144,13 @@ return(A)
 
 #Button function\
 
+general.settings.dummy <- function()
+{
+  child.window <- tktoplevel(NEW$ttMain);
+  general.settings(child.window)
+}
+
+
 save.object.dummy <- function()
 {
   save.object.all(NEW)
@@ -238,7 +249,7 @@ analyse.methods.dummy <- function()
 
 analyse.venn.dummy <- function()
 {
-xxx <- plot.generate.vennreplacement(Method.Vec = slot(NEW$Object.job.config,'Methods'), Mat.pVal = NEW$Object.data.refined@ConsensusMat, threshold = 0.05)
+xxx <- plot.generate.vennreplacement(Method.Vec = slot(NEW$Object.job.config,'Methods'), Mat.pVal = NEW$Object.data.refined@ConsensusMat, threshold = slot(NEW$Object.job.config,'pValThresh'))
 return(NULL)
 }
 
@@ -1070,7 +1081,7 @@ getfiles.for.selection <- function(Object.Part)
 
 ALL.BUTTON.NAMES <- c(
     'button.process.output',
-
+    
     'button.input.fasta',
     'button.input.fastanorrna',
     'button.input.uproc',
@@ -1186,6 +1197,11 @@ class.button.input.object <- setClass(
 )
 
 #PROCESS
+class.button.set.general <- setClass(
+  "class.button.set.general",
+  contains = 'button.container'
+)
+
 class.button.process.output <- setClass(
   "class.button.process.output",
   contains = 'button.container'
@@ -1273,6 +1289,7 @@ Class.Object.Buttons <- setClass(
     button.input.uproc = "class.button.input.uproc",
     button.input.object = "class.button.input.object",
 
+    button.set.general = "class.button.set.general",
     button.process.output = "class.button.process.output",
     button.process.category = "class.button.process.category",
     button.process.conditions = "class.button.process.conditions",
@@ -1386,7 +1403,7 @@ initialize.Button.Object <- function()
 
     }
   
-    else if (curr.Name %in% c('button.process.output', 'class.button.main.ok','class.button.main.reset','class.button.main.quit'))
+    else if (curr.Name %in% c('button.process.output', 'button.main.ok','button.main.reset','class.button.main.quit','button.set.general'))
     {
       slot(slot(Object,curr.Name),'state') <- TRUE
     }
@@ -1497,6 +1514,20 @@ setMethod ("button.execute", "class.button.input.object",
 	   return('OK')
            })
 
+
+
+class.button.set.general
+
+setMethod ("button.execute", "class.button.set.general",
+           function(Object, Environment, x, y){
+             print('button.output.svghtml!')
+             #Environment$Container.Object.Button
+             #tclvalue(Environment$tcltk.variable) = 'QQ';
+             
+             child.window <- tktoplevel(x);
+             general.settings(child.window)
+             return(y)
+           })
 
 setMethod ("button.execute", "class.button.process.output",
            function(Object, Environment, x, y){
@@ -1778,6 +1809,18 @@ setMethod ("button.set.states", "class.button.input.object",
 	   return(Object)
            })
 
+
+setMethod ("button.set.states", "class.button.set.general",
+           function(Part.Object, Object,x,y){
+             print('set buttons for fasta!')
+             #Environment$Container.Object.Button
+             #tclvalue(Environment$tcltk.variable) = 'QQ';
+             
+             Object <- swtich.function(Object,Part.Object)
+             print('done...')
+             return(Object)
+           })
+
 setMethod ("button.set.states", "class.button.process.output",
            function(Part.Object, Object,x,y){
 	   print('set buttons for fasta!')
@@ -1972,6 +2015,12 @@ setMethod ("set.interaction.on", "class.button.process.output",
 	    
 	    
 	   return(Object)
+           })
+
+
+setMethod ("set.interaction.on", "class.button.set.general",
+           function(Part.Object, Object,x,y){
+             return(Object)
            })
 
 setMethod ("set.interaction.on", "class.button.process.category",
@@ -2268,10 +2317,13 @@ name = ttkentry(frame.input)
 
 
 general.label = tklabel(frame.first, text = "General Settings" ,background ='#9080F0' ,foreground = '#0ffff0')
-slot(slot(Container.Object.Button,'button.process.output'),'tcldata') = ttkbutton(frame.first, text = '1Output Folder', command = button.dummy.process.output)
 tkgrid(general.label, row = 0, column = 0, columnspan = 2, sticky = 'nsew')
+
+slot(slot(Container.Object.Button,'button.process.output'),'tcldata') = ttkbutton(frame.first, text = '1Output Folder', command = button.dummy.process.output)
 tkgrid(slot(slot(Container.Object.Button,'button.process.output'),'tcldata'), row = 1, column = 0, columnspan = 1, sticky = 'nsew')
 
+slot(slot(Container.Object.Button,'button.set.general'),'tcldata') = ttkbutton(frame.first, text = 'Settings', command = general.settings.dummy)
+tkgrid(slot(slot(Container.Object.Button,'button.set.general'),'tcldata'), row = 1, column = 1, columnspan = 1, sticky = 'nsew')
 
 
 # Input #####################################
@@ -2394,7 +2446,7 @@ tkgrid(slot(slot(Container.Object.Button,'button.output.figures'),'tcldata'), ro
 # buttons
 slot(slot(Container.Object.Button,'button.main.saveobject'),'tcldata') = ttkbutton(frame.save, text = '19save Object', command = save.object.dummy)
 slot(slot(Container.Object.Button,'button.main.reset'),'tcldata') = ttkbutton(frame.save, text = '18Reset', command = reset.function)
-slot(slot(Container.Object.Button,'button.main.ok'),'tcldata') = ttkbutton(frame.save, text = '20OK', command = ok.function)
+slot(slot(Container.Object.Button,'button.main.ok'),'tcldata') = ttkbutton(frame.save, text = 'HELP', command = help.function)
 slot(slot(Container.Object.Button,'button.main.quit'),'tcldata') = ttkbutton(frame.save, text = '21cancel', command = cancel.function)
 
 # layput
@@ -2492,38 +2544,6 @@ tclvar.main.okcancel <- tclVar('empty')
   ##load fixed data
   
   load.kegg.object.parts()
-  
-#   #tax Mat
-# 
-
-#   #Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS('./data/TaxMat.rds'))
-#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'TaxMat',value = readRDS(file.path(DATA_PATH,'TaxMat.rds')))
-#   #ko2path
-#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KEGG2PATH', value = as.matrix(readRDS(file.path(DATA_PATH,'KEGG2PATH.rds'))))
-#   #kointax
-#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'KOinTax', value = readRDS(file.path(DATA_PATH,'KOlist.rds')))
-#   #...
-#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'ko2br.pathway', value = readRDS(file.path(DATA_PATH,'ko2br_pathway.rds')))
-# 
-#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'keggmapnames', value = readRDS(file.path(DATA_PATH,'keggmapnames.rds')))
-#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'pathway.names', value = readRDS(file.path(DATA_PATH,'pathway.names.Rds')))
-#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'ko_desc', value = readRDS(file.path(DATA_PATH,'ko_desc.rds')))
-#   NEW$Object.data.kegg  <- setInputdata(ObjectPart = Object.data.kegg , Type = 'br2pathway', value = readRDS(file.path(DATA_PATH,'br2pathway.rds')))
-#   
-#   
-#Keggmapnames
-#pathway.names
-#ko_descr
-
-
-
-
-
-  #  .QDT <- perform.quickdatatable(slot(NEW$Object.data.big,'CountDT'))
-
-  #NEW$Object.data.refined <- setInputdata(NEW$Object.data.refined,'QuickDT',.QDT)
-
-
 
   attemptExecution(Object.job.config <- set.methods(Object.job.config))
   print(Object.job.config)
@@ -2548,8 +2568,7 @@ tkgrid.rowconfigure(NEW$ttMain, 0, weight=1)
 
 #set buttons to initial setting
 Container.Object.Button <- check.state(Container.Object.Button,slotNames(Container.Object.Button))
-#tclServiceMode(TRUE)
-#wait for final buttonpress
+
 print('main waiting...')
 
 

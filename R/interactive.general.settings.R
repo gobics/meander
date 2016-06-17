@@ -34,6 +34,12 @@ general.settings <- function(parent.window)
     general.settings.consensus(tt2)
   }
   
+  dummy.licver.function <- function()
+  {
+    edit.ConfigFile.Keys(SHOW_LICENCE_TEXT = tclvalue(license.selection))
+    edit.ConfigFile.Keys(SHOW_VERSION = tclvalue(version.selection))
+  }
+  
   frame.header <- ttkframe(parent.window, padding = c(1,2,4,8), borderwidth = 2, width = 200, height = 100)
   frame.middle <- ttkframe(parent.window, padding = c(1,2,4,8), borderwidth = 10,  width = 200, height = 100)
   frame.bottom <- ttkframe(parent.window, padding = c(1,2,4,8), borderwidth = 2,  width = 200, height = 100)
@@ -61,17 +67,51 @@ general.settings <- function(parent.window)
   #MeandeR
   general.MeandeR = tklabel(frame.middle, text = 'MeandeR' ,background ='#9080F0' ,foreground = '#0ffff0')  
   
-  #button
-  button.meander.setting.consensus = ttkbutton(frame.middle, text = 'persistent', command = dummy.meander.setting.consensus)
-  #label
-  label.meander.consensus = tklabel(frame.middle, text = 'Set Consensus')
+  frame.MeandeR <- ttkframe(frame.middle, padding = c(1,2,4,8), borderwidth = 2,  width = 200, height = 100)
+  general.settings.consensus(frame.MeandeR)
   
-  #organize in grid
+  
+  general.pval = tklabel(frame.middle, text = 'p-value' ,background ='#9080F0' ,foreground = '#0ffff0')
+  frame.pval <- ttkframe(frame.middle, padding = c(1,2,4,8), borderwidth = 2,  width = 200, height = 100)
+  general.settings.pickvalue(frame.pval)
+  
+  general.space = tklabel(frame.middle, text = '')
+
+  general.license = tklabel(frame.middle, text = 'show license', background = COLOR_LABEL_BACKGROUND, foreground = COLOR_LABEL_FOREGROUND)
+  general.version = tklabel(frame.middle, text = 'show version', background = COLOR_LABEL_BACKGROUND, foreground = COLOR_LABEL_FOREGROUND)
+  
+  
+  licver.selection.button <- ttkbutton(frame.middle, text = 'Set', command = dummy.licver.function)
+  
+  license.selection = tclVar(._CONFIG$SHOW_LICENCE_TEXT)
+  version.selection = tclVar(._CONFIG$SHOW_VERSION)
+  
+  license.but = tkradiobutton(frame.middle, value = 0, text = 'no', variable = license.selection)  
+  version.but = tkradiobutton(frame.middle, value = 0, text = 'no', variable = version.selection)  
+  
+  license.but2 = tkradiobutton(frame.middle, value = 1, text = 'yes', variable = license.selection)  
+  version.but2 = tkradiobutton(frame.middle, value = 1, text = 'yes', variable = version.selection) 
+
   tkgrid(general.MeandeR, row = 10, column = 0, columnspan = 2, sticky = 'nsew')
-  tkgrid(label.meander.consensus, row = 11, column = 0, columnspan = 1, sticky = 'nsew')
-  tkgrid(button.meander.setting.consensus, row = 11, column = 1, columnspan = 1, sticky = 'nsew')
+  tkgrid(frame.MeandeR, row = 11, column = 0, columnspan = 2, sticky = 'nsew')
+  tkgrid(general.pval, row = 12, column = 0, columnspan = 2, sticky = 'nsew')
+  tkgrid(frame.pval, row = 13, column = 0, columnspan = 2, sticky = 'nsew')
+  
+  tkgrid(general.space, row = 14, column = 0, columnspan = 1, sticky = 'nsew')
+  tkgrid(general.license, row = 15, column = 0, columnspan = 1, sticky = 'nsew')
+  tkgrid(general.version, row = 16, column = 0, columnspan = 1, sticky = 'nsew')
+  
+  tkgrid(license.but, row = 15, column = 1, columnspan = 1, sticky = 'nsew')
+  tkgrid(license.but2, row = 15, column = 2, columnspan = 1, sticky = 'nsew')
+  
+  tkgrid(version.but, row = 16, column = 1, columnspan = 1, sticky = 'nsew')
+  tkgrid(version.but2, row = 16, column = 2, columnspan = 1, sticky = 'nsew')
+
+  tkgrid(licver.selection.button, row = 17, column = 1, columnspan = 2, sticky = 'nsew')
   
   
+  
+    
   tkgrid(frame.header, row = 0, column = 0, columnspan = 1, sticky = 'nsew')
   tkgrid(frame.middle, row = 1, column = 0, columnspan = 1, sticky = 'nsew')
   tkgrid(frame.bottom, row = 2, column = 0, columnspan = 1, sticky = 'nsew')
@@ -94,7 +134,7 @@ general.settings <- function(parent.window)
   tkgrid.rowconfigure( frame.middle, 0, weight = 1)
   tkgrid.rowconfigure( frame.middle, 1, weight = 1)
   tkgrid.rowconfigure( frame.middle, 10, weight = 1)
-  
+  tkgrid.rowconfigure( frame.middle, 13, weight = 1)
   #config bottom
   tkgrid.columnconfigure( frame.bottom, 0, weight = 1 )
   tkgrid.rowconfigure( frame.bottom, 0, weight = 1)
@@ -113,23 +153,14 @@ general.settings <- function(parent.window)
   general.setting.uproc(frame.uproc)
 }
 
-
 general.settings.consensus <- function(parent.window)
 {
   #set title of window
-  tkwm.title(parent.window, 'Consensus Settings')
+  #tkwm.title(parent.window, 'Consensus Settings')
   
   but.function.ok <- function()
   {
     edit.ConfigFile.Keys(CONSENSUS = tclvalue(selection))
-    ret.Val = tclVar('TRUE')
-    tkdestroy(parent.window)
-  }
-  
-  but.function.cancel <- function()
-  {
-    ret.Val = tclVar('FALSE')
-    tkdestroy(parent.window)
   }
   
   selection <- tclVar(._CONFIG$CONSENSUS)
@@ -168,11 +199,9 @@ general.settings.consensus <- function(parent.window)
   tkgrid(method.selection.button.all, row = 3, column = 1, columnspan = 3)
   
   # buttons
-  button.ok = ttkbutton(frame.bottom, text = 'OK', command = but.function.ok)
-  button.cancel = ttkbutton(frame.bottom, text = 'cancel', command = but.function.cancel)
+  button.ok = ttkbutton(frame.bottom, text = 'Set Value', command = but.function.ok)
   
-  tkgrid(button.ok, row = 0, column = 0, columnspan = 1)
-  tkgrid(button.cancel, row = 0, column = 1, columnspan = 1)
+  tkgrid(button.ok, row = 0, column = 0, columnspan = 4, sticky = 'nsew')
   
   tkgrid(frame.header, row = 0, column = 0, columnspan = 1, sticky = 'nsew')
   tkgrid(frame.middle, row = 1, column = 0, columnspan = 1, sticky = 'nsew')
@@ -202,14 +231,13 @@ general.settings.consensus <- function(parent.window)
   tkgrid.columnconfigure( frame.bottom, 0, weight = 1 )
   tkgrid.rowconfigure( frame.bottom, 0, weight = 1)
   
-  tkwait.window(parent.window)
+  #tkwait.variable(ret.Val)
   #tclvalue(selection)
 }
 
-
 general.settings.pickvalue <- function(parent.frame)
 {
-  selection <- tclVar(0.05)
+  selection <- tclVar(slot(NEW$Object.job.config,'pValThresh'))
   charalpha <- tclVar()
   
   valid_input <- function(...) 
@@ -237,34 +265,33 @@ general.settings.pickvalue <- function(parent.frame)
     if (valid_input())
     {
       slot(NEW$Object.job.config,'pValThresh') = as.numeric(tclvalue(charalpha))
-      tkdestroy(tt)
     }
   }
   
-  scale.cancel.function <- function()
-  {
-    tkdestroy(tt)
-  }
   
-  charalpha <- tclVar(as.character(0.05)) 
+  charalpha <- tclVar(as.character(slot(NEW$Object.job.config,'pValThresh'))) 
   
   ed <- tkentry(parent.frame, textvariable=charalpha) 
   
   button.ok = ttkbutton(parent.frame, text = 'ok', command = scale.ok.function)
-  button.cancel = ttkbutton(parent.frame, text = 'cancel', command = scale.cancel.function)
   
-  tkgrid(ed, row = 0, column = 0, columnspan = 2, sticky = 'nsew')
+  tkgrid(ed, row = 0, column = 0, columnspan = 1, sticky = 'nsew')
   tkgrid(button.ok, row = 1, column = 0, columnspan = 1, sticky = 'nsew')
-  tkgrid(button.cancel, row = 1, column = 1, columnspan = 1, sticky = 'nsew')
   
   tkbind(ed, "<Return>", valid_input) 
   #linux for numpad enter... hope this doesn't cause trouble in windows...
   tkbind(ed, "<KP_Enter>", valid_input) 
-  tkwait.window(tt)
+  #tkwait.window(tt)
 }
 
 OK.FUNCTION <- function(envi)
 {
+  if (! uproc.working.check())
+  {
+    edit.ConfigFile.Keys(UPROC_DIR = NULL)
+    edit.ConfigFile.Keys(MODEL_DIR = NULL)
+    edit.ConfigFile.Keys(UPROC_DB = NULL)
+  }
   envi$tcltkval <- tclVar('OK')
 }
 
@@ -315,6 +342,7 @@ general.setting.uproc <- function(parent.frame)
         return(tclvalue(ret))
       }
     }
+  tkmessageBox(title = "UProC-TX Settings", message = "correct file >> uproc-dna[.exe] << selected?", icon = "warning", type = "ok")
   return(NULL)
   }
   
@@ -327,10 +355,28 @@ general.setting.uproc <- function(parent.frame)
     }
   return(tclvalue(ret))    
   }
+  
+  function.uprocworks <- function()
+  {
+    if (! uproc.working.check())
+    {
+      edit.ConfigFile.Keys(UPROC_DIR = NULL)
+      edit.ConfigFile.Keys(MODEL_DIR = NULL)
+      edit.ConfigFile.Keys(UPROC_DB = NULL)
+      tkmessageBox(title = "UProC-TX Settings", message = "UProC-TX is not set up correctly.", icon = "error", type = "ok")
+      
+    }
+    
+    else
+    {
+      tkmessageBox(title = "UProC-TX Settings", message = "UProC-TX seems to be configured correctly.", icon = "info", type = "ok")
+    }
+  }
+
 
   
   
-  button.factory(c('UProC dna','UProC model', 'UProC db'),c('UProC dna','UProC model', 'UProC db'),list(dummy.selectfile,dummy.selectfolder.model,dummy.selectfolder.db),parent.frame)
+  button.factory(c('select executable','select folder', 'select folder', 'run test'),c('UProC-dna[.exe]','UProC-TX model', 'UProC-TX db', 'check UProC-TX configuration'),list(dummy.selectfile,dummy.selectfolder.model,dummy.selectfolder.db,function.uprocworks),parent.frame)
   
   tcltkval = tclVar()
   
