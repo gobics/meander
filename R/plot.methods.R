@@ -485,11 +485,7 @@ ko2br.path.counts <- function(O.job.config,O.data.kegg,O.data.refined)
     {
       Allowed.KO <- 1:dim(slot(O.data.kegg,'KEGG2PATH'))[1]
     }
-  
-  
-  
 
-  print('qq')
   Allowed.KO.Ind <-   c(1:dims[1]) %in% Allowed.KO
 
   #reduce allowed list

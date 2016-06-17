@@ -532,12 +532,12 @@ tkwait.variable(tcltk.variable)
 
   if (tclvalue(tcltk.variable) == 'OK')
   {
-  print("noice!")
+  #print("noice!")
   }
 
   else
   {
-  print("shice!")
+  #print("shice!")
   }
 
 return(tclvalue(tcltk.variable))
@@ -800,7 +800,7 @@ print(nClasses)
       {
       staph <- tcltk.input.box(boxname = 'bin', labelname = 'Condition name: ', toplabel = paste0('Please enter name to add category number ',iter, ' and press "Submit" and "Done" with an empty entry to finish input.' ), entryval = Vector[iter])
       Vector[iter] <- paste0(sample(letters, 10, replace = TRUE), collapse='')
-      print(staph)
+
       }
 
 
@@ -815,7 +815,7 @@ print(nClasses)
 	if (staph %in% Vector)
 	{
 	#name already exists...
-	print(Vector)
+
 	staph = NULL
 	}
 
@@ -972,7 +972,7 @@ keep.running = TRUE
     if (length(fullFiles) < 2)
     {
     ret = spawn.retrycancel.messagebox('WARNING: less than two files selected.', the.details = 'use "shift" or "control" to select multiple files')
-    print(ret)
+
       if (ret == "cancel")
       {
       return(-1)
@@ -1003,13 +1003,13 @@ tcl.Var.Vec <- buttonbuilder.bytemplate(nButtons,template)
 
   sub.ok.function <- function()
   {
-  print('mhhhh...');
+  #print('mhhhh...');
   tclvalue(tcl.Var.Vec[[nButtons+1]]) = 'OK'
   }
 
   sub.cancel.function <- function()
   {
-  print('...mhhhh');
+  #print('...mhhhh');
   tclvalue(tcl.Var.Vec[[nButtons+1]]) = 'CANCEL'
   }
 
@@ -1147,7 +1147,7 @@ Sys.sleep(5)
 
 emptyfunction <- function()
 {
-print('i am empty inside!');
+#print('i am empty inside!');
 return(1+1)
 }
 
@@ -1370,7 +1370,7 @@ BUTTONS.ON.OFF <- function(Object.Part, Environment, x, y)
 
 	    else
 	    {
-	    print('problem123')
+	    #print('problem123')
 	    #Object.Copy <- button.set.states(Object.Part,Object.Copy,NULL,NULL)
   	  Object.Copy <- check.state(Object.Copy,Button.Names)
   
@@ -1418,7 +1418,7 @@ initialize.Button.Object <- function()
     {
     Object <- set.interaction.on(slot(Object,curr.Name),Object,curr.Name,NULL)
     }
-print(curr.Name)
+
   }
 return(Object)
 }
@@ -1441,7 +1441,7 @@ setGeneric("button.execute",
 
 setMethod ("button.execute", "class.button.input.fasta",
            function(Object, Environment, x, y){
-           print('mhhhh?')
+           #print('mhhhh?')
 
            #lock all buttons
 	   child.window <- tktoplevel(x);
@@ -1457,7 +1457,6 @@ setMethod ("button.execute", "class.button.input.fasta",
 
 setMethod ("button.execute", "class.button.input.fastanorrna",
            function(Object, Environment, x, y){
-	   print('fastanorrna!')
 
 	   child.window <- tktoplevel(x);
 	   ret <- Message.waiting(child.window,input.fastanorrna.dummy,"Please press 'run' and wait for process to end.",Environment)
@@ -1465,7 +1464,6 @@ setMethod ("button.execute", "class.button.input.fastanorrna",
 	    {
 	    return('BAD')
 	    }
-	   print('done waiting...')
 	   return('OK')
            })
 
@@ -1473,7 +1471,6 @@ setMethod ("button.execute", "class.button.input.fastanorrna",
 
 setMethod ("button.execute", "class.button.input.uproc",
            function(Object, Environment, x, y){
-	   print('fastanorrna!')
 	   #select uproc files
 
 
@@ -1481,7 +1478,7 @@ setMethod ("button.execute", "class.button.input.uproc",
 
 	   ret <- Message.waiting(child.window,input.uproc.dummy,"Please press 'run' and wait for process to end.",Environment)
 	   
-	   print(ret)
+
 	   
 	    if (ret == 'Cancel')
 	    {
@@ -1494,12 +1491,12 @@ setMethod ("button.execute", "class.button.input.uproc",
 
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
-	   print('done waiting...')
+
 	   return('OK')
            })
 setMethod ("button.execute", "class.button.input.object",
            function(Object, Environment, x, y){
-	   print('fastanorrna!')
+
 
 	   
 	   child.window <- tktoplevel(x);
@@ -1520,7 +1517,7 @@ class.button.set.general
 
 setMethod ("button.execute", "class.button.set.general",
            function(Object, Environment, x, y){
-             print('button.output.svghtml!')
+
              #Environment$Container.Object.Button
              #tclvalue(Environment$tcltk.variable) = 'QQ';
              
@@ -1531,7 +1528,7 @@ setMethod ("button.execute", "class.button.set.general",
 
 setMethod ("button.execute", "class.button.process.output",
            function(Object, Environment, x, y){
-	   print('fastanorrna!')
+
 
 
 	   AAA <- tk_choose.dir()
@@ -1549,7 +1546,7 @@ setMethod ("button.execute", "class.button.process.output",
 
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
-	   print('done waiting...')
+
 	   return('OK')
            })
 
@@ -1557,18 +1554,18 @@ setMethod ("button.execute", "class.button.process.output",
 
 setMethod ("button.execute", "class.button.process.category",
            function(Object, Environment, x, y){
-	   print('fastanorrna!')
+
 
 	   xx <- br.selection(unlist(slot(slot(Environment$Object.data.kegg, 'ko2br.pathway'),'Names')),Environment)
 	   slot(Environment$Object.job.config,'SelectedBR') <- xx
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
-	   print('done waiting...')
+
 	   return('OK')
            })
 setMethod ("button.execute", "class.button.process.conditions",
            function(Object, Environment, x, y){
-	   print('class.button.process.conditions!')
+
 
 	   #HACK##############
 
@@ -1584,20 +1581,19 @@ slot(Environment$Object.job.config,'ClassVec') <- Vector
 #SelectedClasses
 Vector2 <- tcltk.select.category(Class.names.Vec)
 slot(Environment$Object.job.config,'SelectedClasses') <- Vector2
-	   print(Vector)
-	   print(Vector2)
+
 	   ##############HACK#
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 
 
-	   print('done waiting...')
+
 	   return('OK')
            })
 
 setMethod ("button.execute", "class.button.process.score",
            function(Object, Environment, x, y){
-	   print('fastanorrna!')
+
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 
@@ -1610,13 +1606,13 @@ setMethod ("button.execute", "class.button.process.score",
 	    }
 
 
-	   print('done waiting...')
+
 	   return('OK')
            })
 
 setMethod ("button.execute", "class.button.process.taxonomy",
            function(Object, Environment, x, y){
-	   print('class.button.process.taxonomy!')
+
 
 	   child.window <- tktoplevel(x);
 
@@ -1628,13 +1624,13 @@ setMethod ("button.execute", "class.button.process.taxonomy",
 	    }
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
-	   print('done waiting...')
+
 	   return('OK')
            })
 
 setMethod ("button.execute", "class.button.analyse.methods",
            function(Object, Environment, x, y){
-	   print('fastanorrna!')
+
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 
@@ -1646,12 +1642,12 @@ setMethod ("button.execute", "class.button.analyse.methods",
 	    return('BAD')
 	    }
 
-	   print('done waiting...')
+
 	   return('OK')
            })
 setMethod ("button.execute", "class.button.analyse.pca",
            function(Object, Environment, x, y){
-	   print('fastanorrna!')
+
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 
@@ -1666,12 +1662,12 @@ setMethod ("button.execute", "class.button.analyse.pca",
 
 
 
-	   print('done waiting...')
+
 	   return('OK')
            })
 setMethod ("button.execute", "class.button.analyse.br",
            function(Object, Environment, x, y){
-	   print('fastanorrna!')
+
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 	   child.window <- tktoplevel(x);
@@ -1681,13 +1677,13 @@ setMethod ("button.execute", "class.button.analyse.br",
 	    {
 	    return('BAD')
 	    }
-	   print('done waiting...')
+
 	   return('OK')
            })
 
 setMethod ("button.execute", "class.button.analyse.venn",
            function(Object, Environment, x, y){
-	   print('fastanorrna!')
+
 
 	   child.window <- tktoplevel(x);
 	   ret <- Message.waiting(child.window,analyse.venn.dummy,"Please press 'run' and wait for process to end.",Environment)
@@ -1699,13 +1695,12 @@ setMethod ("button.execute", "class.button.analyse.venn",
 
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
-	   print('done waiting...')
 	   return('OK')
            })
 
 setMethod ("button.execute", "class.button.analyse.pathway",
            function(Object, Environment, x, y){
-	   print('fastanorrna!')
+	   
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 
@@ -1717,14 +1712,14 @@ setMethod ("button.execute", "class.button.analyse.pathway",
 	    }
 
 
-	   print('done waiting...')
+	   
 	   return('OK')
            })
 
 
 setMethod ("button.execute", "class.button.output.svghtml",
            function(Object, Environment, x, y){
-	   print('button.output.svghtml!')
+
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 
@@ -1735,27 +1730,27 @@ setMethod ("button.execute", "class.button.output.svghtml",
 	    return('BAD')
 	    }
 
-	   print('done waiting...')
+	   
 	   return(y)
            })
 
 
 setMethod ("button.execute", "class.button.output.csv",
            function(Object, Environment, x, y){
-	   print('button.output.csv!')
+
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
      save.figures()
-	   print('done waiting...')
+	   
 	   return(y)
            })
 
 setMethod ("button.execute", "class.button.output.figures",
            function(Object, Environment, x, y){
-	   print('button.output.figures!')
+
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
-	   print('done waiting...')
+	   
 	   return(y)
            })
 
@@ -1768,21 +1763,21 @@ setGeneric("button.set.states",
 
 setMethod ("button.set.states", "class.button.input.fasta",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 
 	   Object <- swtich.function(Object,Part.Object)
 
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.input.fastanorrna",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
@@ -1791,60 +1786,60 @@ setMethod ("button.set.states", "class.button.input.fastanorrna",
 
 setMethod ("button.set.states", "class.button.input.uproc",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.input.object",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	   Object <- set.objectinput.object(Object)
 	   Object <- set.objectinput.conditions(Object)
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 
 setMethod ("button.set.states", "class.button.set.general",
            function(Part.Object, Object,x,y){
-             print('set buttons for fasta!')
+             
              #Environment$Container.Object.Button
              #tclvalue(Environment$tcltk.variable) = 'QQ';
              
              Object <- swtich.function(Object,Part.Object)
-             print('done...')
+             
              return(Object)
            })
 
 setMethod ("button.set.states", "class.button.process.output",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.process.category",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.process.conditions",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 	    if (slot(slot(Object,'button.input.object'),'state'))
@@ -1854,104 +1849,104 @@ setMethod ("button.set.states", "class.button.process.conditions",
 
 
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.process.score",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.process.taxonomy",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	   #tclvalue(Environment$tcltk.variable) = 'QQ';
 
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 
 setMethod ("button.set.states", "class.button.analyse.methods",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button\
 
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.analyse.pca",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.analyse.br",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.analyse.venn",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.analyse.pathway",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 
 setMethod ("button.set.states", "class.button.output.svghtml",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.output.csv",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
 setMethod ("button.set.states", "class.button.output.figures",
            function(Part.Object, Object,x,y){
-	   print('set buttons for fasta!')
+	   
 	   #Environment$Container.Object.Button
 	    Object <- swtich.function(Object,Part.Object)
-	   print('done...')
+	   
 	   return(Object)
            })
 
@@ -1963,7 +1958,7 @@ setGeneric("set.interaction.on",
            function(Part.Object, Object,x,y)
              
            {
-           print(Part.Object)
+
            ERROR$new('NO SUCH METHOD in set.interaction.on')$throw()}
 )
 
@@ -2158,7 +2153,7 @@ do.retry = TRUE
   while(do.retry)
   {
   fullFile = as.character(tkgetOpenFile(filetypes = "{{Meander object files} {.MeandeR}} {{All files} *}", multiple = TRUE))
-  print(length(fullFile))
+
   nRetry = nRetry + 1
   spawn.retrycancel.messagebox
   }
@@ -2499,7 +2494,7 @@ tkgrid.rowconfigure( frame.output, 0, weight = 1)
 tkgrid.columnconfigure( frame.save, 0, weight = 1 )
 tkgrid.rowconfigure( frame.save, 0, weight = 1)
 
-print('do not pack');
+
 #tkpack(frame.first,frame.input,frame.process,frame.analyse,frame.output,frame.save, expand = 1, fill = 'both')
 return(Container.Object.Button)
 }
@@ -2546,7 +2541,7 @@ tclvar.main.okcancel <- tclVar('empty')
   load.kegg.object.parts()
 
   attemptExecution(Object.job.config <- set.methods(Object.job.config))
-  print(Object.job.config)
+
   #png
     ##
 
@@ -2569,7 +2564,7 @@ tkgrid.rowconfigure(NEW$ttMain, 0, weight=1)
 #set buttons to initial setting
 Container.Object.Button <- check.state(Container.Object.Button,slotNames(Container.Object.Button))
 
-print('main waiting...')
+
 
 
 tkwait.variable(NEW$tclvar.main.okcancel)
