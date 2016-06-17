@@ -21,8 +21,15 @@ NCBI_TAX_URL = 'http://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id='
 
 EXTENSION_SEPERATOR = '.'
 
+HELP.DIR = file.path(system.file(package=getPackageName()))
+
+HELP.FILE.INTERFACE = file.path(HELP.DIR,'MeandeR_help.html')
+
+
+
 DATA_DIR_NAME = 'data'
 DATA_PATH = file.path(system.file(package=getPackageName()), DATA_DIR_NAME)
+
 
 HTML_TEMPLATE_DIR_NAME = 'template'
 HTML_TEMPLATE_PATH = file.path(system.file(package=getPackageName()), HTML_TEMPLATE_DIR_NAME)
