@@ -1231,20 +1231,3 @@ function( id )
         v = ( PCA$sdev ^ 2 / sum( PCA$sdev ^ 2) )[ 1 : 2 ]
     )
 }
-
-#=================================================================================================== 
-# DUMMY FUNCTIONS
-#=================================================================================================== 
-
-call.Wrapper = 
-function()
-{
-    library( data.table )
-    library( tcltk )
-
-    tax.Select(
-        readRDS( '/data/big.rds' ),
-        readRDS( '/data/Refined.rds' ),
-        readRDS( '/data/job.nonfig.rds' )
-    )
-}
