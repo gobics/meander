@@ -2,7 +2,7 @@
 
 help.function <- function()
 {
-  .path = file.path(DATA_PATH, 'MeandeR_help.html')
+  .path = file.path( 'MeandeR_help.html')
   browseURL(.path, browser = getOption("browser"),encodeIfNeeded = FALSE)
 }
 
