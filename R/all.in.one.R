@@ -305,7 +305,7 @@ analyse.pathway.dummy <- function()
   
   find.unselected.functions()
   
-  write.html.files(sebastian.rekt.df.mod,PWTH,keggmapnames.mod,slot(NEW$Object.data.kegg,'pathway.names'),slot(NEW$Object.data.kegg,'ko_desc'),slot(NEW$Object.data.refined,'FlagVec'),perform.pvalcalc(NEW$Object.data.refined),KEGG2PATH.mod,.path)
+  write.html.files(sebastian.rekt.df.mod,PWTH,keggmapnames.mod,slot(NEW$Object.data.kegg,'pathway.names'),slot(NEW$Object.data.kegg,'ko_desc'),slot(NEW$Object.data.refined,'FlagVec'),perform.pvalcalc(NEW$Object.data.refined),KEGG2PATH.mod,.path, slot( NEW$Object.job.config, 'ClassNames' )[slot( NEW$Object.job.config, 'SelectedClasses' )] )
 #create HTML
   return(NULL)
 }

@@ -13,7 +13,7 @@ TABLE_COLUMN_OFFSET = 2
 # double     : orthologs.p_value          [ _pval.rds ]
 # matrix     : orthologs.pathways.map     [ Object@DATA@KEGG@KEGG2PATH ]
 # string     : output.Dir
-write.html.files = function(pathways.table, pathways.table.header, kegg.pathways.IDs, kegg.pathways.names, kegg.orthologs.description, orthologs.flag, orthologs.p_value, orthologs.pathways.map, output.Dir)
+write.html.files = function(pathways.table, pathways.table.header, kegg.pathways.IDs, kegg.pathways.names, kegg.orthologs.description, orthologs.flag, orthologs.p_value, orthologs.pathways.map, output.Dir, conditions)
 {
     # prepare pathways.table
     names(pathways.table) = pathways.table.header$string  
@@ -48,19 +48,19 @@ write.html.files = function(pathways.table, pathways.table.header, kegg.pathways
     dimnames(pathways.orthologs.map) = list(rownames(pathways.table), rownames(orthologs.table))
 
     # call next
-    create.HTML.Output(pathways.table, orthologs.table,  pathways.orthologs.map, output.Dir)
+    create.HTML.Output(pathways.table, orthologs.table,  pathways.orthologs.map, output.Dir, conditions)
 }
 
-create.HTML.Output = function(Pathways.Table, Orthologs.Table, Pathways.Orthologs.Map, output.Dir)
+create.HTML.Output = function(Pathways.Table, Orthologs.Table, Pathways.Orthologs.Map, output.Dir, conditions)
 {
-    prepare.Output.Dir(output.Dir)
+    prepare.Output.Dir(output.Dir, conditions)
 
     create.Output.Pathways(Pathways.Table, Orthologs.Table, Pathways.Orthologs.Map, output.Dir)
 
     create.Output.Orthologs(Pathways.Table, Orthologs.Table, Pathways.Orthologs.Map, output.Dir)
 }
 
-prepare.Output.Dir = function (output.Dir)
+prepare.Output.Dir = function (output.Dir, conditions)
 {
     pathway.Dir = file.path(output.Dir, PATHWAY_TABLE_PATH)
     ortholog.Dir = file.path(output.Dir, ORTHOLOG_TABLE_PATH)
@@ -79,7 +79,7 @@ prepare.Output.Dir = function (output.Dir)
         to = output.Dir
     )
 
-    write.ColorKey.HTML(output.Dir)
+    write.ColorKey.HTML(output.Dir, conditions)
 }
 
 init.Dir = 
@@ -326,7 +326,7 @@ convertTo.HTML_StringArray = function(data)
 }
 
 
-write.ColorKey.HTML = function (output.Dir)
+write.ColorKey.HTML = function (output.Dir, conditions)
 {
     output.File = file.path(output.Dir, HTML_OUTPUT_SUBDIR, 'COLOR_KEY.html')
     table.FormatString = readLines(file.path(HTML_TEMPLATE_PATH, 'key_table.fmt'))
@@ -337,7 +337,7 @@ write.ColorKey.HTML = function (output.Dir)
             ORTHOLOG_COLORS[16], 'Significant upregulated', ORTHOLOG_COLORS[3], 'Hit but should not',
             ORTHOLOG_COLORS[12], 'Significant downregulated', ORTHOLOG_COLORS[2], 'No Hit but should',
             ORTHOLOG_COLORS[8], 'Upregulated', ORTHOLOG_COLORS[1], 'No Hit and should not',
-            ORTHOLOG_COLORS[4], 'Downregulated', '', ''
+            ORTHOLOG_COLORS[4], 'Downregulated', '', bindStrings( conditions[1], " vs ", conditions[2] )
             ),
         byrow = TRUE,
         ncol = 4    
